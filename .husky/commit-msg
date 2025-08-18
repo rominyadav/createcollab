@@ -1,0 +1,23 @@
+#!/usr/bin/env sh
+# This script enforces Conventional Commits in your Git commit messages.
+# It checks if the commit message starts with a valid type (e.g., feat, fix, docs, chore, style, refactor, test, perf, ci, build, revert).
+# The format should be: type(scope): subject
+# Examples:
+# feat(authentication): add user login functionality
+# fix: correct typo in README
+# docs(api): update endpoint documentation
+
+commit_regex="^(feat|fix|docs|chore|style|refactor|test|perf|ci|build|revert)(\\([a-zA-Z0-9_-]+\\))?: .+"
+error_msg="""
+Bad commit message! 🚫 Please follow the Conventional Commits specification.
+See https://www.conventionalcommits.org/en/v1.0.0/ for details.
+"""
+
+# Read the commit message from the file provided as the first argument ($1)
+commit_message=$(cat "$1")
+
+# Check if the commit message matches the regex
+if ! echo "$commit_message" | grep -Eq "$commit_regex"; then
+  echo "$error_msg" >&2 # Output error message to standard error
+  exit 1 # Exit with a non-zero status to abort the commit
+fi
