@@ -1,0 +1,20 @@
+{
+  "semi": true,
+  "singleQuote": false,
+  "trailingComma": "es5",
+  "importOrder": [
+    "^(react|next?/?([a-zA-Z/]*))$",
+    "<THIRD_PARTY_MODULES>",
+    "^@/ui(.*)$",
+    "^@/components(.*)$",
+    "^@/(.*)$",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderParserPlugins": ["typescript", "jsx"],
+  "importOrderSortSpecifiers": true,
+  "plugins": [
+    "@trivago/prettier-plugin-sort-imports",
+    "prettier-plugin-tailwindcss"
+  ]
+}
