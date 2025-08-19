@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -219,7 +220,7 @@ export default function Home() {
               </p>
               <div className="flex flex-col gap-4 sm:flex-row">
                 <Button variant="hero" size="xl" className="w-full sm:w-auto">
-                  Get Started
+                  <Link href="/sign-up">Get Started</Link>
                 </Button>
                 <Button
                   variant="heroOutline"

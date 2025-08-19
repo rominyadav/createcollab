@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,7 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Navigation } from "@/components/ui/navigation";
-import { Separator } from "@/components/ui/separator";
 
 export default function BrandsPage() {
   const brandTypes = [
@@ -182,7 +183,7 @@ export default function BrandsPage() {
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Button variant="gradient" size="xl">
-              Start Your Campaign
+              <Link href="/sign-up">Start Your Campaign</Link>
             </Button>
             <Button variant="outline" size="xl">
               View Case Studies

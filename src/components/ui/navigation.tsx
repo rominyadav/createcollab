@@ -105,12 +105,16 @@ export function Navigation({ className }: NavigationProps) {
           </ul>
 
           <div className="flex space-x-4">
-            <Button variant="outline" size="sm">
-              Login
-            </Button>
-            <Button variant="gradient" size="sm">
-              Sign Up
-            </Button>
+            <Link href="/sign-in">
+              <Button variant="outline" size="sm">
+                Login
+              </Button>
+            </Link>
+            <Link href="/sign-up">
+              <Button variant="gradient" size="sm">
+                Sign Up
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

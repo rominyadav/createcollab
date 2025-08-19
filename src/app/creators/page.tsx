@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,7 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Navigation } from "@/components/ui/navigation";
-import { Separator } from "@/components/ui/separator";
 
 export default function CreatorsPage() {
   const creatorTypes = [
@@ -149,7 +150,7 @@ export default function CreatorsPage() {
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Button variant="gradient" size="xl">
-              Join as Creator
+              <Link href="/sign-up">Join as Creator</Link>
             </Button>
             <Button variant="outline" size="xl">
               View Success Stories
@@ -352,7 +353,7 @@ export default function CreatorsPage() {
           </p>
           <div className="flex flex-col justify-center gap-4 sm:flex-row">
             <Button variant="hero" size="xl">
-              Create Your Profile
+              <Link href="/sign-up">Create Your Profile</Link>
             </Button>
             <Button variant="heroOutline" size="xl">
               Schedule a Demo
