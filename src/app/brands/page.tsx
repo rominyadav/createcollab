@@ -1,6 +1,6 @@
 "use client";
 
-import { Navigation } from "@/components/ui/navigation";
+import Navigation from "@/components/ui/navigation";
 import BrandTypesSection from "@/components/user-ui/brand-types-section";
 import BrandsCTASection from "@/components/user-ui/brands-cta-section";
 import BrandsHero from "@/components/user-ui/brands-hero";

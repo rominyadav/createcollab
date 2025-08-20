@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { Navigation } from "@/components/ui/navigation";
+import Navigation from "@/components/ui/navigation";
 import FeaturesSection from "@/components/user-ui/features-section";
 import HomeFooter from "@/components/user-ui/home-footer";
 import HomeHero from "@/components/user-ui/home-hero";
@@ -11,7 +11,6 @@ import StatsSection from "@/components/user-ui/stats-section";
 
 export default function Home() {
   const [scrollY, setScrollY] = useState(0);
-  const [activeSection, setActiveSection] = useState("home");
   const [animatedElements, setAnimatedElements] = useState<Set<string>>(
     new Set()
   );
@@ -26,17 +25,6 @@ export default function Home() {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       setScrollY(currentScrollY);
-
-      // Update active section based on scroll position
-      if (currentScrollY < window.innerHeight * 0.5) {
-        setActiveSection("home");
-      } else if (currentScrollY < window.innerHeight * 1.5) {
-        setActiveSection("features");
-      } else if (currentScrollY < window.innerHeight * 2.5) {
-        setActiveSection("stats");
-      } else {
-        setActiveSection("footer");
-      }
     };
 
     // Intersection Observer for scroll animations

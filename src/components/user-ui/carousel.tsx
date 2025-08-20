@@ -38,13 +38,13 @@ export function Carousel({
     setTimeout(() => setIsTransitioning(false), 300);
   };
 
-  const nextSlide = () => {
+  const nextSlide = React.useCallback(() => {
     goToSlide((currentSlide + 1) % totalSlides);
-  };
+  }, [currentSlide, totalSlides]);
 
-  const prevSlide = () => {
+  const prevSlide = React.useCallback(() => {
     goToSlide(currentSlide === 0 ? totalSlides - 1 : currentSlide - 1);
-  };
+  }, [currentSlide, totalSlides]);
 
   React.useEffect(() => {
     if (!autoPlay) return;
@@ -54,7 +54,7 @@ export function Carousel({
     }, interval);
 
     return () => clearInterval(timer);
-  }, [currentSlide, autoPlay, interval]);
+  }, [autoPlay, interval, nextSlide]);
 
   return (
     <div className={cn("relative w-full", className)}>

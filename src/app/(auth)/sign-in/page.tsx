@@ -1,6 +1,6 @@
 "use client";
 
-import { Navigation } from "@/components/ui/navigation";
+import Navigation from "@/components/ui/navigation";
 
 import { SignInCard } from "@/features/auth/components/sign-in-card";
 

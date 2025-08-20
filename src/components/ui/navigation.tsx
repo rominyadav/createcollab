@@ -1,122 +1,134 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
-interface NavigationProps {
-  className?: string;
-}
-
-export function Navigation({ className }: NavigationProps) {
-  const [scrollY, setScrollY] = useState(0);
-  const [activeSection, setActiveSection] = useState("home");
-  const pathname = usePathname();
+export default function Navigation() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      setScrollY(currentScrollY);
-
-      // Update active section based on scroll position (only for home page)
-      if (pathname === "/") {
-        if (currentScrollY < window.innerHeight * 0.5) {
-          setActiveSection("home");
-        } else if (currentScrollY < window.innerHeight * 1.5) {
-          setActiveSection("features");
-        } else if (currentScrollY < window.innerHeight * 2.5) {
-          setActiveSection("stats");
-        } else {
-          setActiveSection("footer");
-        }
-      }
+      setIsScrolled(window.scrollY > 10);
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [pathname]);
-
-  const scrollToSection = (sectionId: string) => {
-    if (pathname === "/") {
-      const element = document.getElementById(sectionId);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
-      }
-    }
-  };
-
-  const isActivePage = (path: string) => {
-    if (path === "/" && pathname === "/") return true;
-    if (path !== "/" && pathname.startsWith(path)) return true;
-    return false;
-  };
-
-  const navItems = [
-    { path: "/", label: "home", action: () => scrollToSection("home") },
-    { path: "/", label: "features", action: () => scrollToSection("features") },
-    { path: "/creators", label: "creators", action: () => {} },
-    { path: "/brands", label: "brands", action: () => {} },
-    { path: "/about", label: "about", action: () => {} },
-  ];
+  }, []);
 
   return (
     <nav
-      className={`fixed top-0 z-40 w-full border-b border-gray-100 bg-white/95 backdrop-blur-md transition-all duration-300 ${className}`}
+      className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? "bg-white/95 shadow-lg backdrop-blur-md"
+          : "bg-white/90 backdrop-blur-sm"
+      }`}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          <Link
-            href="/"
-            className="bg-gradient-to-r from-slate-600 to-slate-800 bg-clip-text text-2xl font-bold text-transparent"
-          >
-            CreateCollab
+          {/* Logo */}
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="text-2xl font-bold text-slate-800">
+              CreateCollab
+            </div>
           </Link>
 
-          <ul className="hidden space-x-8 md:flex">
-            {navItems.map((item) => (
-              <li key={item.label}>
-                {item.path === "/" && pathname === "/" ? (
-                  <button
-                    onClick={item.action}
-                    className={`capitalize transition-colors duration-300 ${
-                      activeSection === item.label
-                        ? "font-semibold text-slate-600"
-                        : "text-gray-600 hover:text-slate-600"
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                ) : (
-                  <Link
-                    href={item.path}
-                    className={`capitalize transition-colors duration-300 ${
-                      isActivePage(item.path)
-                        ? "font-semibold text-slate-600"
-                        : "text-gray-600 hover:text-slate-600"
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
-                )}
-              </li>
-            ))}
-          </ul>
-
-          <div className="flex space-x-4">
-            <Link href="/sign-in">
-              <Button variant="outline" size="sm">
-                Login
-              </Button>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex md:items-center md:space-x-8">
+            <Link
+              href="/about"
+              className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
+            >
+              About
             </Link>
-            <Link href="/sign-up">
-              <Button variant="gradient" size="sm">
-                Sign Up
-              </Button>
+            <Link
+              href="/brands"
+              className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
+            >
+              For Brands
             </Link>
+            <Link
+              href="/creators"
+              className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
+            >
+              For Creators
+            </Link>
+            <Link
+              href="/sign-in"
+              className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
+            >
+              Sign In
+            </Link>
+            <Button variant="gradient" size="sm">
+              <Link href="/sign-up">Get Started</Link>
+            </Button>
           </div>
+
+          {/* Mobile menu button */}
+          <button
+            className="md:hidden"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            <svg
+              className="h-6 w-6 text-slate-600"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              {isMobileMenuOpen ? (
+                <path d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
         </div>
+
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden">
+            <div className="space-y-1 pt-2 pb-3">
+              <Link
+                href="/about"
+                className="block px-3 py-2 text-base font-medium text-slate-600 hover:text-slate-900"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                About
+              </Link>
+              <Link
+                href="/brands"
+                className="block px-3 py-2 text-base font-medium text-slate-600 hover:text-slate-900"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                For Brands
+              </Link>
+              <Link
+                href="/creators"
+                className="block px-3 py-2 text-base font-medium text-slate-600 hover:text-slate-900"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                For Creators
+              </Link>
+              <Link
+                href="/sign-in"
+                className="block px-3 py-2 text-base font-medium text-slate-600 hover:text-slate-900"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Sign In
+              </Link>
+              <div className="px-3 py-2">
+                <Button variant="gradient" size="sm" className="w-full">
+                  <Link href="/sign-up">Get Started</Link>
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );

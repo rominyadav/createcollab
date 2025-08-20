@@ -11,8 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Navigation } from "@/components/ui/navigation";
-import { Separator } from "@/components/ui/separator";
+import Navigation from "@/components/ui/navigation";
 
 export default function AboutPage() {
   const [scrollProgress, setScrollProgress] = useState(0);

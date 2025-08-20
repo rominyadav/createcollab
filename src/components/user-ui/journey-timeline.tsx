@@ -175,7 +175,7 @@ export function JourneyTimeline({ className }: JourneyTimelineProps) {
 
           {/* Creator Journey (Left Side) */}
           <div className="space-y-16">
-            {creatorSteps.map((step, index) => (
+            {creatorSteps.map((step) => (
               <div
                 key={`creator-${step.step}`}
                 data-step={step.step}
@@ -241,7 +241,7 @@ export function JourneyTimeline({ className }: JourneyTimelineProps) {
 
           {/* Brand Journey (Right Side) - Positioned to be parallel */}
           <div className="mt-16 space-y-16">
-            {brandSteps.map((step, index) => (
+            {brandSteps.map((step) => (
               <div
                 key={`brand-${step.step}`}
                 data-step={step.step + 10} // Different step numbers to avoid conflicts

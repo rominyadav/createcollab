@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Navigation } from "@/components/ui/navigation";
+import Navigation from "@/components/ui/navigation";
 
 export default function CreatorsPage() {
   const creatorTypes = [
