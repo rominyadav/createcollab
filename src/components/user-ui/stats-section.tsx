@@ -67,7 +67,8 @@ export default function StatsSection({ animatedElements }: StatsSectionProps) {
   ];
 
   useEffect(() => {
-    if (hasAnimated) return;
+    // Only start animation when the stats section comes into view
+    if (!animatedElements.has("stats-title") || hasAnimated) return;
 
     const animateCounters = () => {
       const newCounters: { [key: string]: number } = {};
@@ -115,10 +116,10 @@ export default function StatsSection({ animatedElements }: StatsSectionProps) {
       return () => clearInterval(timer);
     };
 
-    // Start animation when component mounts
-    const timer = setTimeout(animateCounters, 500);
+    // Start animation when stats section comes into view
+    const timer = setTimeout(animateCounters, 300);
     return () => clearTimeout(timer);
-  }, [hasAnimated, stats]);
+  }, [animatedElements, hasAnimated, stats]);
 
   const formatNumber = (stat: StatItem, value: number) => {
     if (stat.prefix && stat.suffix) {
