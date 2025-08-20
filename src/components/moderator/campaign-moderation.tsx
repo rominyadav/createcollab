@@ -283,6 +283,7 @@ export function CampaignModeration() {
         : campaign
     );
     // In real app, you'd update the state properly
+    console.log("Updated campaigns:", updatedCampaigns);
   };
 
   const categories = [
@@ -330,7 +331,17 @@ export function CampaignModeration() {
             <div className="flex gap-2">
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as any)}
+                onChange={(e) =>
+                  setStatusFilter(
+                    e.target.value as
+                      | "all"
+                      | "pending"
+                      | "approved"
+                      | "rejected"
+                      | "active"
+                      | "completed"
+                  )
+                }
                 className="rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">All Status</option>

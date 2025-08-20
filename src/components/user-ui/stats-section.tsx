@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { StatsCard } from "@/components/user-ui/stats-card";
 
@@ -26,45 +26,48 @@ export default function StatsSection({ animatedElements }: StatsSectionProps) {
   const [counters, setCounters] = useState<{ [key: string]: number }>({});
   const [hasAnimated, setHasAnimated] = useState(false);
 
-  const stats: StatItem[] = [
-    {
-      id: "creators",
-      number: "50K+",
-      target: 50,
-      suffix: "K+",
-      label: "Active Creators",
-      icon: "👥",
-      trend: { value: "+12%", isPositive: true },
-    },
-    {
-      id: "brands",
-      number: "2K+",
-      target: 2,
-      suffix: "K+",
-      label: "Partner Brands",
-      icon: "🏢",
-      trend: { value: "+8%", isPositive: true },
-    },
-    {
-      id: "earnings",
-      number: "$5M+",
-      target: 5,
-      prefix: "$",
-      suffix: "M+",
-      label: "Creator Earnings",
-      icon: "💰",
-      trend: { value: "+25%", isPositive: true },
-    },
-    {
-      id: "success",
-      number: "95%",
-      target: 95,
-      suffix: "%",
-      label: "Success Rate",
-      icon: "🎯",
-      trend: { value: "+3%", isPositive: true },
-    },
-  ];
+  const stats: StatItem[] = React.useMemo(
+    () => [
+      {
+        id: "creators",
+        number: "50K+",
+        target: 50,
+        suffix: "K+",
+        label: "Active Creators",
+        icon: "👥",
+        trend: { value: "+12%", isPositive: true },
+      },
+      {
+        id: "brands",
+        number: "2K+",
+        target: 2,
+        suffix: "K+",
+        label: "Partner Brands",
+        icon: "🏢",
+        trend: { value: "+8%", isPositive: true },
+      },
+      {
+        id: "earnings",
+        number: "$5M+",
+        target: 5,
+        prefix: "$",
+        suffix: "M+",
+        label: "Creator Earnings",
+        icon: "💰",
+        trend: { value: "+25%", isPositive: true },
+      },
+      {
+        id: "success",
+        number: "95%",
+        target: 95,
+        suffix: "%",
+        label: "Success Rate",
+        icon: "🎯",
+        trend: { value: "+3%", isPositive: true },
+      },
+    ],
+    []
+  );
 
   useEffect(() => {
     // Only start animation when the stats section comes into view
@@ -119,7 +122,7 @@ export default function StatsSection({ animatedElements }: StatsSectionProps) {
     // Start animation when stats section comes into view
     const timer = setTimeout(animateCounters, 300);
     return () => clearTimeout(timer);
-  }, [animatedElements, hasAnimated, stats]);
+  }, [animatedElements, hasAnimated]);
 
   const formatNumber = (stat: StatItem, value: number) => {
     if (stat.prefix && stat.suffix) {

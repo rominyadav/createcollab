@@ -233,7 +233,7 @@ export function DashboardOverview() {
           <div>
             <h1 className="text-2xl font-bold">Welcome back, Moderator!</h1>
             <p className="mt-1 text-emerald-100">
-              Here's what's happening on the platform today
+              Here&apos;s what&apos;s happening on the platform today
             </p>
           </div>
           <div className="text-right">

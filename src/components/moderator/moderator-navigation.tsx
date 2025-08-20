@@ -225,7 +225,7 @@ export function ModeratorNavigation({
                   <span className="font-semibold text-red-400">35</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-300">Today's Reports</span>
+                  <span className="text-slate-300">Today&apos;s Reports</span>
                   <span className="font-semibold text-yellow-400">12</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">

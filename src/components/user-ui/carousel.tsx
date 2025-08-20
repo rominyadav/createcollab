@@ -40,11 +40,11 @@ export function Carousel({
 
   const nextSlide = React.useCallback(() => {
     goToSlide((currentSlide + 1) % totalSlides);
-  }, [currentSlide, totalSlides]);
+  }, [currentSlide, totalSlides, goToSlide]);
 
   const prevSlide = React.useCallback(() => {
     goToSlide(currentSlide === 0 ? totalSlides - 1 : currentSlide - 1);
-  }, [currentSlide, totalSlides]);
+  }, [currentSlide, totalSlides, goToSlide]);
 
   React.useEffect(() => {
     if (!autoPlay) return;

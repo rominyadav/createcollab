@@ -228,7 +228,9 @@ export function Messages() {
                   key={type}
                   variant={filterType === type ? "emerald" : "outline"}
                   size="sm"
-                  onClick={() => setFilterType(type as any)}
+                  onClick={() =>
+                    setFilterType(type as "all" | "creator" | "brand" | "user")
+                  }
                   className="rounded-none border-b-0 transition-none first:rounded-tl-md last:rounded-tr-md hover:scale-100 hover:transform-none focus:scale-100 active:scale-100"
                 >
                   {type.charAt(0).toUpperCase() + type.slice(1)}
