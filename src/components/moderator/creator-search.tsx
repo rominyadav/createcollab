@@ -426,7 +426,7 @@ const mockCreators: Creator[] = [
       province: "Bagmati",
       coordinates: { lat: 27.7172, lng: 85.324 },
     },
-    engagement: "5.3%",
+    engagement: "8.3%",
     verified: false,
   },
   {
