@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:latest
+    restart: unless-stopped
+    container_name: postgres_server
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=user
+      - POSTGRES_DB=createcollab
+    volumes:
+      - postgres:/var/lib/postgresql/data
+volumes:
+  postgres:
