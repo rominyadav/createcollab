@@ -1,0 +1,69 @@
+/* Video Collage Animations */
+.video-collage-container {
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.video-collage-container:hover {
+  transform: scale(1.05);
+}
+
+.video-collage-video {
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center center;
+}
+
+.video-collage-video:hover {
+  transform: scale(1.1);
+}
+
+.video-collage-item {
+  animation: fadeInUp 0.8s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.video-collage-item:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.video-collage-item:nth-child(2) {
+  animation-delay: 200ms;
+}
+
+.video-collage-item:nth-child(3) {
+  animation-delay: 400ms;
+}
+
+.video-collage-item:nth-child(4) {
+  animation-delay: 600ms;
+}
+
+.video-collage-item:nth-child(5) {
+  animation-delay: 800ms;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth glass effect transitions */
+.video-collage-glass {
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.video-collage-glass:hover {
+  box-shadow:
+    0 25px 50px -12px rgba(255, 255, 255, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.video-collage-glass:not(:hover) {
+  box-shadow:
+    0 8px 32px rgba(255, 255, 255, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
