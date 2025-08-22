@@ -62,15 +62,20 @@ export function CreatorReviews() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Creator Reviews</h2>
-        <p className="text-gray-600">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          Creator Reviews
+        </h2>
+        <p className="text-gray-600 dark:text-gray-300">
           Review and approve creator profile submissions
         </p>
       </div>
 
       <div className="grid gap-6">
         {pendingCreators.map((creator) => (
-          <Card key={creator.id}>
+          <Card
+            key={creator.id}
+            className="border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700"
+          >
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
@@ -83,14 +88,18 @@ export function CreatorReviews() {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 className="text-lg font-semibold">{creator.name}</h3>
-                    <p className="text-gray-600">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {creator.name}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300">
                       {creator.followers} followers • {creator.category}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       Submitted {creator.submitted}
                     </p>
-                    <p className="text-sm text-gray-500">{creator.email}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {creator.email}
+                    </p>
                   </div>
                 </div>
                 <div className="flex space-x-2">

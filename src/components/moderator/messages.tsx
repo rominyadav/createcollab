@@ -206,9 +206,11 @@ export function Messages() {
   return (
     <div className="flex h-[calc(100vh-200px)] gap-4">
       {/* Messages List */}
-      <Card className="w-80 flex-shrink-0">
+      <Card className="w-80 flex-shrink-0 border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700">
         <CardHeader className="pb-4">
-          <CardTitle className="text-lg">Messages</CardTitle>
+          <CardTitle className="text-lg text-gray-900 dark:text-white">
+            Messages
+          </CardTitle>
           <div className="space-y-3">
             {/* Search */}
             <div className="relative">
@@ -217,7 +219,7 @@ export function Messages() {
                 placeholder="Search messages..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="border-gray-300 bg-white pl-10 text-gray-900 placeholder:text-gray-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-gray-400"
               />
             </div>
 
@@ -246,9 +248,9 @@ export function Messages() {
               <div
                 key={message.id}
                 onClick={() => setSelectedChat(message)}
-                className={`cursor-pointer p-3 hover:bg-gray-50 ${
+                className={`cursor-pointer p-3 hover:bg-gray-50 dark:hover:bg-slate-600 ${
                   selectedChat?.id === message.id
-                    ? "border-r-2 border-blue-500 bg-blue-50"
+                    ? "border-r-2 border-blue-500 bg-blue-50 dark:bg-blue-900/20"
                     : ""
                 }`}
               >
@@ -266,10 +268,10 @@ export function Messages() {
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between">
-                      <h4 className="truncate text-sm font-medium text-gray-900">
+                      <h4 className="truncate text-sm font-medium text-gray-900 dark:text-white">
                         {message.user}
                       </h4>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                         {message.time}
                       </span>
                     </div>
@@ -288,7 +290,7 @@ export function Messages() {
                       )}
                     </div>
 
-                    <p className="mt-1 truncate text-sm text-gray-600">
+                    <p className="mt-1 truncate text-sm text-gray-600 dark:text-gray-300">
                       {message.lastMessage}
                     </p>
                   </div>

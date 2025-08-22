@@ -42,15 +42,20 @@ export function BrandReviews() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Brand Reviews</h2>
-        <p className="text-gray-600">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          Brand Reviews
+        </h2>
+        <p className="text-gray-600 dark:text-gray-300">
           Review and approve brand profile submissions
         </p>
       </div>
 
       <div className="grid gap-6">
         {pendingBrands.map((brand) => (
-          <Card key={brand.id}>
+          <Card
+            key={brand.id}
+            className="border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700"
+          >
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
@@ -63,11 +68,13 @@ export function BrandReviews() {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 className="text-lg font-semibold">{brand.name}</h3>
-                    <p className="text-gray-600">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {brand.name}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300">
                       {brand.industry} • {brand.employees} employees
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       Submitted {brand.submitted}
                     </p>
                   </div>

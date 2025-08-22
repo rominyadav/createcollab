@@ -213,15 +213,15 @@ export function DashboardOverview() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "success":
-        return "bg-green-50 border-green-200";
+        return "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700";
       case "warning":
-        return "bg-yellow-50 border-yellow-200";
+        return "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700";
       case "info":
-        return "bg-blue-50 border-blue-200";
+        return "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700";
       case "error":
-        return "bg-red-50 border-red-200";
+        return "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700";
       default:
-        return "bg-gray-50 border-gray-200";
+        return "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600";
     }
   };
 
@@ -255,14 +255,17 @@ export function DashboardOverview() {
         {statsData.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className="group">
+            <Card
+              key={index}
+              className="group border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700"
+            >
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
                       {stat.title}
                     </p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
                       {formatNumber(counters[stat.title] || 0, stat.title)}
                     </p>
                     <div className="mt-1 flex items-center gap-1">
@@ -280,13 +283,15 @@ export function DashboardOverview() {
                       >
                         {stat.change}
                       </span>
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
                         from last month
                       </span>
                     </div>
                   </div>
-                  <div className={`rounded-full p-3 ${stat.bgColor}`}>
-                    <Icon className={`h-6 w-6 ${stat.color}`} />
+                  <div
+                    className={`rounded-full p-3 ${stat.bgColor} dark:bg-slate-600`}
+                  >
+                    <Icon className={`h-6 w-6 ${stat.color} dark:text-white`} />
                   </div>
                 </div>
               </CardContent>
@@ -297,9 +302,9 @@ export function DashboardOverview() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Card>
+        <Card className="border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
               <Activity className="h-5 w-5" />
               Quick Actions
             </CardTitle>
@@ -311,18 +316,22 @@ export function DashboardOverview() {
                 return (
                   <div
                     key={index}
-                    className="group cursor-pointer rounded-lg border p-4"
+                    className="group cursor-pointer rounded-lg border border-gray-200 p-4 dark:border-slate-600"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`rounded-lg p-2 ${action.bgColor}`}>
-                          <Icon className={`h-5 w-5 ${action.color}`} />
+                        <div
+                          className={`rounded-lg p-2 ${action.bgColor} dark:bg-slate-600`}
+                        >
+                          <Icon
+                            className={`h-5 w-5 ${action.color} dark:text-white`}
+                          />
                         </div>
                         <div>
-                          <h3 className="font-medium text-gray-900">
+                          <h3 className="font-medium text-gray-900 dark:text-white">
                             {action.title}
                           </h3>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-sm text-gray-600 dark:text-gray-300">
                             {action.description}
                           </p>
                         </div>
@@ -342,9 +351,9 @@ export function DashboardOverview() {
         </Card>
 
         {/* Recent Activity */}
-        <Card>
+        <Card className="border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
               <Clock className="h-5 w-5" />
               Recent Activity
             </CardTitle>
@@ -354,14 +363,14 @@ export function DashboardOverview() {
               {recentActivities.map((activity) => (
                 <div
                   key={activity.id}
-                  className={`flex items-start gap-3 rounded-lg border p-3 ${getStatusColor(activity.status)}`}
+                  className={`flex items-start gap-3 rounded-lg border border-gray-200 p-3 dark:border-slate-600 ${getStatusColor(activity.status)}`}
                 >
                   {getStatusIcon(activity.status)}
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
                       {activity.message}
                     </p>
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                       {activity.time}
                     </p>
                   </div>
@@ -372,7 +381,7 @@ export function DashboardOverview() {
                 </div>
               ))}
             </div>
-            <div className="mt-4 border-t pt-4">
+            <div className="mt-4 border-t border-gray-200 pt-4 dark:border-slate-600">
               <Button variant="outline" className="w-full">
                 View All Activity
               </Button>
@@ -382,9 +391,9 @@ export function DashboardOverview() {
       </div>
 
       {/* Platform Health */}
-      <Card>
+      <Card className="border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
             <BarChart3 className="h-5 w-5" />
             Platform Health Overview
           </CardTitle>
@@ -392,29 +401,39 @@ export function DashboardOverview() {
         <CardContent>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             <div className="text-center">
-              <div className="mb-3 inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-                <CheckCircle className="h-8 w-8 text-green-600" />
+              <div className="mb-3 inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+                <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">98.5%</h3>
-              <p className="text-sm text-gray-600">Uptime</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                98.5%
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Uptime</p>
               <p className="mt-1 text-xs text-green-600">Excellent</p>
             </div>
 
             <div className="text-center">
-              <div className="mb-3 inline-flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
-                <Users className="h-8 w-8 text-blue-600" />
+              <div className="mb-3 inline-flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+                <Users className="h-8 w-8 text-blue-600 dark:text-blue-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">2,847</h3>
-              <p className="text-sm text-gray-600">Active Creators</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                2,847
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                Active Creators
+              </p>
               <p className="mt-1 text-xs text-blue-600">+12 this week</p>
             </div>
 
             <div className="text-center">
-              <div className="mb-3 inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-                <TrendingUp className="h-8 w-8 text-emerald-600" />
+              <div className="mb-3 inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
+                <TrendingUp className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900">89</h3>
-              <p className="text-sm text-gray-600">Active Campaigns</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                89
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                Active Campaigns
+              </p>
               <p className="mt-1 text-xs text-emerald-600">+5 this month</p>
             </div>
           </div>
@@ -423,46 +442,56 @@ export function DashboardOverview() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">
+        <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100 dark:border-blue-700 dark:from-blue-900/20 dark:to-blue-800/20">
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-900">
+            <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
               {pendingCreators}
             </div>
-            <div className="text-sm text-blue-700">Pending Creators</div>
+            <div className="text-sm text-blue-700 dark:text-blue-300">
+              Pending Creators
+            </div>
             <Button variant="emerald" size="sm" className="mt-2 w-full">
               Review Now
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="border-green-200 bg-gradient-to-br from-green-50 to-green-100">
+        <Card className="border-green-200 bg-gradient-to-br from-green-50 to-green-100 dark:border-green-700 dark:from-green-900/20 dark:to-green-800/20">
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-900">
+            <div className="text-2xl font-bold text-green-900 dark:text-green-100">
               {pendingBrands}
             </div>
-            <div className="text-sm text-green-700">Pending Brands</div>
+            <div className="text-sm text-green-700 dark:text-green-300">
+              Pending Brands
+            </div>
             <Button variant="emerald" size="sm" className="mt-2 w-full">
               Review Now
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="border-red-200 bg-gradient-to-br from-red-50 to-red-100">
+        <Card className="border-red-200 bg-gradient-to-br from-red-50 to-red-100 dark:border-red-700 dark:from-red-900/20 dark:to-red-800/20">
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-red-900">
+            <div className="text-2xl font-bold text-red-900 dark:text-red-100">
               {reportedVideos}
             </div>
-            <div className="text-sm text-red-700">Reported Videos</div>
+            <div className="text-sm text-red-700 dark:text-red-300">
+              Reported Videos
+            </div>
             <Button variant="emerald" size="sm" className="mt-2 w-full">
               Moderate Now
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100">
+        <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100 dark:border-purple-700 dark:from-purple-900/20 dark:to-purple-800/20">
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-purple-900">{messages}</div>
-            <div className="text-sm text-purple-700">Unread Messages</div>
+            <div className="text-2xl font-bold text-purple-900 dark:text-purple-100">
+              {messages}
+            </div>
+            <div className="text-sm text-purple-700 dark:text-purple-300">
+              Unread Messages
+            </div>
             <Button variant="emerald" size="sm" className="mt-2 w-full">
               Reply Now
             </Button>

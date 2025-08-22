@@ -33,8 +33,6 @@ export default function ModeratorDashboard() {
         return <Messages />;
       case "search":
         return <CreatorSearch />;
-      case "reports":
-        return <VideoModeration />;
       default:
         return <DashboardOverview />;
     }
@@ -45,7 +43,7 @@ export default function ModeratorDashboard() {
       activeSection={activeSection}
       onSectionChange={setActiveSection}
     >
-      <div className="p-6">{renderContent()}</div>
+      <div className="bg-white p-6 dark:bg-slate-800">{renderContent()}</div>
     </ModeratorNavigation>
   );
 }

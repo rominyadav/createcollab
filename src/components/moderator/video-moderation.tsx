@@ -1,8 +1,16 @@
-import { CheckCircle, Eye, XCircle } from "lucide-react";
+import { useState } from "react";
 
-import { Badge } from "@/components/ui/badge";
+import { Flag, Users, Video } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
+
+import { CampaignVideo } from "./campaign-video";
+import { CampaignVideoReview } from "./campaign-video-review";
+import { CreatorPublicVideo } from "./creator-public-video";
+import { CreatorPublicVideoReview } from "./creator-public-video-review";
+import { ReportedVideo } from "./reported-video";
+import { ReportedVideoReview } from "./reported-video-review";
 
 interface ReportedVideo {
   id: number;
@@ -34,67 +42,145 @@ const reportedVideos: ReportedVideo[] = [
 ];
 
 export function VideoModeration() {
+  const [activeSection, setActiveSection] = useState<
+    "campaign" | "public" | "reported"
+  >("campaign");
+  const [selectedCampaignVideo, setSelectedCampaignVideo] = useState<any>(null);
+  const [selectedPublicVideo, setSelectedPublicVideo] = useState<any>(null);
+  const [selectedReportedVideo, setSelectedReportedVideo] = useState<any>(null);
+
   const handleAction = (videoId: number, action: "approve" | "remove") => {
     console.log(`Video ${videoId} ${action}d`);
     // In real app, you'd update the state properly
   };
 
+  const handleCampaignVideoPreview = (video: any) => {
+    setSelectedCampaignVideo(video);
+  };
+
+  const handlePublicVideoPreview = (video: any) => {
+    setSelectedPublicVideo(video);
+  };
+
+  const handleCampaignVideoApprove = (videoId: number) => {
+    console.log(`Campaign video ${videoId} approved`);
+    setSelectedCampaignVideo(null);
+  };
+
+  const handleCampaignVideoReject = (videoId: number) => {
+    console.log(`Campaign video ${videoId} rejected`);
+    setSelectedCampaignVideo(null);
+  };
+
+  const handlePublicVideoApprove = (videoId: number) => {
+    console.log(`Public video ${videoId} approved`);
+    setSelectedPublicVideo(null);
+  };
+
+  const handlePublicVideoReject = (videoId: number) => {
+    console.log(`Public video ${videoId} rejected`);
+    setSelectedPublicVideo(null);
+  };
+
+  const handleReportedVideoPreview = (video: any) => {
+    setSelectedReportedVideo(video);
+  };
+
+  const handleHideVideo = (videoId: number) => {
+    console.log(`Video ${videoId} hidden`);
+    setSelectedReportedVideo(null);
+  };
+
+  const handleDismissReport = (videoId: number) => {
+    console.log(`Report for video ${videoId} dismissed`);
+    setSelectedReportedVideo(null);
+  };
+
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Video Moderation</h2>
-        <p className="text-gray-600">
-          Review and moderate reported video content
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          Video Moderation
+        </h2>
+        <p className="text-gray-600 dark:text-gray-300">
+          Review and moderate video content from campaigns and creators
         </p>
       </div>
 
-      <div className="grid gap-6">
-        {reportedVideos.map((video) => (
-          <Card key={video.id}>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold">{video.title}</h3>
-                  <p className="text-gray-600">by {video.creator}</p>
-                  <div className="mt-2 flex items-center gap-4">
-                    <Badge variant="destructive" className="text-xs">
-                      {video.reports} reports
-                    </Badge>
-                    <span className="text-sm text-gray-500">
-                      Reason: {video.reason}
-                    </span>
-                    <span className="text-sm text-gray-500">
-                      Reported {video.submitted}
-                    </span>
-                  </div>
-                </div>
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="sm">
-                    <Eye className="mr-2 h-4 w-4" />
-                    Watch
-                  </Button>
-                  <Button
-                    variant="emerald"
-                    size="sm"
-                    onClick={() => handleAction(video.id, "approve")}
-                  >
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Approve
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleAction(video.id, "remove")}
-                  >
-                    <XCircle className="mr-2 h-4 w-4" />
-                    Remove
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
-        ))}
-      </div>
+      {/* Section Tabs */}
+      <Card className="border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700">
+        <CardHeader>
+          <div className="flex space-x-1 rounded-lg bg-gray-100 p-1 dark:bg-slate-600">
+            <Button
+              variant={activeSection === "campaign" ? "emerald" : "ghost"}
+              size="sm"
+              onClick={() => setActiveSection("campaign")}
+              className="flex items-center gap-2"
+            >
+              <Video className="h-4 w-4" />
+              Campaign Videos
+            </Button>
+            <Button
+              variant={activeSection === "public" ? "emerald" : "ghost"}
+              size="sm"
+              onClick={() => setActiveSection("public")}
+              className="flex items-center gap-2"
+            >
+              <Users className="h-4 w-4" />
+              Creator Public Videos
+            </Button>
+            <Button
+              variant={activeSection === "reported" ? "emerald" : "ghost"}
+              size="sm"
+              onClick={() => setActiveSection("reported")}
+              className="flex items-center gap-2"
+            >
+              <Flag className="h-4 w-4" />
+              Reported Videos
+            </Button>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Content Sections */}
+      {activeSection === "campaign" ? (
+        <CampaignVideo onPreview={handleCampaignVideoPreview} />
+      ) : activeSection === "public" ? (
+        <CreatorPublicVideo onPreview={handlePublicVideoPreview} />
+      ) : (
+        <ReportedVideo onPreview={handleReportedVideoPreview} />
+      )}
+
+      {/* Campaign Video Review Modal */}
+      {selectedCampaignVideo && (
+        <CampaignVideoReview
+          video={selectedCampaignVideo}
+          onApprove={handleCampaignVideoApprove}
+          onReject={handleCampaignVideoReject}
+          onClose={() => setSelectedCampaignVideo(null)}
+        />
+      )}
+
+      {/* Creator Public Video Review Modal */}
+      {selectedPublicVideo && (
+        <CreatorPublicVideoReview
+          video={selectedPublicVideo}
+          onApprove={handlePublicVideoApprove}
+          onReject={handlePublicVideoReject}
+          onClose={() => setSelectedPublicVideo(null)}
+        />
+      )}
+
+      {/* Reported Video Review Modal */}
+      {selectedReportedVideo && (
+        <ReportedVideoReview
+          video={selectedReportedVideo}
+          onHideVideo={handleHideVideo}
+          onDismissReport={handleDismissReport}
+          onClose={() => setSelectedReportedVideo(null)}
+        />
+      )}
     </div>
   );
 }

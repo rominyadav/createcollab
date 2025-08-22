@@ -640,7 +640,7 @@ export function CreatorSearch() {
   return (
     <div className="space-y-6">
       {/* Search Header */}
-      <Card>
+      <Card className="border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
@@ -678,7 +678,7 @@ export function CreatorSearch() {
                 placeholder="Search creators by name, niche, or keywords..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full"
+                className="w-full border-gray-300 bg-white text-gray-900 placeholder:text-gray-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-gray-400"
               />
             </div>
             <Button
@@ -695,13 +695,13 @@ export function CreatorSearch() {
           {/* Basic Filters */}
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Country
               </label>
               <select
                 value={selectedCountry}
                 onChange={(e) => setSelectedCountry(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
               >
                 {countries.map((country) => (
                   <option key={country} value={country}>
@@ -882,7 +882,7 @@ export function CreatorSearch() {
               {currentCreators.map((creator) => (
                 <div
                   key={creator.id}
-                  className="flex items-center justify-between rounded-lg border p-4 hover:bg-gray-50"
+                  className="flex items-center justify-between rounded-lg border p-4 hover:bg-gray-50 dark:hover:bg-slate-600"
                 >
                   <div className="flex items-center space-x-4">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-400 to-purple-500 font-semibold text-white">
@@ -890,7 +890,9 @@ export function CreatorSearch() {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="font-medium">{creator.name}</h3>
+                        <h3 className="font-medium text-gray-900 dark:text-white">
+                          {creator.name}
+                        </h3>
                         {creator.verified && (
                           <Badge
                             variant="default"
@@ -900,12 +902,12 @@ export function CreatorSearch() {
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         {creator.niche} • {creator.followers} followers
                       </p>
                       <div className="mt-1 flex items-center gap-2">
-                        <MapPin className="h-3 w-3 text-gray-400" />
-                        <span className="text-xs text-gray-500">
+                        <MapPin className="h-3 w-3 text-gray-400 dark:text-gray-500" />
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
                           {creator.location.city}, {creator.location.state},{" "}
                           {creator.location.country}
                         </span>
@@ -913,7 +915,7 @@ export function CreatorSearch() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
                       {creator.engagement} engagement
                     </p>
                     <Button variant="emerald" size="sm" className="mt-2">
@@ -927,7 +929,7 @@ export function CreatorSearch() {
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="mt-6 flex items-center justify-between">
-                <div className="text-sm text-gray-700">
+                <div className="text-sm text-gray-700 dark:text-gray-300">
                   Showing {startIndex + 1} to{" "}
                   {Math.min(endIndex, searchResults.length)} of{" "}
                   {searchResults.length} results
@@ -975,13 +977,12 @@ export function CreatorSearch() {
       {searchResults.length === 0 && !isSearching && (
         <Card>
           <CardContent className="py-12 text-center">
-            <Search className="mx-auto mb-4 h-16 w-16 text-gray-300" />
-            <h3 className="mb-2 text-lg font-medium text-gray-900">
+            <Search className="mx-auto mb-4 h-16 w-16 text-gray-300 dark:text-gray-600" />
+            <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
               No creators found
             </h3>
-            <p className="mb-4 text-gray-500">
-              Try adjusting your search criteria or filters to find more
-              creators.
+            <p className="text-gray-600 dark:text-gray-400">
+              Try adjusting your search criteria or filters.
             </p>
             <Button variant="emerald" onClick={clearFilters}>
               Clear All Filters
