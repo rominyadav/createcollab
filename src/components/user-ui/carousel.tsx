@@ -31,12 +31,15 @@ export function Carousel({
   const childrenArray = React.Children.toArray(children);
   const totalSlides = childrenArray.length;
 
-  const goToSlide = (index: number) => {
-    if (isTransitioning || index === currentSlide) return;
-    setIsTransitioning(true);
-    setCurrentSlide(index);
-    setTimeout(() => setIsTransitioning(false), 300);
-  };
+  const goToSlide = React.useCallback(
+    (index: number) => {
+      if (isTransitioning || index === currentSlide) return;
+      setIsTransitioning(true);
+      setCurrentSlide(index);
+      setTimeout(() => setIsTransitioning(false), 300);
+    },
+    [isTransitioning, currentSlide]
+  );
 
   const nextSlide = React.useCallback(() => {
     goToSlide((currentSlide + 1) % totalSlides);

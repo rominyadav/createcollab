@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Filter,
@@ -497,6 +497,111 @@ export function CreatorSearch() {
   const [searchResults, setSearchResults] = useState<Creator[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [mounted, setMounted] = useState(false);
+
+  // Load saved search state from localStorage on component mount
+  useEffect(() => {
+    setMounted(true);
+    const savedSearchState = localStorage.getItem("creator-search-state");
+    if (savedSearchState) {
+      try {
+        const parsed = JSON.parse(savedSearchState);
+        if (parsed.searchQuery) setSearchQuery(parsed.searchQuery);
+        if (parsed.selectedCountry) setSelectedCountry(parsed.selectedCountry);
+        if (parsed.selectedProvince)
+          setSelectedProvince(parsed.selectedProvince);
+        if (parsed.selectedDistrict)
+          setSelectedDistrict(parsed.selectedDistrict);
+        if (parsed.selectedNiche) setSelectedNiche(parsed.selectedNiche);
+        if (parsed.selectedFollowers)
+          setSelectedFollowers(parsed.selectedFollowers);
+        if (parsed.showAdvancedSearch)
+          setShowAdvancedSearch(parsed.showAdvancedSearch);
+        if (parsed.latitude) setLatitude(parsed.latitude);
+        if (parsed.longitude) setLongitude(parsed.longitude);
+        if (parsed.radius) setRadius(parsed.radius);
+        if (parsed.currentPage) setCurrentPage(parsed.currentPage);
+      } catch (e) {
+        console.error("Error loading saved search state:", e);
+      }
+    }
+  }, []);
+
+  // Save search state to localStorage whenever it changes
+  const saveSearchState = () => {
+    if (!mounted) return; // Don't save until mounted to prevent hydration issues
+
+    const searchState = {
+      searchQuery,
+      selectedCountry,
+      selectedProvince,
+      selectedDistrict,
+      selectedNiche,
+      selectedFollowers,
+      showAdvancedSearch,
+      latitude,
+      longitude,
+      radius,
+      currentPage,
+    };
+    localStorage.setItem("creator-search-state", JSON.stringify(searchState));
+  };
+
+  // Update state and save to localStorage
+  const updateSearchQuery = (query: string) => {
+    setSearchQuery(query);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateSelectedCountry = (country: string) => {
+    setSelectedCountry(country);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateSelectedProvince = (province: string) => {
+    setSelectedProvince(province);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateSelectedDistrict = (district: string) => {
+    setSelectedDistrict(district);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateSelectedNiche = (niche: string) => {
+    setSelectedNiche(niche);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateSelectedFollowers = (followers: string) => {
+    setSelectedFollowers(followers);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateShowAdvancedSearch = (show: boolean) => {
+    setShowAdvancedSearch(show);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateLatitude = (lat: string) => {
+    setLatitude(lat);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateLongitude = (lng: string) => {
+    setLongitude(lng);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateRadius = (r: string) => {
+    setRadius(r);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateCurrentPage = (page: number) => {
+    setCurrentPage(page);
+    setTimeout(saveSearchState, 0);
+  };
 
   const filteredCreators = mockCreators.filter((creator) => {
     const matchesSearch =
@@ -545,7 +650,7 @@ export function CreatorSearch() {
 
   const handleSearch = () => {
     setIsSearching(true);
-    setCurrentPage(1); // Reset to first page on new search
+    updateCurrentPage(1); // Reset to first page on new search
 
     // Simulate API call delay
     setTimeout(() => {
@@ -573,6 +678,7 @@ export function CreatorSearch() {
 
       setSearchResults(filtered);
       setIsSearching(false);
+      saveSearchState(); // Save the search state
     }, 1000);
   };
 
@@ -624,17 +730,18 @@ export function CreatorSearch() {
   };
 
   const clearFilters = () => {
-    setSearchQuery("");
-    setSelectedCountry("Nepal");
-    setSelectedProvince("");
-    setSelectedDistrict("");
-    setSelectedNiche("");
-    setSelectedFollowers("");
-    setLatitude("");
-    setLongitude("");
-    setRadius("50");
+    updateSearchQuery("");
+    updateSelectedCountry("Nepal");
+    updateSelectedProvince("");
+    updateSelectedDistrict("");
+    updateSelectedNiche("");
+    updateSelectedFollowers("");
+    updateLatitude("");
+    updateLongitude("");
+    updateRadius("50");
     setSearchResults([]);
-    setCurrentPage(1);
+    updateCurrentPage(1);
+    saveSearchState(); // Save the cleared state
   };
 
   return (
@@ -651,7 +758,7 @@ export function CreatorSearch() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
+                onClick={() => updateShowAdvancedSearch(!showAdvancedSearch)}
                 className="flex items-center gap-2"
               >
                 <SlidersHorizontal className="h-4 w-4" />
@@ -677,7 +784,7 @@ export function CreatorSearch() {
                 type="text"
                 placeholder="Search creators by name, niche, or keywords..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => updateSearchQuery(e.target.value)}
                 className="w-full border-gray-300 bg-white text-gray-900 placeholder:text-gray-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-gray-400"
               />
             </div>
@@ -700,7 +807,7 @@ export function CreatorSearch() {
               </label>
               <select
                 value={selectedCountry}
-                onChange={(e) => setSelectedCountry(e.target.value)}
+                onChange={(e) => updateSelectedCountry(e.target.value)}
                 className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
               >
                 {countries.map((country) => (
@@ -717,7 +824,7 @@ export function CreatorSearch() {
               </label>
               <select
                 value={selectedNiche}
-                onChange={(e) => setSelectedNiche(e.target.value)}
+                onChange={(e) => updateSelectedNiche(e.target.value)}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Niches</option>
@@ -735,7 +842,7 @@ export function CreatorSearch() {
               </label>
               <select
                 value={selectedFollowers}
-                onChange={(e) => setSelectedFollowers(e.target.value)}
+                onChange={(e) => updateSelectedFollowers(e.target.value)}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Followers</option>
@@ -772,7 +879,7 @@ export function CreatorSearch() {
                     </label>
                     <select
                       value={selectedProvince}
-                      onChange={(e) => setSelectedProvince(e.target.value)}
+                      onChange={(e) => updateSelectedProvince(e.target.value)}
                       className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">All Provinces</option>
@@ -790,7 +897,7 @@ export function CreatorSearch() {
                     </label>
                     <select
                       value={selectedDistrict}
-                      onChange={(e) => setSelectedDistrict(e.target.value)}
+                      onChange={(e) => updateSelectedDistrict(e.target.value)}
                       className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">All Districts</option>
@@ -821,7 +928,7 @@ export function CreatorSearch() {
                       step="any"
                       placeholder="27.7172"
                       value={latitude}
-                      onChange={(e) => setLatitude(e.target.value)}
+                      onChange={(e) => updateLatitude(e.target.value)}
                     />
                   </div>
 
@@ -834,7 +941,7 @@ export function CreatorSearch() {
                       step="any"
                       placeholder="85.3240"
                       value={longitude}
-                      onChange={(e) => setLongitude(e.target.value)}
+                      onChange={(e) => updateLongitude(e.target.value)}
                     />
                   </div>
 
@@ -847,7 +954,7 @@ export function CreatorSearch() {
                       min="1"
                       max="1000"
                       value={radius}
-                      onChange={(e) => setRadius(e.target.value)}
+                      onChange={(e) => updateRadius(e.target.value)}
                     />
                   </div>
 
@@ -938,7 +1045,7 @@ export function CreatorSearch() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentPage(currentPage - 1)}
+                    onClick={() => updateCurrentPage(currentPage - 1)}
                     disabled={currentPage === 1}
                   >
                     Previous
@@ -950,7 +1057,7 @@ export function CreatorSearch() {
                         key={page}
                         variant={currentPage === page ? "emerald" : "outline"}
                         size="sm"
-                        onClick={() => setCurrentPage(page)}
+                        onClick={() => updateCurrentPage(page)}
                         className="w-10"
                       >
                         {page}
@@ -961,7 +1068,7 @@ export function CreatorSearch() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentPage(currentPage + 1)}
+                    onClick={() => updateCurrentPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
                   >
                     Next

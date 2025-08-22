@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button";
 
 export function ThemeToggle() {
   const [isDark, setIsDark] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     // Check if user has a saved preference
     const savedTheme = localStorage.getItem("moderator-theme");
     if (savedTheme) {
@@ -21,19 +23,42 @@ export function ThemeToggle() {
   }, []);
 
   useEffect(() => {
+    if (!mounted) return;
+
     // Apply theme to document
     if (isDark) {
       document.documentElement.classList.add("dark");
-      localStorage.setItem("moderator-theme", "dark");
+      if (mounted) {
+        // Only save when mounted to prevent hydration issues
+        localStorage.setItem("moderator-theme", "dark");
+      }
     } else {
       document.documentElement.classList.remove("dark");
-      localStorage.setItem("moderator-theme", "light");
+      if (mounted) {
+        // Only save when mounted to prevent hydration issues
+        localStorage.setItem("moderator-theme", "light");
+      }
     }
-  }, [isDark]);
+  }, [isDark, mounted]);
 
   const toggleTheme = () => {
     setIsDark(!isDark);
   };
+
+  // Prevent hydration mismatch by not rendering until mounted
+  if (!mounted) {
+    return (
+      <Button
+        variant="outline"
+        size="sm"
+        className="flex items-center gap-2 rounded-xl border-white/30 bg-white/10 px-4 text-white transition-all duration-200 hover:border-white/50 hover:bg-white/20"
+        disabled
+      >
+        <div className="h-4 w-4 animate-pulse rounded bg-white/50"></div>
+        Loading...
+      </Button>
+    );
+  }
 
   return (
     <Button

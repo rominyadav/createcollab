@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Flag, Users, Video } from "lucide-react";
 
@@ -12,53 +12,111 @@ import { CreatorPublicVideoReview } from "./creator-public-video-review";
 import { ReportedVideo } from "./reported-video";
 import { ReportedVideoReview } from "./reported-video-review";
 
-interface ReportedVideo {
+// Define interfaces for the video types
+interface CampaignVideoType {
   id: number;
   title: string;
-  creator: string;
-  reports: number;
-  reason: string;
-  submitted: string;
+  description: string;
+  thumbnail: string;
+  campaignType: "Review" | "Unboxing" | "Brand Collaboration" | "Pro";
+  campaignTitle: string;
+  creatorName: string;
+  creatorAvatar: string;
+  creatorFollowers: string;
+  creatorLocation: string;
+  status: "pending" | "approved" | "rejected";
+  uploadedAt: string;
+  videoUrl: string;
+  videoLayout: "9:16" | "16:9";
+  duration: string;
 }
 
-// Mock data - in real app, this would come from props or context
-const reportedVideos: ReportedVideo[] = [
-  {
-    id: 1,
-    title: "Product Review - Latest Smartphone",
-    creator: "Mike Chen",
-    reports: 3,
-    reason: "Misleading content",
-    submitted: "1 hour ago",
-  },
-  {
-    id: 2,
-    title: "Fashion Haul Summer 2025",
-    creator: "Sarah Johnson",
-    reports: 1,
-    reason: "Inappropriate content",
-    submitted: "3 hours ago",
-  },
-];
+interface CreatorPublicVideoType {
+  id: number;
+  title: string;
+  description: string;
+  thumbnail: string;
+  creatorName: string;
+  creatorAvatar: string;
+  creatorFollowers: string;
+  creatorLocation: string;
+  status: "pending" | "approved" | "rejected";
+  uploadedAt: string;
+  videoUrl: string;
+  videoLayout: "9:16" | "16:9";
+  duration: string;
+  category: string;
+  tags: string[];
+}
+
+interface ReportedVideoType {
+  id: number;
+  title: string;
+  description: string;
+  thumbnail: string;
+  creatorName: string;
+  creatorAvatar: string;
+  creatorFollowers: string;
+  creatorLocation: string;
+  status: "pending" | "reviewed" | "dismissed" | "hidden";
+  uploadedAt: string;
+  videoUrl: string;
+  videoLayout: "9:16" | "16:9";
+  duration: string;
+  category: string;
+  tags: string[];
+  reports: {
+    id: number;
+    reporterName: string;
+    reportDate: string;
+    reason: string;
+    severity: "low" | "medium" | "high";
+  }[];
+  firstReportedOn: string;
+}
 
 export function VideoModeration() {
   const [activeSection, setActiveSection] = useState<
     "campaign" | "public" | "reported"
   >("campaign");
-  const [selectedCampaignVideo, setSelectedCampaignVideo] = useState<any>(null);
-  const [selectedPublicVideo, setSelectedPublicVideo] = useState<any>(null);
-  const [selectedReportedVideo, setSelectedReportedVideo] = useState<any>(null);
+  const [selectedCampaignVideo, setSelectedCampaignVideo] =
+    useState<CampaignVideoType | null>(null);
+  const [selectedPublicVideo, setSelectedPublicVideo] =
+    useState<CreatorPublicVideoType | null>(null);
+  const [selectedReportedVideo, setSelectedReportedVideo] =
+    useState<ReportedVideoType | null>(null);
+  const [mounted, setMounted] = useState(false);
 
-  const handleAction = (videoId: number, action: "approve" | "remove") => {
-    console.log(`Video ${videoId} ${action}d`);
-    // In real app, you'd update the state properly
+  // Load active video section from localStorage on component mount
+  useEffect(() => {
+    setMounted(true);
+    const savedVideoSection = localStorage.getItem(
+      "video-moderation-active-section"
+    );
+    if (
+      savedVideoSection &&
+      ["campaign", "public", "reported"].includes(savedVideoSection)
+    ) {
+      setActiveSection(savedVideoSection as "campaign" | "public" | "reported");
+    }
+  }, []);
+
+  // Save active video section to localStorage whenever it changes
+  const handleVideoSectionChange = (
+    section: "campaign" | "public" | "reported"
+  ) => {
+    setActiveSection(section);
+    if (mounted) {
+      // Only save when mounted to prevent hydration issues
+      localStorage.setItem("video-moderation-active-section", section);
+    }
   };
 
-  const handleCampaignVideoPreview = (video: any) => {
+  const handleCampaignVideoPreview = (video: CampaignVideoType) => {
     setSelectedCampaignVideo(video);
   };
 
-  const handlePublicVideoPreview = (video: any) => {
+  const handlePublicVideoPreview = (video: CreatorPublicVideoType) => {
     setSelectedPublicVideo(video);
   };
 
@@ -82,7 +140,7 @@ export function VideoModeration() {
     setSelectedPublicVideo(null);
   };
 
-  const handleReportedVideoPreview = (video: any) => {
+  const handleReportedVideoPreview = (video: ReportedVideoType) => {
     setSelectedReportedVideo(video);
   };
 
@@ -115,7 +173,7 @@ export function VideoModeration() {
             <Button
               variant={activeSection === "campaign" ? "emerald" : "ghost"}
               size="sm"
-              onClick={() => setActiveSection("campaign")}
+              onClick={() => handleVideoSectionChange("campaign")}
               className="flex items-center gap-2"
             >
               <Video className="h-4 w-4" />
@@ -124,7 +182,7 @@ export function VideoModeration() {
             <Button
               variant={activeSection === "public" ? "emerald" : "ghost"}
               size="sm"
-              onClick={() => setActiveSection("public")}
+              onClick={() => handleVideoSectionChange("public")}
               className="flex items-center gap-2"
             >
               <Users className="h-4 w-4" />
@@ -133,7 +191,7 @@ export function VideoModeration() {
             <Button
               variant={activeSection === "reported" ? "emerald" : "ghost"}
               size="sm"
-              onClick={() => setActiveSection("reported")}
+              onClick={() => handleVideoSectionChange("reported")}
               className="flex items-center gap-2"
             >
               <Flag className="h-4 w-4" />

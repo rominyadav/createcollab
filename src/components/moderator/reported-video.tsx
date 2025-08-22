@@ -186,19 +186,6 @@ export function ReportedVideo({ onPreview }: ReportedVideoProps) {
     return layout === "9:16" ? "📱" : "🖥️";
   };
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case "low":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
-      case "medium":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
-      case "high":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
-    }
-  };
-
   const filteredVideos = mockReportedVideos.filter((video) => {
     const matchesStatus =
       statusFilter === "all" || video.status === statusFilter;
@@ -228,7 +215,6 @@ export function ReportedVideo({ onPreview }: ReportedVideoProps) {
   const categories = [
     ...new Set(mockReportedVideos.map((video) => video.category)),
   ];
-  const severities = ["low", "medium", "high"];
 
   return (
     <div className="space-y-6">

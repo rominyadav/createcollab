@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { ThemeProvider } from "../theme-provider";
 import { BrandReviews } from "./brand-reviews";
 import { CampaignModeration } from "./campaign-moderation";
 import { CreatorReviews } from "./creator-reviews";
@@ -14,6 +15,25 @@ import { VideoModeration } from "./video-moderation";
 
 export default function ModeratorDashboard() {
   const [activeSection, setActiveSection] = useState("dashboard");
+  const [mounted, setMounted] = useState(false);
+
+  // Load active section from localStorage on component mount
+  useEffect(() => {
+    setMounted(true);
+    const savedSection = localStorage.getItem("moderator-active-section");
+    if (savedSection) {
+      setActiveSection(savedSection);
+    }
+  }, []);
+
+  // Save active section to localStorage whenever it changes
+  const handleSectionChange = (section: string) => {
+    setActiveSection(section);
+    if (mounted) {
+      // Only save when mounted to prevent hydration issues
+      localStorage.setItem("moderator-active-section", section);
+    }
+  };
 
   const renderContent = () => {
     switch (activeSection) {
@@ -39,11 +59,13 @@ export default function ModeratorDashboard() {
   };
 
   return (
-    <ModeratorNavigation
-      activeSection={activeSection}
-      onSectionChange={setActiveSection}
-    >
-      <div className="bg-white p-6 dark:bg-slate-800">{renderContent()}</div>
-    </ModeratorNavigation>
+    <ThemeProvider>
+      <ModeratorNavigation
+        activeSection={activeSection}
+        onSectionChange={handleSectionChange}
+      >
+        <div className="bg-white p-6 dark:bg-slate-800">{renderContent()}</div>
+      </ModeratorNavigation>
+    </ThemeProvider>
   );
 }

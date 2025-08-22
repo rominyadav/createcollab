@@ -113,7 +113,7 @@ const mockCampaignVideos: CampaignVideo[] = [
     status: "approved",
     uploadedAt: "1 day ago",
     videoUrl: "https://example.com/video5",
-    videoLayout: "9:16", // Vertical/Short
+    videoLayout: "9:16",
     duration: "0:58",
   },
   {
@@ -131,7 +131,7 @@ const mockCampaignVideos: CampaignVideo[] = [
     status: "pending",
     uploadedAt: "3 days ago",
     videoUrl: "https://example.com/video6",
-    videoLayout: "16:9", // Horizontal
+    videoLayout: "16:9",
     duration: "2:15",
   },
   {
@@ -149,7 +149,7 @@ const mockCampaignVideos: CampaignVideo[] = [
     status: "rejected",
     uploadedAt: "1 week ago",
     videoUrl: "https://example.com/video7",
-    videoLayout: "9:16", // Vertical/Short
+    videoLayout: "9:16",
     duration: "1:22",
   },
   {
@@ -167,7 +167,7 @@ const mockCampaignVideos: CampaignVideo[] = [
     status: "approved",
     uploadedAt: "4 days ago",
     videoUrl: "https://example.com/video8",
-    videoLayout: "16:9", // Horizontal
+    videoLayout: "16:9",
     duration: "12:47",
   },
   {
@@ -185,7 +185,7 @@ const mockCampaignVideos: CampaignVideo[] = [
     status: "pending",
     uploadedAt: "5 days ago",
     videoUrl: "https://example.com/video9",
-    videoLayout: "9:16", // Vertical/Short
+    videoLayout: "9:16",
     duration: "0:45",
   },
   {
@@ -203,115 +203,7 @@ const mockCampaignVideos: CampaignVideo[] = [
     status: "approved",
     uploadedAt: "Just now",
     videoUrl: "https://example.com/video10",
-    videoLayout: "16:9", // Horizontal
-    duration: "8:31",
-  },
-  {
-    id: 5,
-    title: "Quick & Easy Momo Recipe",
-    description:
-      "Step-by-step guide to making authentic Nepali momos with a special chutney recipe.",
-    thumbnail: "/api/placeholder/300/400",
-    campaignType: "Brand Collaboration",
-    campaignTitle: "Taste of Nepal",
-    creatorName: "Anita Gurung",
-    creatorAvatar: "AG",
-    creatorFollowers: "45.1K",
-    creatorLocation: "Kathmandu, Nepal",
-    status: "approved",
-    uploadedAt: "1 day ago",
-    videoUrl: "https://example.com/video5",
-    videoLayout: "9:16", // Vertical/Short
-    duration: "0:58",
-  },
-  {
-    id: 6,
-    title: "Himalayan Sunrise - Timelapse",
-    description:
-      "A breathtaking 4K timelapse of the sun rising over the Annapurna mountain range.",
-    thumbnail: "/api/placeholder/300/400",
-    campaignType: "Review",
-    campaignTitle: "Visit Nepal 2023",
-    creatorName: "Bikram Thapa",
-    creatorAvatar: "BT",
-    creatorFollowers: "18.7K",
-    creatorLocation: "Pokhara, Nepal",
-    status: "pending",
-    uploadedAt: "3 days ago",
-    videoUrl: "https://example.com/video6",
-    videoLayout: "16:9", // Horizontal
-    duration: "2:15",
-  },
-  {
-    id: 7,
-    title: "My Morning Skincare Routine",
-    description:
-      "Sharing my affordable and effective daily skincare products for glowing skin.",
-    thumbnail: "/api/placeholder/300/400",
-    campaignType: "Review",
-    campaignTitle: "Glow Up Secrets",
-    creatorName: "Priya Joshi",
-    creatorAvatar: "PJ",
-    creatorFollowers: "89.4K",
-    creatorLocation: "Lalitpur, Nepal",
-    status: "rejected",
-    uploadedAt: "1 week ago",
-    videoUrl: "https://example.com/video7",
-    videoLayout: "9:16", // Vertical/Short
-    duration: "1:22",
-  },
-  {
-    id: 8,
-    title: "Street Food Tour of Kathmandu",
-    description:
-      "Exploring the best street food spots in Ason and Indrachowk, from chatpate to juju dhau.",
-    thumbnail: "/api/placeholder/300/400",
-    campaignType: "Brand Collaboration",
-    campaignTitle: "Nepali Bites",
-    creatorName: "Suman Khadka",
-    creatorAvatar: "SK",
-    creatorFollowers: "120.5K",
-    creatorLocation: "Kathmandu, Nepal",
-    status: "approved",
-    uploadedAt: "4 days ago",
-    videoUrl: "https://example.com/video8",
-    videoLayout: "16:9", // Horizontal
-    duration: "12:47",
-  },
-  {
-    id: 9,
-    title: "POV: Hiking to Namche Bazaar",
-    description:
-      "A first-person view of the stunning trek from Lukla to Namche Bazaar on the way to Everest Base Camp.",
-    thumbnail: "/api/placeholder/300/400",
-    campaignType: "Review",
-    campaignTitle: "Himalayan Diaries",
-    creatorName: "Tenzing Sherpa",
-    creatorAvatar: "TS",
-    creatorFollowers: "33.8K",
-    creatorLocation: "Solukhumbu, Nepal",
-    status: "pending",
-    uploadedAt: "5 days ago",
-    videoUrl: "https://example.com/video9",
-    videoLayout: "9:16", // Vertical/Short
-    duration: "0:45",
-  },
-  {
-    id: 10,
-    title: "DIY Traditional Nepali Jewelry",
-    description:
-      "Crafting a beautiful 'Naugedi' necklace and 'Tilhari' using traditional methods passed down through generations.",
-    thumbnail: "/api/placeholder/300/400",
-    campaignType: "Brand Collaboration",
-    campaignTitle: "Nepali Heritage Crafts",
-    creatorName: "Laxmi Maharjan",
-    creatorAvatar: "LM",
-    creatorFollowers: "15.2K",
-    creatorLocation: "Bhaktapur, Nepal",
-    status: "approved",
-    uploadedAt: "Just now",
-    videoUrl: "https://example.com/video10",
-    videoLayout: "16:9", // Horizontal
+    videoLayout: "16:9",
     duration: "8:31",
   },
 ];
