@@ -1,0 +1,420 @@
+[
+  {
+    "id": 1,
+    "name": "TechCorp Inc.",
+    "logo": "TC",
+    "industry": "Technology",
+    "email": "contact@techcorp.com",
+    "phone": "+977-1-4444444",
+    "website": "www.techcorp.com",
+    "description": "Leading technology solutions provider specializing in AI and machine learning applications",
+    "founded": "2018",
+    "employees": "500-1000",
+    "revenue": "$10M - $50M",
+    "status": "pending",
+    "verified": false,
+    "location": {
+      "address": "123 Tech Park, Kathmandu",
+      "city": "Kathmandu",
+      "state": "Bagmati",
+      "country": "Nepal",
+      "district": "Kathmandu",
+      "province": "Bagmati",
+      "coordinates": {
+        "lat": 27.7172,
+        "lng": 85.324
+      }
+    },
+    "documents": {
+      "panNumber": "ABCDE1234F",
+      "vatNumber": "VAT123456789",
+      "companyRegistration": "REG123456789",
+      "registrationNumber": "COMP001/2018"
+    },
+    "adminUsers": [
+      {
+        "id": 1,
+        "name": "Rajesh Kumar",
+        "email": "rajesh@techcorp.com",
+        "role": "CEO",
+        "phone": "+977-9841234567",
+        "avatar": "RK",
+        "isPrimary": true
+      },
+      {
+        "id": 2,
+        "name": "Priya Sharma",
+        "email": "priya@techcorp.com",
+        "role": "Marketing Director",
+        "phone": "+977-9852345678",
+        "avatar": "PS",
+        "isPrimary": false
+      },
+      {
+        "id": 3,
+        "name": "Amit Patel",
+        "email": "amit@techcorp.com",
+        "role": "Operations Manager",
+        "phone": "+977-9863456789",
+        "avatar": "AP",
+        "isPrimary": false
+      }
+    ],
+    "billing": {
+      "plan": "Enterprise",
+      "subscriptionType": "Annual",
+      "subscriptionExpiry": "2024-12-31",
+      "monthlyAmount": 5000,
+      "currency": "USD",
+      "paymentMethod": "Credit Card",
+      "lastBillingDate": "2024-01-01",
+      "nextBillingDate": "2024-02-01"
+    },
+    "depositRequests": [
+      {
+        "id": 1,
+        "amount": 50000,
+        "currency": "NPR",
+        "status": "pending",
+        "requestedDate": "2024-01-15",
+        "purpose": "Campaign funding for Q1 2024",
+        "adminUser": "Rajesh Kumar"
+      },
+      {
+        "id": 2,
+        "amount": 25000,
+        "currency": "NPR",
+        "status": "approved",
+        "requestedDate": "2024-01-10",
+        "approvedDate": "2024-01-12",
+        "purpose": "Emergency campaign boost",
+        "adminUser": "Priya Sharma"
+      }
+    ],
+    "coupons": [
+      {
+        "id": 1,
+        "code": "TECH20",
+        "discount": "20%",
+        "type": "percentage",
+        "validFrom": "2024-01-01",
+        "validUntil": "2024-03-31",
+        "maxUses": 100,
+        "usedCount": 45,
+        "minOrderAmount": 10000,
+        "status": "active"
+      },
+      {
+        "id": 2,
+        "code": "NEWCUST50",
+        "discount": "50%",
+        "type": "percentage",
+        "validFrom": "2024-01-01",
+        "validUntil": "2024-06-30",
+        "maxUses": 50,
+        "usedCount": 12,
+        "minOrderAmount": 5000,
+        "status": "active"
+      }
+    ],
+    "creatorCollaborations": [
+      {
+        "creatorId": 1,
+        "creatorName": "Sarah Johnson",
+        "creatorAvatar": "SJ",
+        "campaigns": 3,
+        "totalSpent": 15000,
+        "lastCollaboration": "2024-01-10",
+        "rating": 4.8
+      },
+      {
+        "creatorId": 3,
+        "creatorName": "Emma Wilson",
+        "creatorAvatar": "EW",
+        "campaigns": 2,
+        "totalSpent": 12000,
+        "lastCollaboration": "2024-01-05",
+        "rating": 4.9
+      },
+      {
+        "creatorId": 4,
+        "creatorName": "Raj Sharma",
+        "creatorAvatar": "RS",
+        "campaigns": 1,
+        "totalSpent": 8000,
+        "lastCollaboration": "2024-01-08",
+        "rating": 4.7
+      }
+    ],
+    "submitted": "3 hours ago",
+    "campaigns": [
+      {
+        "id": 1,
+        "title": "AI Product Launch Q1",
+        "budget": 100000,
+        "status": "active",
+        "startDate": "2024-01-01",
+        "endDate": "2024-03-31"
+      },
+      {
+        "id": 2,
+        "title": "Tech Conference Promotion",
+        "budget": 75000,
+        "status": "planning",
+        "startDate": "2024-02-01",
+        "endDate": "2024-02-28"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "StyleHub",
+    "logo": "SH",
+    "industry": "Fashion",
+    "email": "hello@stylehub.com",
+    "phone": "+977-1-5555555",
+    "website": "www.stylehub.com",
+    "description": "Trendy fashion brand offering affordable and stylish clothing for young adults",
+    "founded": "2020",
+    "employees": "50-100",
+    "revenue": "$1M - $5M",
+    "status": "pending",
+    "verified": false,
+    "location": {
+      "address": "456 Fashion Street, Pokhara",
+      "city": "Pokhara",
+      "state": "Gandaki",
+      "country": "Nepal",
+      "district": "Kaski",
+      "province": "Gandaki",
+      "coordinates": {
+        "lat": 28.2096,
+        "lng": 83.9856
+      }
+    },
+    "documents": {
+      "panNumber": "FGHIJ5678K",
+      "vatNumber": "VAT987654321",
+      "companyRegistration": "REG987654321",
+      "registrationNumber": "COMP002/2020"
+    },
+    "adminUsers": [
+      {
+        "id": 1,
+        "name": "Sita Thapa",
+        "email": "sita@stylehub.com",
+        "role": "Founder & CEO",
+        "phone": "+977-9874567890",
+        "avatar": "ST",
+        "isPrimary": true
+      },
+      {
+        "id": 2,
+        "name": "Bikash Gurung",
+        "email": "bikash@stylehub.com",
+        "role": "Creative Director",
+        "phone": "+977-9885678901",
+        "avatar": "BG",
+        "isPrimary": false
+      }
+    ],
+    "billing": {
+      "plan": "Professional",
+      "subscriptionType": "Monthly",
+      "subscriptionExpiry": "2024-02-01",
+      "monthlyAmount": 2000,
+      "currency": "USD",
+      "paymentMethod": "Bank Transfer",
+      "lastBillingDate": "2024-01-01",
+      "nextBillingDate": "2024-02-01"
+    },
+    "depositRequests": [
+      {
+        "id": 1,
+        "amount": 30000,
+        "currency": "NPR",
+        "status": "pending",
+        "requestedDate": "2024-01-18",
+        "purpose": "Spring collection campaign",
+        "adminUser": "Sita Thapa"
+      }
+    ],
+    "coupons": [
+      {
+        "id": 1,
+        "code": "STYLE15",
+        "discount": "15%",
+        "type": "percentage",
+        "validFrom": "2024-01-01",
+        "validUntil": "2024-04-30",
+        "maxUses": 200,
+        "usedCount": 89,
+        "minOrderAmount": 5000,
+        "status": "active"
+      }
+    ],
+    "creatorCollaborations": [
+      {
+        "creatorId": 1,
+        "creatorName": "Sarah Johnson",
+        "creatorAvatar": "SJ",
+        "campaigns": 5,
+        "totalSpent": 25000,
+        "lastCollaboration": "2024-01-12",
+        "rating": 4.9
+      },
+      {
+        "creatorId": 5,
+        "creatorName": "Priya Shrestha",
+        "creatorAvatar": "PS",
+        "campaigns": 3,
+        "totalSpent": 18000,
+        "lastCollaboration": "2024-01-08",
+        "rating": 4.8
+      }
+    ],
+    "submitted": "1 day ago",
+    "campaigns": [
+      {
+        "id": 1,
+        "title": "Spring Collection 2024",
+        "budget": 80000,
+        "status": "active",
+        "startDate": "2024-01-15",
+        "endDate": "2024-04-15"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "FoodieDelight",
+    "logo": "FD",
+    "industry": "Food & Beverage",
+    "email": "info@foodiedelight.com",
+    "phone": "+977-1-6666666",
+    "website": "www.foodiedelight.com",
+    "description": "Premium food delivery service specializing in authentic Nepali and international cuisine",
+    "founded": "2019",
+    "employees": "100-250",
+    "revenue": "$5M - $10M",
+    "status": "approved",
+    "verified": true,
+    "location": {
+      "address": "789 Food Court, Lalitpur",
+      "city": "Lalitpur",
+      "state": "Bagmati",
+      "country": "Nepal",
+      "district": "Lalitpur",
+      "province": "Bagmati",
+      "coordinates": {
+        "lat": 27.6667,
+        "lng": 85.3333
+      }
+    },
+    "documents": {
+      "panNumber": "KLMNO9012P",
+      "vatNumber": "VAT456789123",
+      "companyRegistration": "REG456789123",
+      "registrationNumber": "COMP003/2019"
+    },
+    "adminUsers": [
+      {
+        "id": 1,
+        "name": "Ramesh Bhandari",
+        "email": "ramesh@foodiedelight.com",
+        "role": "Managing Director",
+        "phone": "+977-9896789012",
+        "avatar": "RB",
+        "isPrimary": true
+      },
+      {
+        "id": 2,
+        "name": "Anita Tamang",
+        "email": "anita@foodiedelight.com",
+        "role": "Marketing Manager",
+        "phone": "+977-9907890123",
+        "avatar": "AT",
+        "isPrimary": false
+      }
+    ],
+    "billing": {
+      "plan": "Enterprise",
+      "subscriptionType": "Annual",
+      "subscriptionExpiry": "2024-12-31",
+      "monthlyAmount": 4000,
+      "currency": "USD",
+      "paymentMethod": "Credit Card",
+      "lastBillingDate": "2024-01-01",
+      "nextBillingDate": "2024-02-01"
+    },
+    "depositRequests": [
+      {
+        "id": 1,
+        "amount": 75000,
+        "currency": "NPR",
+        "status": "approved",
+        "requestedDate": "2024-01-05",
+        "approvedDate": "2024-01-07",
+        "purpose": "Festival season campaign",
+        "adminUser": "Ramesh Bhandari"
+      }
+    ],
+    "coupons": [
+      {
+        "id": 1,
+        "code": "FOOD25",
+        "discount": "25%",
+        "type": "percentage",
+        "validFrom": "2024-01-01",
+        "validUntil": "2024-05-31",
+        "maxUses": 500,
+        "usedCount": 234,
+        "minOrderAmount": 2000,
+        "status": "active"
+      },
+      {
+        "id": 2,
+        "code": "FIRSTORDER",
+        "discount": "1000",
+        "type": "fixed",
+        "validFrom": "2024-01-01",
+        "validUntil": "2024-12-31",
+        "maxUses": 1000,
+        "usedCount": 456,
+        "minOrderAmount": 3000,
+        "status": "active"
+      }
+    ],
+    "creatorCollaborations": [
+      {
+        "creatorId": 4,
+        "creatorName": "Raj Sharma",
+        "creatorAvatar": "RS",
+        "campaigns": 4,
+        "totalSpent": 22000,
+        "lastCollaboration": "2024-01-15",
+        "rating": 4.9
+      },
+      {
+        "creatorId": 3,
+        "creatorName": "Emma Wilson",
+        "creatorAvatar": "EW",
+        "campaigns": 2,
+        "totalSpent": 15000,
+        "lastCollaboration": "2024-01-10",
+        "rating": 4.8
+      }
+    ],
+    "submitted": "2 days ago",
+    "campaigns": [
+      {
+        "id": 1,
+        "title": "Festival Food Festival",
+        "budget": 120000,
+        "status": "active",
+        "startDate": "2024-01-01",
+        "endDate": "2024-02-29"
+      }
+    ]
+  }
+]
