@@ -51,10 +51,10 @@ export function ThemeToggle() {
       <Button
         variant="outline"
         size="sm"
-        className="flex items-center gap-2 rounded-xl border-white/30 bg-white/10 px-4 text-white transition-all duration-200 hover:border-white/50 hover:bg-white/20"
+        className="flex items-center gap-2 rounded-xl border-gray-300 bg-gray-100 px-4 text-gray-700 transition-all duration-200 hover:border-gray-400 hover:bg-gray-200 dark:border-white/30 dark:bg-white/10 dark:text-white dark:hover:border-white/50 dark:hover:bg-white/20"
         disabled
       >
-        <div className="h-4 w-4 animate-pulse rounded bg-white/50"></div>
+        <div className="h-4 w-4 animate-pulse rounded bg-gray-400 dark:bg-white/50"></div>
         Loading...
       </Button>
     );
@@ -65,7 +65,7 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       variant="outline"
       size="sm"
-      className="flex items-center gap-2 rounded-xl border-white/30 bg-white/10 px-4 text-white transition-all duration-200 hover:border-white/50 hover:bg-white/20"
+      className="flex items-center gap-2 rounded-xl border-gray-300 bg-gray-100 px-4 text-gray-700 transition-all duration-200 hover:border-gray-400 hover:bg-gray-200 dark:border-white/30 dark:bg-white/10 dark:text-white dark:hover:border-white/50 dark:hover:bg-white/20"
     >
       {isDark ? (
         <>

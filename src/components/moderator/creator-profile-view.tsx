@@ -3,7 +3,6 @@
 import { useState } from "react";
 
 import {
-  CheckCircle,
   Clock,
   MapPin,
   MessageCircle,
@@ -11,7 +10,6 @@ import {
   Star,
   Users,
   X,
-  XCircle,
 } from "lucide-react";
 import { FaFacebook, FaInstagram, FaTiktok, FaYoutube } from "react-icons/fa";
 
@@ -33,39 +31,6 @@ interface CreatorVideo {
   uploadedAt: string;
 }
 
-interface CreatorPricing {
-  "15sec": {
-    type: "fixed" | "range";
-    amount?: number;
-    min?: number;
-    max?: number;
-  };
-  "30sec": {
-    type: "fixed" | "range";
-    amount?: number;
-    min?: number;
-    max?: number;
-  };
-  "60sec": {
-    type: "fixed" | "range";
-    amount?: number;
-    min?: number;
-    max?: number;
-  };
-  "1-5min": {
-    type: "fixed" | "range";
-    amount?: number;
-    min?: number;
-    max?: number;
-  };
-  "5min+": {
-    type: "fixed" | "range";
-    amount?: number;
-    min?: number;
-    max?: number;
-  };
-}
-
 interface Creator {
   id: number;
   name: string;
@@ -76,10 +41,13 @@ interface Creator {
   email: string;
   bio: string;
   socialLinks: string[];
-  pricing: CreatorPricing;
+  pricing: Record<
+    string,
+    { type: string; amount?: number; min?: number; max?: number }
+  >;
   shippingAddress: string;
   profileCompletion: string;
-  status: "pending" | "approved" | "rejected" | "blocked";
+  status: string;
   verified: boolean;
   panCard: string;
   paymentVerification: {
@@ -100,19 +68,15 @@ interface Creator {
   videos: CreatorVideo[];
 }
 
-interface CreatorProfileReviewProps {
+interface CreatorProfileViewProps {
   creator: Creator;
-  onApprove: (creatorId: number) => void;
-  onReject: (creatorId: number) => void;
   onClose: () => void;
 }
 
-export function CreatorProfileReview({
+export function CreatorProfileView({
   creator,
-  onApprove,
-  onReject,
   onClose,
-}: CreatorProfileReviewProps) {
+}: CreatorProfileViewProps) {
   const [showChat, setShowChat] = useState(false);
 
   const getStatusColor = (status: string) => {
@@ -163,7 +127,7 @@ export function CreatorProfileReview({
   };
 
   const formatPricing = (pricing: {
-    type: "fixed" | "range";
+    type: string;
     amount?: number;
     min?: number;
     max?: number;
@@ -207,7 +171,7 @@ export function CreatorProfileReview({
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Creator Profile Review: {creator.name}
+                    Creator Profile: {creator.name}
                   </h2>
                   <p className="text-gray-600 dark:text-slate-300">
                     {creator.niche} • {creator.followers} followers
@@ -364,7 +328,7 @@ export function CreatorProfileReview({
                       {creator.videos.map((video) => (
                         <div
                           key={video.id}
-                          className="group cursor-pointer rounded-lg border border-gray-200 p-4 transition-all duration-200 hover:border-emerald-300 hover:shadow-md dark:border-slate-600 dark:hover:border-emerald-600"
+                          className="group rounded-lg border border-gray-200 p-4 transition-all duration-200 hover:border-emerald-300 hover:shadow-md dark:border-slate-600 dark:hover:border-emerald-600"
                         >
                           <div className="mb-3 flex aspect-video items-center justify-center rounded-lg bg-gradient-to-br from-gray-200 to-gray-300 dark:from-slate-600 dark:to-slate-500">
                             <div className="text-center">
@@ -581,32 +545,6 @@ export function CreatorProfileReview({
                     </div>
                   </CardContent>
                 </Card>
-
-                {/* Action Buttons */}
-                {creator.status === "pending" && (
-                  <Card>
-                    <CardContent className="p-4">
-                      <div className="space-y-3">
-                        <Button
-                          onClick={() => onApprove(creator.id)}
-                          variant="emerald"
-                          className="w-full"
-                        >
-                          <CheckCircle className="mr-2 h-4 w-4" />
-                          Approve Creator
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          onClick={() => onReject(creator.id)}
-                          className="w-full"
-                        >
-                          <XCircle className="mr-2 h-4 w-4" />
-                          Reject Creator
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
               </div>
             </div>
           </div>
