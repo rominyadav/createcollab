@@ -82,9 +82,16 @@ export function ModeratorNavigation({
     },
     {
       id: "search",
-      label: "Creator Search",
+      label: "Creators List",
       icon: Search,
       description: "Find and filter creators",
+      badge: null,
+    },
+    {
+      id: "brand-list",
+      label: "Brand List",
+      icon: Building2,
+      description: "Find and filter brands",
       badge: null,
     },
   ];

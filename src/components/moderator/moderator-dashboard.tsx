@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { ThemeProvider } from "../theme-provider";
 import { BrandReviews } from "./brand-reviews";
+import { BrandSearch } from "./brand-search";
 import { CampaignModeration } from "./campaign-moderation";
 import { CreatorReviews } from "./creator-reviews";
 import { CreatorSearch } from "./creator-search";
@@ -53,6 +54,8 @@ export default function ModeratorDashboard() {
         return <Messages />;
       case "search":
         return <CreatorSearch />;
+      case "brand-list":
+        return <BrandSearch />;
       default:
         return <DashboardOverview />;
     }
