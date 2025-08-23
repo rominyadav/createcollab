@@ -36,7 +36,7 @@ export function MiniChat({
     },
   ]);
   const [newMessage, setNewMessage] = useState("");
-  const [isOnline, setIsOnline] = useState(true); // Simulate online status
+  const [isOnline] = useState(true); // Simulate online status
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 

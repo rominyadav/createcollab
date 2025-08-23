@@ -21,7 +21,10 @@ interface Creator {
   email: string;
   bio: string;
   socialLinks: string[];
-  pricing: any;
+  pricing: Record<
+    string,
+    { type: "fixed" | "range"; amount?: number; min?: number; max?: number }
+  >;
   shippingAddress: string;
   profileCompletion: string;
   status: "pending" | "approved" | "rejected" | "blocked";
@@ -33,9 +36,24 @@ interface Creator {
     verified: boolean;
   };
   creatorScore: number;
-  location: any;
+  location: {
+    city: string;
+    state: string;
+    country: string;
+    district?: string;
+    province?: string;
+    coordinates?: { lat: number; lng: number };
+  };
   engagement: string;
-  videos: any[];
+  videos: Array<{
+    id: number;
+    title: string;
+    thumbnail: string;
+    duration: string;
+    views: string;
+    likes: string;
+    uploadedAt: string;
+  }>;
 }
 
 // Use mock data from JSON file and ensure all creators in review are not verified

@@ -113,7 +113,6 @@ export function CreatorProfileReview({
   onReject,
   onClose,
 }: CreatorProfileReviewProps) {
-  const [selectedVideo, setSelectedVideo] = useState<CreatorVideo | null>(null);
   const [showChat, setShowChat] = useState(false);
 
   const getStatusColor = (status: string) => {
@@ -163,7 +162,12 @@ export function CreatorProfileReview({
       : "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
   };
 
-  const formatPricing = (pricing: any) => {
+  const formatPricing = (pricing: {
+    type: "fixed" | "range";
+    amount?: number;
+    min?: number;
+    max?: number;
+  }) => {
     if (pricing.type === "fixed") {
       return `Rs ${pricing.amount}`;
     } else {
@@ -355,7 +359,6 @@ export function CreatorProfileReview({
                         <div
                           key={video.id}
                           className="group cursor-pointer rounded-lg border border-gray-200 p-4 transition-all duration-200 hover:border-emerald-300 hover:shadow-md dark:border-slate-600 dark:hover:border-emerald-600"
-                          onClick={() => setSelectedVideo(video)}
                         >
                           <div className="mb-3 flex aspect-video items-center justify-center rounded-lg bg-gradient-to-br from-gray-200 to-gray-300 dark:from-slate-600 dark:to-slate-500">
                             <div className="text-center">
