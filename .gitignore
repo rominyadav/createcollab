@@ -10,7 +10,8 @@
 !.yarn/releases
 !.yarn/versions
 docker-compose.yaml
-
+src\database\database.ts.local
+*.local
 # testing
 /coverage
 
