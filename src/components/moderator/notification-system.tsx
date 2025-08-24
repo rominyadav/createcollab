@@ -144,12 +144,14 @@ export function NotificationSystem() {
 
       {/* Notifications Panel */}
       {showNotifications && (
-        <div className="absolute top-12 right-0 z-50 max-h-[70vh] w-[500px] overflow-hidden rounded-lg border bg-white shadow-2xl">
+        <div className="absolute top-12 right-0 z-50 max-h-[70vh] w-[500px] overflow-hidden rounded-lg border border-gray-200 bg-white shadow-2xl dark:border-slate-600 dark:bg-slate-800">
           {/* Header */}
-          <div className="flex items-center justify-between border-b bg-gray-50 p-4">
+          <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 p-4 dark:border-slate-600 dark:bg-slate-700">
             <div className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-gray-600" />
-              <h3 className="font-semibold text-gray-900">Notifications</h3>
+              <Bell className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+              <h3 className="font-semibold text-gray-900 dark:text-white">
+                Notifications
+              </h3>
               {unreadCount > 0 && (
                 <Badge variant="default" className="bg-emerald-600 text-xs">
                   {unreadCount} new
@@ -181,8 +183,8 @@ export function NotificationSystem() {
           {/* Notifications List */}
           <div className="max-h-[calc(70vh-80px)] overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
-                <Bell className="mx-auto mb-3 h-12 w-12 text-gray-300" />
+              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                <Bell className="mx-auto mb-3 h-12 w-12 text-gray-300 dark:text-gray-500" />
                 <p>No notifications yet</p>
               </div>
             ) : (
@@ -201,8 +203,8 @@ export function NotificationSystem() {
                           <h4
                             className={`text-sm font-medium ${
                               notification.read
-                                ? "text-gray-600"
-                                : "text-gray-900"
+                                ? "text-gray-600 dark:text-gray-400"
+                                : "text-gray-900 dark:text-white"
                             }`}
                           >
                             {notification.title}
@@ -219,8 +221,8 @@ export function NotificationSystem() {
                         <p
                           className={`mt-1 text-sm ${
                             notification.read
-                              ? "text-gray-500"
-                              : "text-gray-700"
+                              ? "text-gray-500 dark:text-gray-400"
+                              : "text-gray-700 dark:text-gray-300"
                           }`}
                         >
                           {notification.message}
@@ -250,7 +252,7 @@ export function NotificationSystem() {
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="border-t bg-gray-50 p-3 text-center">
+            <div className="border-t border-gray-200 bg-gray-50 p-3 text-center dark:border-slate-600 dark:bg-slate-700">
               <Button
                 variant="outline"
                 size="sm"

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Filter,
@@ -15,438 +15,57 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
+// Import mock data from JSON file
+import creatorMockData from "../mock-data/creator-mockdata.json";
+import { CreatorProfileView } from "./creator-profile-view";
+
 interface Creator {
   id: number;
   name: string;
   avatar: string;
   followers: string;
+  following: string;
   niche: string;
+  email: string;
+  bio: string;
+  socialLinks: string[];
+  pricing: Record<
+    string,
+    { type: string; amount?: number; min?: number; max?: number }
+  >;
+  shippingAddress: string;
+  profileCompletion: string;
+  status: string;
+  verified: boolean;
+  panCard: string;
+  paymentVerification: {
+    khalti: string;
+    esewa: string;
+    verified: boolean;
+  };
+  creatorScore: number;
   location: {
     city: string;
     state: string;
     country: string;
     district?: string;
     province?: string;
-    coordinates?: {
-      lat: number;
-      lng: number;
-    };
+    coordinates?: { lat: number; lng: number };
   };
   engagement: string;
-  verified: boolean;
+  videos: Array<{
+    id: number;
+    title: string;
+    thumbnail: string;
+    duration: string;
+    views: string;
+    likes: string;
+    uploadedAt: string;
+  }>;
 }
 
-// Mock data - in real app, this would come from props or context
-const mockCreators: Creator[] = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    avatar: "SJ",
-    followers: "12.5K",
-    niche: "Fashion",
-    location: {
-      city: "Kathmandu",
-      state: "Bagmati",
-      country: "Nepal",
-      district: "Kathmandu",
-      province: "Bagmati",
-      coordinates: { lat: 27.7172, lng: 85.324 },
-    },
-    engagement: "4.2%",
-    verified: true,
-  },
-  {
-    id: 2,
-    name: "Mike Chen",
-    avatar: "MC",
-    followers: "8.2K",
-    niche: "Tech",
-    location: {
-      city: "Pokhara",
-      state: "Gandaki",
-      country: "Nepal",
-      district: "Kaski",
-      province: "Gandaki",
-      coordinates: { lat: 28.2096, lng: 83.9856 },
-    },
-    engagement: "3.8%",
-    verified: false,
-  },
-  {
-    id: 3,
-    name: "Emma Wilson",
-    avatar: "EW",
-    followers: "45.1K",
-    niche: "Lifestyle",
-    location: {
-      city: "Lalitpur",
-      state: "Bagmati",
-      country: "Nepal",
-      district: "Lalitpur",
-      province: "Bagmati",
-      coordinates: { lat: 27.6667, lng: 85.3333 },
-    },
-    engagement: "5.1%",
-    verified: true,
-  },
-  {
-    id: 4,
-    name: "Raj Sharma",
-    avatar: "RS",
-    followers: "22.3K",
-    niche: "Food",
-    location: {
-      city: "Biratnagar",
-      state: "Province 1",
-      country: "Nepal",
-      district: "Morang",
-      province: "Province 1",
-      coordinates: { lat: 26.4831, lng: 87.2834 },
-    },
-    engagement: "4.7%",
-    verified: true,
-  },
-  {
-    id: 5,
-    name: "Priya Shrestha",
-    avatar: "PS",
-    followers: "15.8K",
-    niche: "Beauty",
-    location: {
-      city: "Bhaktapur",
-      state: "Bagmati",
-      country: "Nepal",
-      district: "Bhaktapur",
-      province: "Bagmati",
-      coordinates: { lat: 27.671, lng: 85.4298 },
-    },
-    engagement: "6.3%",
-    verified: true,
-  },
-  {
-    id: 6,
-    name: "Rajesh Thapa",
-    avatar: "RT",
-    followers: "8.7K",
-    niche: "Travel & Adventure",
-    location: {
-      city: "Pokhara",
-      state: "Gandaki",
-      country: "Nepal",
-      district: "Kaski",
-      province: "Gandaki",
-      coordinates: { lat: 28.2096, lng: 83.9856 },
-    },
-    engagement: "5.8%",
-    verified: false,
-  },
-  {
-    id: 7,
-    name: "Anita Gurung",
-    avatar: "AG",
-    followers: "23.1K",
-    niche: "Food & Cooking",
-    location: {
-      city: "Lalitpur",
-      state: "Bagmati",
-      country: "Nepal",
-      district: "Lalitpur",
-      province: "Bagmati",
-      coordinates: { lat: 27.6667, lng: 85.3167 },
-    },
-    engagement: "7.3%",
-    verified: true,
-  },
-  {
-    id: 8,
-    name: "Bikram Singh",
-    avatar: "BS",
-    followers: "15.9K",
-    niche: "Fitness & Wellness",
-    location: {
-      city: "Biratnagar",
-      state: "Province 1",
-      country: "Nepal",
-      district: "Morang",
-      province: "Province 1",
-      coordinates: { lat: 26.4834, lng: 87.2834 },
-    },
-    engagement: "6.1%",
-    verified: true,
-  },
-  {
-    id: 9,
-    name: "Priya Shrestha",
-    avatar: "PS",
-    followers: "5.2K",
-    niche: "Art & Design",
-    location: {
-      city: "Bhaktapur",
-      state: "Bagmati",
-      country: "Nepal",
-      district: "Bhaktapur",
-      province: "Bagmati",
-      coordinates: { lat: 27.671, lng: 85.4298 },
-    },
-    engagement: "8.9%",
-    verified: false,
-  },
-  {
-    id: 10,
-    name: "Amit Kumar",
-    avatar: "AK",
-    followers: "18.7K",
-    niche: "Gaming",
-    location: {
-      city: "Kathmandu",
-      state: "Bagmati",
-      country: "Nepal",
-      district: "Kathmandu",
-      province: "Bagmati",
-      coordinates: { lat: 27.7172, lng: 85.324 },
-    },
-    engagement: "5.4%",
-    verified: true,
-  },
-  {
-    id: 11,
-    name: "Neha Patel",
-    avatar: "NP",
-    followers: "32.4K",
-    niche: "Education",
-    location: {
-      city: "Pokhara",
-      state: "Gandaki",
-      country: "Nepal",
-      district: "Kaski",
-      province: "Gandaki",
-      coordinates: { lat: 28.2096, lng: 83.9856 },
-    },
-    engagement: "4.8%",
-    verified: true,
-  },
-  {
-    id: 12,
-    name: "Rahul Verma",
-    avatar: "RV",
-    followers: "11.3K",
-    niche: "Business",
-    location: {
-      city: "Lalitpur",
-      state: "Bagmati",
-      country: "Nepal",
-      district: "Lalitpur",
-      province: "Bagmati",
-      coordinates: { lat: 27.6667, lng: 85.3333 },
-    },
-    engagement: "6.7%",
-    verified: false,
-  },
-  {
-    id: 13,
-    name: "Sita Tamang",
-    avatar: "ST",
-    followers: "28.9K",
-    niche: "Fashion",
-    location: {
-      city: "Kathmandu",
-      state: "Bagmati",
-      country: "Nepal",
-      district: "Kathmandu",
-      province: "Bagmati",
-      coordinates: { lat: 27.7172, lng: 85.324 },
-    },
-    engagement: "7.1%",
-    verified: true,
-  },
-  {
-    id: 14,
-    name: "Deepak Thapa",
-    avatar: "DT",
-    followers: "9.6K",
-    niche: "Tech",
-    location: {
-      city: "Biratnagar",
-      state: "Province 1",
-      country: "Nepal",
-      district: "Morang",
-      province: "Province 1",
-      coordinates: { lat: 26.4831, lng: 87.2834 },
-    },
-    engagement: "5.2%",
-    verified: false,
-  },
-  {
-    id: 15,
-    name: "Maya Gurung",
-    avatar: "MG",
-    followers: "41.2K",
-    niche: "Lifestyle",
-    location: {
-      city: "Pokhara",
-      state: "Gandaki",
-      country: "Nepal",
-      district: "Kaski",
-      province: "Gandaki",
-      coordinates: { lat: 28.2096, lng: 83.9856 },
-    },
-    engagement: "6.9%",
-    verified: true,
-  },
-  {
-    id: 16,
-    name: "Kiran Shrestha",
-    avatar: "KS",
-    followers: "16.8K",
-    niche: "Food",
-    location: {
-      city: "Bhaktapur",
-      state: "Bagmati",
-      country: "Nepal",
-      district: "Bhaktapur",
-      province: "Bagmati",
-      coordinates: { lat: 27.671, lng: 85.4298 },
-    },
-    engagement: "5.6%",
-    verified: true,
-  },
-  {
-    id: 17,
-    name: "Arjun Basnet",
-    avatar: "AB",
-    followers: "24.3K",
-    niche: "Travel",
-    location: {
-      city: "Lalitpur",
-      state: "Bagmati",
-      country: "Nepal",
-      district: "Lalitpur",
-      province: "Bagmati",
-      coordinates: { lat: 27.6667, lng: 85.3333 },
-    },
-    engagement: "7.8%",
-    verified: true,
-  },
-  {
-    id: 18,
-    name: "Pooja Sharma",
-    avatar: "PS",
-    followers: "19.5K",
-    niche: "Beauty",
-    location: {
-      city: "Kathmandu",
-      state: "Bagmati",
-      country: "Nepal",
-      district: "Kathmandu",
-      province: "Bagmati",
-      coordinates: { lat: 27.7172, lng: 85.324 },
-    },
-    engagement: "6.4%",
-    verified: true,
-  },
-  {
-    id: 19,
-    name: "Ramesh Karki",
-    avatar: "RK",
-    followers: "12.7K",
-    niche: "Fitness",
-    location: {
-      city: "Biratnagar",
-      state: "Province 1",
-      country: "Nepal",
-      district: "Morang",
-      province: "Province 1",
-      coordinates: { lat: 26.4831, lng: 87.2834 },
-    },
-    engagement: "5.9%",
-    verified: false,
-  },
-  {
-    id: 20,
-    name: "Sunita Rai",
-    avatar: "SR",
-    followers: "35.6K",
-    niche: "Education",
-    location: {
-      city: "Pokhara",
-      state: "Gandaki",
-      country: "Nepal",
-      district: "Kaski",
-      province: "Gandaki",
-      coordinates: { lat: 28.2096, lng: 83.9856 },
-    },
-    engagement: "8.2%",
-    verified: true,
-  },
-  {
-    id: 21,
-    name: "Vikram Adhikari",
-    avatar: "VA",
-    followers: "14.2K",
-    niche: "Gaming",
-    location: {
-      city: "Bhaktapur",
-      state: "Bagmati",
-      country: "Nepal",
-      district: "Bhaktapur",
-      province: "Bagmati",
-      coordinates: { lat: 27.671, lng: 85.4298 },
-    },
-    engagement: "6.8%",
-    verified: true,
-  },
-  {
-    id: 22,
-    name: "Lakshmi Magar",
-    avatar: "LM",
-    followers: "27.8K",
-    niche: "Art",
-    location: {
-      city: "Lalitpur",
-      state: "Bagmati",
-      country: "Nepal",
-      district: "Lalitpur",
-      province: "Bagmati",
-      coordinates: { lat: 27.6667, lng: 85.3333 },
-    },
-    engagement: "7.5%",
-    verified: true,
-  },
-  {
-    id: 23,
-    name: "Hari Thapa",
-    avatar: "HT",
-    followers: "10.9K",
-    niche: "Business",
-    location: {
-      city: "Kathmandu",
-      state: "Bagmati",
-      country: "Nepal",
-      district: "Kathmandu",
-      province: "Bagmati",
-      coordinates: { lat: 27.7172, lng: 85.324 },
-    },
-    engagement: "5.3%",
-    verified: false,
-  },
-  {
-    id: 24,
-    name: "Anjali Tamang",
-    avatar: "AT",
-    followers: "38.4K",
-    niche: "Fashion",
-    location: {
-      city: "Biratnagar",
-      state: "Province 1",
-      country: "Nepal",
-      district: "Morang",
-      province: "Province 1",
-      coordinates: { lat: 26.4831, lng: 87.2834 },
-    },
-    engagement: "8.7%",
-    verified: true,
-  },
-];
+// Use mock data from JSON file
+const mockCreators: Creator[] = creatorMockData;
 
 const countries = ["Nepal", "India", "USA", "UK", "Canada"];
 const nepalProvinces = [
@@ -485,11 +104,15 @@ const itemsPerPage = 16;
 
 export function CreatorSearch() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState("Nepal");
+  const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedNiche, setSelectedNiche] = useState("");
   const [selectedFollowers, setSelectedFollowers] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedVerification, setSelectedVerification] = useState("");
+  const [selectedCreatorScore, setSelectedCreatorScore] = useState("");
+  const [creatorScoreValue, setCreatorScoreValue] = useState("");
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
@@ -497,25 +120,180 @@ export function CreatorSearch() {
   const [searchResults, setSearchResults] = useState<Creator[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [mounted, setMounted] = useState(false);
+  const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
+
+  // Load saved search state from localStorage on component mount
+  useEffect(() => {
+    setMounted(true);
+    const savedSearchState = localStorage.getItem("creator-search-state");
+    if (savedSearchState) {
+      try {
+        const parsed = JSON.parse(savedSearchState);
+        if (parsed.searchQuery) setSearchQuery(parsed.searchQuery);
+        if (parsed.selectedCountry) setSelectedCountry(parsed.selectedCountry);
+        if (parsed.selectedProvince)
+          setSelectedProvince(parsed.selectedProvince);
+        if (parsed.selectedDistrict)
+          setSelectedDistrict(parsed.selectedDistrict);
+        if (parsed.selectedNiche) setSelectedNiche(parsed.selectedNiche);
+        if (parsed.selectedFollowers)
+          setSelectedFollowers(parsed.selectedFollowers);
+        if (parsed.selectedStatus) setSelectedStatus(parsed.selectedStatus);
+        if (parsed.selectedVerification)
+          setSelectedVerification(parsed.selectedVerification);
+        if (parsed.selectedCreatorScore)
+          setSelectedCreatorScore(parsed.selectedCreatorScore);
+        if (parsed.creatorScoreValue)
+          setCreatorScoreValue(parsed.creatorScoreValue);
+        if (parsed.showAdvancedSearch)
+          setShowAdvancedSearch(parsed.showAdvancedSearch);
+        if (parsed.latitude) setLatitude(parsed.latitude);
+        if (parsed.longitude) setLongitude(parsed.longitude);
+        if (parsed.radius) setRadius(parsed.radius);
+        if (parsed.currentPage) setCurrentPage(parsed.currentPage);
+      } catch (e) {
+        console.error("Error loading saved search state:", e);
+      }
+    }
+
+    // Show all creators by default
+    setTimeout(() => {
+      setSearchResults(mockCreators);
+    }, 100);
+  }, []);
+
+  // Save search state to localStorage whenever it changes
+  const saveSearchState = () => {
+    if (!mounted) return; // Don't save until mounted to prevent hydration issues
+
+    const searchState = {
+      searchQuery,
+      selectedCountry,
+      selectedProvince,
+      selectedDistrict,
+      selectedNiche,
+      selectedFollowers,
+      selectedStatus,
+      selectedVerification,
+      selectedCreatorScore,
+      creatorScoreValue,
+      showAdvancedSearch,
+      latitude,
+      longitude,
+      radius,
+      currentPage,
+    };
+    localStorage.setItem("creator-search-state", JSON.stringify(searchState));
+  };
+
+  // Update state and save to localStorage
+  const updateSearchQuery = (query: string) => {
+    setSearchQuery(query);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateSelectedCountry = (country: string) => {
+    setSelectedCountry(country);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateSelectedProvince = (province: string) => {
+    setSelectedProvince(province);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateSelectedDistrict = (district: string) => {
+    setSelectedDistrict(district);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateSelectedNiche = (niche: string) => {
+    setSelectedNiche(niche);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateSelectedFollowers = (followers: string) => {
+    setSelectedFollowers(followers);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateSelectedStatus = (status: string) => {
+    setSelectedStatus(status);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateSelectedVerification = (verification: string) => {
+    setSelectedVerification(verification);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateSelectedCreatorScore = (score: string) => {
+    setSelectedCreatorScore(score);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateCreatorScoreValue = (value: string) => {
+    setCreatorScoreValue(value);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateShowAdvancedSearch = (show: boolean) => {
+    setShowAdvancedSearch(show);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateLatitude = (lat: string) => {
+    setLatitude(lat);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateLongitude = (lng: string) => {
+    setLongitude(lng);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateRadius = (r: string) => {
+    setRadius(r);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const updateCurrentPage = (page: number) => {
+    setCurrentPage(page);
+    setTimeout(saveSearchState, 0);
+  };
+
+  const handleViewProfile = (creator: Creator) => {
+    setSelectedCreator(creator);
+  };
+
+  const handleCloseProfile = () => {
+    setSelectedCreator(null);
+  };
 
   const filteredCreators = mockCreators.filter((creator) => {
     const matchesSearch =
       creator.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       creator.niche.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCountry = creator.location.country === selectedCountry;
+    const matchesCountry =
+      !selectedCountry || creator.location.country === selectedCountry;
     const matchesProvince =
       !selectedProvince ||
-      (selectedCountry === "Nepal" &&
+      (selectedCountry &&
+        selectedCountry === "Nepal" &&
         creator.location.province === selectedProvince);
     const matchesDistrict =
       !selectedDistrict ||
-      (selectedCountry === "Nepal" &&
+      (selectedCountry &&
+        selectedCountry === "Nepal" &&
         creator.location.district === selectedDistrict);
     const matchesNiche = !selectedNiche || creator.niche === selectedNiche;
+
+    // Fix followers filter
     const matchesFollowers =
       !selectedFollowers ||
       (() => {
-        const followers = parseFloat(creator.followers.replace("K", "000"));
+        const followers = parseFloat(creator.followers.replace("K", "")) * 1000;
         switch (selectedFollowers) {
           case "1K - 10K":
             return followers >= 1000 && followers < 10000;
@@ -528,13 +306,44 @@ export function CreatorSearch() {
         }
       })();
 
+    // Status filter
+    const matchesStatus = !selectedStatus || creator.status === selectedStatus;
+
+    // Verification filter
+    const matchesVerification =
+      !selectedVerification ||
+      (selectedVerification === "verified" && creator.verified) ||
+      (selectedVerification === "unverified" && !creator.verified);
+
+    // Creator Score filter
+    const matchesCreatorScore =
+      !selectedCreatorScore ||
+      !creatorScoreValue ||
+      (() => {
+        const score = creator.creatorScore;
+        const value = parseInt(creatorScoreValue);
+        switch (selectedCreatorScore) {
+          case "equals":
+            return score === value;
+          case "less_than_equal":
+            return score <= value;
+          case "greater_than_equal":
+            return score >= value;
+          default:
+            return true;
+        }
+      })();
+
     return (
       matchesSearch &&
       matchesCountry &&
       matchesProvince &&
       matchesDistrict &&
       matchesNiche &&
-      matchesFollowers
+      matchesFollowers &&
+      matchesStatus &&
+      matchesVerification &&
+      matchesCreatorScore
     );
   });
 
@@ -545,7 +354,7 @@ export function CreatorSearch() {
 
   const handleSearch = () => {
     setIsSearching(true);
-    setCurrentPage(1); // Reset to first page on new search
+    updateCurrentPage(1); // Reset to first page on new search
 
     // Simulate API call delay
     setTimeout(() => {
@@ -573,7 +382,8 @@ export function CreatorSearch() {
 
       setSearchResults(filtered);
       setIsSearching(false);
-    }, 1000);
+      saveSearchState(); // Save the search state
+    }, 500); // Reduced delay for better UX
   };
 
   const calculateDistance = (
@@ -624,23 +434,28 @@ export function CreatorSearch() {
   };
 
   const clearFilters = () => {
-    setSearchQuery("");
-    setSelectedCountry("Nepal");
-    setSelectedProvince("");
-    setSelectedDistrict("");
-    setSelectedNiche("");
-    setSelectedFollowers("");
-    setLatitude("");
-    setLongitude("");
-    setRadius("50");
+    updateSearchQuery("");
+    updateSelectedCountry("");
+    updateSelectedProvince("");
+    updateSelectedDistrict("");
+    updateSelectedNiche("");
+    updateSelectedFollowers("");
+    updateSelectedStatus("");
+    updateSelectedVerification("");
+    updateSelectedCreatorScore("");
+    updateCreatorScoreValue("");
+    updateLatitude("");
+    updateLongitude("");
+    updateRadius("50");
     setSearchResults([]);
-    setCurrentPage(1);
+    updateCurrentPage(1);
+    saveSearchState(); // Save the cleared state
   };
 
   return (
     <div className="space-y-6">
       {/* Search Header */}
-      <Card>
+      <Card className="border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
@@ -651,7 +466,7 @@ export function CreatorSearch() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
+                onClick={() => updateShowAdvancedSearch(!showAdvancedSearch)}
                 className="flex items-center gap-2"
               >
                 <SlidersHorizontal className="h-4 w-4" />
@@ -677,8 +492,8 @@ export function CreatorSearch() {
                 type="text"
                 placeholder="Search creators by name, niche, or keywords..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full"
+                onChange={(e) => updateSearchQuery(e.target.value)}
+                className="w-full border-gray-300 bg-white text-gray-900 placeholder:text-gray-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-gray-400"
               />
             </div>
             <Button
@@ -693,16 +508,17 @@ export function CreatorSearch() {
           </div>
 
           {/* Basic Filters */}
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Country
               </label>
               <select
                 value={selectedCountry}
-                onChange={(e) => setSelectedCountry(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                onChange={(e) => updateSelectedCountry(e.target.value)}
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
               >
+                <option value="">All Countries</option>
                 {countries.map((country) => (
                   <option key={country} value={country}>
                     {country}
@@ -712,13 +528,13 @@ export function CreatorSearch() {
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Niche
               </label>
               <select
                 value={selectedNiche}
-                onChange={(e) => setSelectedNiche(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                onChange={(e) => updateSelectedNiche(e.target.value)}
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
               >
                 <option value="">All Niches</option>
                 {niches.map((niche) => (
@@ -730,13 +546,13 @@ export function CreatorSearch() {
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Followers
               </label>
               <select
                 value={selectedFollowers}
-                onChange={(e) => setSelectedFollowers(e.target.value)}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                onChange={(e) => updateSelectedFollowers(e.target.value)}
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
               >
                 <option value="">All Followers</option>
                 <option value="1K - 10K">1K - 10K</option>
@@ -746,7 +562,39 @@ export function CreatorSearch() {
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Status
+              </label>
+              <select
+                value={selectedStatus}
+                onChange={(e) => updateSelectedStatus(e.target.value)}
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+              >
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="blocked">Blocked</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Verification
+              </label>
+              <select
+                value={selectedVerification}
+                onChange={(e) => updateSelectedVerification(e.target.value)}
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+              >
+                <option value="">All</option>
+                <option value="verified">Verified</option>
+                <option value="unverified">Unverified</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Results
               </label>
               <div className="rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-600">
@@ -755,25 +603,72 @@ export function CreatorSearch() {
             </div>
           </div>
 
+          {/* Creator Score Filter */}
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Creator Score
+              </label>
+              <select
+                value={selectedCreatorScore}
+                onChange={(e) => updateSelectedCreatorScore(e.target.value)}
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
+              >
+                <option value="">No Filter</option>
+                <option value="equals">Equals to</option>
+                <option value="less_than_equal">Less than or equal to</option>
+                <option value="greater_than_equal">
+                  Greater than or equal to
+                </option>
+              </select>
+            </div>
+
+            {selectedCreatorScore && (
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Score Value (0-100)
+                </label>
+                <Input
+                  type="number"
+                  min="0"
+                  max="100"
+                  placeholder="e.g., 80"
+                  value={creatorScoreValue}
+                  onChange={(e) => updateCreatorScoreValue(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+            )}
+
+            <div className="md:col-span-2">
+              <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Total Creators Available
+              </label>
+              <div className="rounded-md border border-gray-300 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700">
+                {mockCreators.length} creators in database
+              </div>
+            </div>
+          </div>
+
           {/* Advanced Search */}
           {showAdvancedSearch && (
             <div className="space-y-4 border-t pt-4">
-              <h3 className="flex items-center gap-2 text-lg font-medium text-gray-900">
+              <h3 className="flex items-center gap-2 text-lg font-medium text-gray-900 dark:text-white">
                 <Filter className="h-5 w-5" />
                 Advanced Filters
               </h3>
 
               {/* Nepal-specific filters */}
-              {selectedCountry === "Nepal" && (
+              {selectedCountry && selectedCountry === "Nepal" && (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Province
                     </label>
                     <select
                       value={selectedProvince}
-                      onChange={(e) => setSelectedProvince(e.target.value)}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                      onChange={(e) => updateSelectedProvince(e.target.value)}
+                      className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
                     >
                       <option value="">All Provinces</option>
                       {nepalProvinces.map((province) => (
@@ -785,13 +680,13 @@ export function CreatorSearch() {
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                       District
                     </label>
                     <select
                       value={selectedDistrict}
-                      onChange={(e) => setSelectedDistrict(e.target.value)}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                      onChange={(e) => updateSelectedDistrict(e.target.value)}
+                      className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
                     >
                       <option value="">All Districts</option>
                       {nepalDistricts.map((district) => (
@@ -806,14 +701,14 @@ export function CreatorSearch() {
 
               {/* Geocoding and Radius Search */}
               <div className="border-t pt-4">
-                <h4 className="text-md mb-3 flex items-center gap-2 font-medium text-gray-900">
+                <h4 className="text-md mb-3 flex items-center gap-2 font-medium text-gray-900 dark:text-white">
                   <Navigation className="h-4 w-4" />
                   Location-based Search
                 </h4>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Latitude
                     </label>
                     <Input
@@ -821,12 +716,12 @@ export function CreatorSearch() {
                       step="any"
                       placeholder="27.7172"
                       value={latitude}
-                      onChange={(e) => setLatitude(e.target.value)}
+                      onChange={(e) => updateLatitude(e.target.value)}
                     />
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Longitude
                     </label>
                     <Input
@@ -834,12 +729,12 @@ export function CreatorSearch() {
                       step="any"
                       placeholder="85.3240"
                       value={longitude}
-                      onChange={(e) => setLongitude(e.target.value)}
+                      onChange={(e) => updateLongitude(e.target.value)}
                     />
                   </div>
 
                   <div>
-                    <label className="mb-1 block text-sm font-medium text-gray-700">
+                    <label className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Radius (km)
                     </label>
                     <Input
@@ -847,7 +742,7 @@ export function CreatorSearch() {
                       min="1"
                       max="1000"
                       value={radius}
-                      onChange={(e) => setRadius(e.target.value)}
+                      onChange={(e) => updateRadius(e.target.value)}
                     />
                   </div>
 
@@ -882,7 +777,7 @@ export function CreatorSearch() {
               {currentCreators.map((creator) => (
                 <div
                   key={creator.id}
-                  className="flex items-center justify-between rounded-lg border p-4 hover:bg-gray-50"
+                  className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4 hover:bg-gray-50 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-600"
                 >
                   <div className="flex items-center space-x-4">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-400 to-purple-500 font-semibold text-white">
@@ -890,7 +785,9 @@ export function CreatorSearch() {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="font-medium">{creator.name}</h3>
+                        <h3 className="font-medium text-gray-900 dark:text-white">
+                          {creator.name}
+                        </h3>
                         {creator.verified && (
                           <Badge
                             variant="default"
@@ -900,12 +797,12 @@ export function CreatorSearch() {
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         {creator.niche} • {creator.followers} followers
                       </p>
                       <div className="mt-1 flex items-center gap-2">
-                        <MapPin className="h-3 w-3 text-gray-400" />
-                        <span className="text-xs text-gray-500">
+                        <MapPin className="h-3 w-3 text-gray-400 dark:text-gray-500" />
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
                           {creator.location.city}, {creator.location.state},{" "}
                           {creator.location.country}
                         </span>
@@ -913,10 +810,15 @@ export function CreatorSearch() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
                       {creator.engagement} engagement
                     </p>
-                    <Button variant="emerald" size="sm" className="mt-2">
+                    <Button
+                      variant="emerald"
+                      size="sm"
+                      className="mt-2"
+                      onClick={() => handleViewProfile(creator)}
+                    >
                       View Profile
                     </Button>
                   </div>
@@ -927,7 +829,7 @@ export function CreatorSearch() {
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="mt-6 flex items-center justify-between">
-                <div className="text-sm text-gray-700">
+                <div className="text-sm text-gray-700 dark:text-gray-300">
                   Showing {startIndex + 1} to{" "}
                   {Math.min(endIndex, searchResults.length)} of{" "}
                   {searchResults.length} results
@@ -936,7 +838,7 @@ export function CreatorSearch() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentPage(currentPage - 1)}
+                    onClick={() => updateCurrentPage(currentPage - 1)}
                     disabled={currentPage === 1}
                   >
                     Previous
@@ -948,7 +850,7 @@ export function CreatorSearch() {
                         key={page}
                         variant={currentPage === page ? "emerald" : "outline"}
                         size="sm"
-                        onClick={() => setCurrentPage(page)}
+                        onClick={() => updateCurrentPage(page)}
                         className="w-10"
                       >
                         {page}
@@ -959,7 +861,7 @@ export function CreatorSearch() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentPage(currentPage + 1)}
+                    onClick={() => updateCurrentPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
                   >
                     Next
@@ -975,13 +877,12 @@ export function CreatorSearch() {
       {searchResults.length === 0 && !isSearching && (
         <Card>
           <CardContent className="py-12 text-center">
-            <Search className="mx-auto mb-4 h-16 w-16 text-gray-300" />
-            <h3 className="mb-2 text-lg font-medium text-gray-900">
+            <Search className="mx-auto mb-4 h-16 w-16 text-gray-300 dark:text-gray-600" />
+            <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
               No creators found
             </h3>
-            <p className="mb-4 text-gray-500">
-              Try adjusting your search criteria or filters to find more
-              creators.
+            <p className="text-gray-600 dark:text-gray-400">
+              Try adjusting your search criteria or filters.
             </p>
             <Button variant="emerald" onClick={clearFilters}>
               Clear All Filters
@@ -998,6 +899,14 @@ export function CreatorSearch() {
             <p className="text-gray-600">Searching for creators...</p>
           </CardContent>
         </Card>
+      )}
+
+      {/* Creator Profile View Modal */}
+      {selectedCreator && (
+        <CreatorProfileView
+          creator={selectedCreator}
+          onClose={handleCloseProfile}
+        />
       )}
     </div>
   );

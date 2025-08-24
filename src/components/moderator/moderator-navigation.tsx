@@ -2,7 +2,6 @@ import React from "react";
 
 import {
   Building2,
-  Flag,
   LogOut,
   Megaphone,
   MessageSquare,
@@ -18,6 +17,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
 import { NotificationSystem } from "./notification-system";
+import { ThemeToggle } from "./theme-toggle";
 
 interface ModeratorNavigationProps {
   activeSection: string;
@@ -82,17 +82,17 @@ export function ModeratorNavigation({
     },
     {
       id: "search",
-      label: "Creator Search",
+      label: "Creators List",
       icon: Search,
       description: "Find and filter creators",
       badge: null,
     },
     {
-      id: "reports",
-      label: "Reported Videos",
-      icon: Flag,
-      description: "Handle user reports",
-      badge: { count: 7, variant: "destructive" as const },
+      id: "brand-list",
+      label: "Brand List",
+      icon: Building2,
+      description: "Find and filter brands",
+      badge: null,
     },
   ];
 
@@ -110,9 +110,9 @@ export function ModeratorNavigation({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="border-b border-slate-600 bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 shadow-lg">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+      {/* Fixed Header */}
+      <header className="fixed top-0 right-0 left-0 z-40 border-b border-slate-600 bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 shadow-lg">
         <div className="flex items-center justify-between px-8 py-5">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg ring-4 ring-blue-400/20">
@@ -129,6 +129,7 @@ export function ModeratorNavigation({
           </div>
 
           <div className="flex items-center gap-6">
+            <ThemeToggle />
             <NotificationSystem />
             <div className="flex items-center gap-4 rounded-2xl border border-white/20 bg-white/10 px-4 py-2 backdrop-blur-sm">
               <Avatar className="h-10 w-10 ring-2 ring-white/30">
@@ -153,9 +154,9 @@ export function ModeratorNavigation({
         </div>
       </header>
 
-      <div className="flex">
-        {/* Sidebar */}
-        <aside className="min-h-screen w-72 border-r border-slate-600 bg-slate-800 shadow-lg">
+      <div className="flex pt-24">
+        {/* Fixed Sidebar */}
+        <aside className="fixed top-24 left-0 z-30 min-h-[calc(100vh-6rem)] w-72 border-r border-slate-600 bg-slate-800 shadow-lg">
           <nav className="p-6">
             <div className="space-y-3">
               {menuItems.map((item) => {
@@ -167,18 +168,18 @@ export function ModeratorNavigation({
                     <Button
                       onClick={() => onSectionChange(item.id)}
                       variant="ghost"
-                      className={`h-auto w-full justify-start rounded-xl p-4 transition-all duration-200 ${
+                      className={`group h-auto w-full justify-start rounded-xl p-4 transition-all duration-200 ${
                         isActive
-                          ? "border border-blue-400/30 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 text-blue-200 shadow-lg"
-                          : "text-slate-300 hover:bg-slate-700/50 hover:text-white hover:shadow-md"
+                          ? "border border-blue-400/30 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 text-blue-200 shadow-lg hover:border-blue-400/50 hover:bg-gradient-to-r hover:from-blue-500/30 hover:to-indigo-500/30 hover:text-white"
+                          : "border border-transparent text-slate-300 hover:border-slate-500/30 hover:bg-slate-700/50 hover:text-white hover:shadow-md"
                       }`}
                     >
                       <div className="flex w-full items-start">
                         <div
-                          className={`mr-3 rounded-lg p-2 ${
+                          className={`mr-3 rounded-lg p-2 transition-all duration-200 ${
                             isActive
-                              ? "bg-blue-500/30 text-blue-200"
-                              : "bg-slate-700 text-slate-400"
+                              ? "bg-blue-500/30 text-blue-200 group-hover:bg-blue-500/40"
+                              : "bg-slate-700 text-slate-400 group-hover:bg-slate-600"
                           }`}
                         >
                           <Icon className="h-5 w-5" />
@@ -196,7 +197,9 @@ export function ModeratorNavigation({
                           </div>
                           <p
                             className={`mt-1 text-xs ${
-                              isActive ? "text-blue-200" : "text-slate-400"
+                              isActive
+                                ? "text-blue-200 group-hover:text-white"
+                                : "text-slate-400"
                             }`}
                           >
                             {item.description}
@@ -221,24 +224,30 @@ export function ModeratorNavigation({
               </h3>
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-300">Pending Reviews</span>
-                  <span className="font-semibold text-red-400">35</span>
+                  <span className="text-slate-300">Campaign Videos</span>
+                  <span className="font-semibold text-blue-400">23</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-300">Today&apos;s Reports</span>
-                  <span className="font-semibold text-yellow-400">12</span>
+                  <span className="text-slate-300">Public Videos</span>
+                  <span className="font-semibold text-green-400">18</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-300">Active Campaigns</span>
-                  <span className="font-semibold text-green-400">8</span>
+                  <span className="text-slate-300">Reported Videos</span>
+                  <span className="font-semibold text-red-400">7</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-300">Campaign Reviews</span>
+                  <span className="font-semibold text-yellow-400">8</span>
                 </div>
               </div>
             </div>
           </nav>
         </aside>
 
-        {/* Main Content Area */}
-        <main className="flex-1">{children}</main>
+        {/* Scrollable Main Content Area */}
+        <main className="ml-72 min-h-[calc(100vh-6rem)] flex-1 overflow-y-auto bg-white dark:bg-slate-800">
+          {children}
+        </main>
       </div>
     </div>
   );
