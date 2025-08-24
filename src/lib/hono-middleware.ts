@@ -10,7 +10,7 @@ apiApp.use(
   cors({
     origin: process.env.VERCEL_URL
       ? [`https://${process.env.VERCEL_URL}`]
-      : ["http://localhost:3000", "http://localhost:3002"],
+      : ["http://localhost:3000"],
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,
