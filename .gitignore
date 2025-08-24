@@ -11,6 +11,7 @@
 !.yarn/versions
 docker-compose.yaml
 src\database\database.ts.local
+src/database/copyOf_database.ts
 *.local
 # testing
 /coverage
