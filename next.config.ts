@@ -1,14 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: "http://localhost:3002/api/:path*",
-      },
-    ];
-  },
+  // No more proxy needed - Hono is now integrated directly
+  // All /api/* routes will be handled by the Hono app
 };
 
 export default nextConfig;

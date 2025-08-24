@@ -25,7 +25,10 @@ export const auth = betterAuth({
       });
     },
   },
-  baseURL: "http://localhost:3000",
+  // Handle both development and production
+  baseURL: process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000",
   secret: process.env.BETTER_AUTH_SECRET,
   plugins: [openAPI()],
   logger: {
