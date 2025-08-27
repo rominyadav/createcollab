@@ -201,6 +201,43 @@ const mockCampaigns: Campaign[] = [
 
 const itemsPerPage = 5;
 
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "pending":
+      return "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200";
+    case "approved":
+      return "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-200";
+    case "rejected":
+      return "bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-200";
+    case "active":
+      return "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200";
+    case "completed":
+      return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
+    default:
+      return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
+  }
+};
+
+const getRewardTypeIcon = (type: string) => {
+  switch (type) {
+    case "cash":
+      return <DollarSign className="h-4 w-4" />;
+    case "product":
+      return <Gift className="h-4 w-4" />;
+    case "coupon":
+      return <Gift className="h-4 w-4" />;
+    case "mixed":
+      return (
+        <div className="flex gap-1">
+          <DollarSign className="h-3 w-3" />
+          <Gift className="h-3 w-3" />
+        </div>
+      );
+    default:
+      return <Gift className="h-4 w-4" />;
+  }
+};
+
 export function CampaignModeration() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<Campaign["status"] | "all">(
@@ -228,43 +265,6 @@ export function CampaignModeration() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentCampaigns = filteredCampaigns.slice(startIndex, endIndex);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200";
-      case "approved":
-        return "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-200";
-      case "rejected":
-        return "bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-200";
-      case "active":
-        return "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200";
-      case "completed":
-        return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
-      default:
-        return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
-    }
-  };
-
-  const getRewardTypeIcon = (type: string) => {
-    switch (type) {
-      case "cash":
-        return <DollarSign className="h-4 w-4" />;
-      case "product":
-        return <Gift className="h-4 w-4" />;
-      case "coupon":
-        return <Gift className="h-4 w-4" />;
-      case "mixed":
-        return (
-          <div className="flex gap-1">
-            <DollarSign className="h-3 w-3" />
-            <Gift className="h-3 w-3" />
-          </div>
-        );
-      default:
-        return <Gift className="h-4 w-4" />;
-    }
-  };
 
   const handleReview = (campaign: Campaign) => {
     setSelectedCampaign(campaign);
