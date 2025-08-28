@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
+
 import { Calendar, Clock, Eye, Users } from "lucide-react";
 
+import { CampaignView } from "@/components/creator/campaign-view";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,10 +30,12 @@ export interface Campaign {
 
 interface CampaignCardProps {
   campaign: Campaign;
-  onViewCampaign: (campaign: Campaign) => void;
+  onViewCampaign?: (campaign: Campaign) => void;
   isVerified?: boolean;
   showProgress?: boolean;
   progress?: number;
+  isApplied?: boolean;
+  onApply?: (campaignId: number) => void;
 }
 
 export function CampaignCard({
@@ -39,7 +44,10 @@ export function CampaignCard({
   isVerified = true,
   showProgress = false,
   progress = 0,
+  isApplied = false,
+  onApply,
 }: CampaignCardProps) {
+  const [showCampaignView, setShowCampaignView] = useState(false);
   const truncateText = (text: string, maxLength: number) => {
     return text.length > maxLength
       ? text.substring(0, maxLength) + "..."
@@ -149,7 +157,10 @@ export function CampaignCard({
           </div>
           {isVerified ? (
             <Button
-              onClick={() => onViewCampaign(campaign)}
+              onClick={() => {
+                setShowCampaignView(true);
+                onViewCampaign?.(campaign);
+              }}
               variant="default"
               size="sm"
               disabled={campaign.status === "full"}
@@ -164,6 +175,17 @@ export function CampaignCard({
             </Button>
           )}
         </div>
+
+        {/* Campaign View Modal */}
+        {showCampaignView && (
+          <CampaignView
+            campaign={campaign}
+            onClose={() => setShowCampaignView(false)}
+            onApply={onApply}
+            isApplied={isApplied}
+            isVerified={isVerified}
+          />
+        )}
       </CardContent>
     </Card>
   );

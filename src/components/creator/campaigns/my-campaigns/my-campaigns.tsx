@@ -17,7 +17,7 @@ interface MyCampaign extends Campaign {
 }
 
 interface MyCampaignsProps {
-  onViewCampaign: (campaign: MyCampaign) => void;
+  onViewCampaign?: (campaign: MyCampaign) => void;
 }
 
 const mockMyCampaigns: MyCampaign[] = [
@@ -149,6 +149,7 @@ export function MyCampaigns({ onViewCampaign }: MyCampaignsProps) {
               onViewCampaign={onViewCampaign}
               showProgress={true}
               progress={campaign.progress}
+              isApplied={true}
             />
           ))
         )}

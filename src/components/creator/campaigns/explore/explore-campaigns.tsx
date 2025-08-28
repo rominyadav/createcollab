@@ -11,7 +11,9 @@ import {
 
 interface ExploreCampaignsProps {
   isVerified: boolean;
-  onViewCampaign: (campaign: Campaign) => void;
+  onViewCampaign?: (campaign: Campaign) => void;
+  onApplyCampaign?: (campaignId: number) => void;
+  appliedCampaigns?: number[];
 }
 
 const mockCampaigns: Campaign[] = [
@@ -72,6 +74,8 @@ const mockCampaigns: Campaign[] = [
 export function ExploreCampaigns({
   isVerified,
   onViewCampaign,
+  onApplyCampaign,
+  appliedCampaigns = [],
 }: ExploreCampaignsProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
@@ -111,7 +115,9 @@ export function ExploreCampaigns({
             key={campaign.id}
             campaign={campaign}
             onViewCampaign={onViewCampaign}
+            onApply={onApplyCampaign}
             isVerified={isVerified}
+            isApplied={appliedCampaigns.includes(campaign.id)}
           />
         ))}
       </div>

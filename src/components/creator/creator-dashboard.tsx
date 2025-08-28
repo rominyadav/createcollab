@@ -45,6 +45,7 @@ export function CreatorDashboard({ creator }: CreatorDashboardProps) {
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [showUpload, setShowUpload] = useState(false);
+  const [appliedCampaigns, setAppliedCampaigns] = useState<number[]>([]);
 
   // Load saved tab from localStorage on mount
   useEffect(() => {
@@ -85,6 +86,12 @@ export function CreatorDashboard({ creator }: CreatorDashboardProps) {
     // In real app, this would navigate to campaign details
   };
 
+  const handleApplyCampaign = (campaignId: number) => {
+    setAppliedCampaigns((prev) => [...prev, campaignId]);
+    console.log("Applied to campaign:", campaignId);
+    // In real app, this would send application to backend
+  };
+
   const handleSettingsClick = () => {
     console.log("Opening settings");
     // In real app, this would navigate to settings
@@ -99,6 +106,8 @@ export function CreatorDashboard({ creator }: CreatorDashboardProps) {
           <ExploreCampaigns
             isVerified={creator.verified}
             onViewCampaign={handleViewCampaign}
+            onApplyCampaign={handleApplyCampaign}
+            appliedCampaigns={appliedCampaigns}
           />
         );
       case "my-campaigns":
