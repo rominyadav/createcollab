@@ -51,7 +51,7 @@ export function VideoPlayer({
 
   const getYouTubeEmbedUrl = (url: string) => {
     const videoId = url.match(
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/
+      /(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([^&\n?#]+)/
     );
     return videoId
       ? `https://www.youtube.com/embed/${videoId[1]}?autoplay=1&rel=0`
