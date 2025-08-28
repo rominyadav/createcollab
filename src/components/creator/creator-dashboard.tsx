@@ -106,7 +106,22 @@ export function CreatorDashboard({ creator }: CreatorDashboardProps) {
       case "chats":
         return <Chats creatorId={creator.id} />;
       case "wallet":
-        return <Wallet creatorId={creator.id} />;
+        if (!creator.verified) {
+          return (
+            <div className="flex min-h-screen items-center justify-center p-4">
+              <div className="text-center">
+                <div className="mb-4 text-6xl">🔒</div>
+                <h2 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">
+                  Wallet Access Restricted
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Please complete profile verification to access your wallet.
+                </p>
+              </div>
+            </div>
+          );
+        }
+        return <Wallet creatorId={creator.id.toString()} />;
       case "profile":
         return (
           <Profile

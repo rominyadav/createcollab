@@ -4,99 +4,49 @@ import { useState } from "react";
 
 import { Eye, EyeOff, TrendingUp, Wallet as WalletIcon } from "lucide-react";
 
+import {
+  getCreatorWallet,
+  getTotalPendingAmount,
+  mockCreatorWallets,
+} from "@/components/mock-data/creator-wallet";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { PayoutSection } from "./wallet/payout-section";
 
-interface Transaction {
-  id: number;
-  type: "earning" | "payout" | "bonus";
-  amount: number;
-  currency: string;
-  description: string;
-  date: string;
-  status: "completed" | "pending" | "failed";
-  campaignTitle?: string;
-  brandName?: string;
-}
-
 interface WalletProps {
-  creatorId: number;
+  creatorId?: string;
 }
 
-const mockTransactions: Transaction[] = [
-  {
-    id: 1,
-    type: "earning",
-    amount: 5000,
-    currency: "NPR",
-    description: "Campaign completion payment",
-    date: "2024-01-25",
-    status: "completed",
-    campaignTitle: "Summer Fashion Collection",
-    brandName: "StyleHub Fashion",
-  },
-  {
-    id: 2,
-    type: "earning",
-    amount: 8000,
-    currency: "NPR",
-    description: "Campaign completion payment",
-    date: "2024-01-20",
-    status: "completed",
-    campaignTitle: "Tech Product Review",
-    brandName: "TechCorp Inc.",
-  },
-  {
-    id: 3,
-    type: "payout",
-    amount: -10000,
-    currency: "NPR",
-    description: "Payout to Khalti",
-    date: "2024-01-18",
-    status: "completed",
-  },
-  {
-    id: 4,
-    type: "bonus",
-    amount: 500,
-    currency: "NPR",
-    description: "Performance bonus",
-    date: "2024-01-15",
-    status: "completed",
-  },
-  {
-    id: 5,
-    type: "earning",
-    amount: 3500,
-    currency: "NPR",
-    description: "Campaign completion payment",
-    date: "2024-01-10",
-    status: "pending",
-    campaignTitle: "Healthy Lifestyle Challenge",
-    brandName: "FitLife App",
-  },
-];
-
-export function Wallet({}: WalletProps) {
+export function Wallet({ creatorId }: WalletProps) {
   const [showBalance, setShowBalance] = useState(true);
 
-  const totalBalance = 15750;
-  const pendingEarnings = 3500;
-  const totalEarnings = mockTransactions
-    .filter((t) => t.type === "earning" && t.status === "completed")
-    .reduce((sum, t) => sum + t.amount, 0);
+  const wallet = getCreatorWallet(creatorId!);
+
+  if (!wallet) {
+    return (
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <div className="text-center">
+          <div className="mb-4 text-6xl">💫</div>
+          <h2 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">
+            No Wallet Data
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            Complete campaigns to start earning.
+          </p>
+        </div>
+      </div>
+    );
+  }
+  const totalPendingAmount = getTotalPendingAmount(wallet);
 
   const getTransactionIcon = (type: string) => {
     switch (type) {
-      case "earning":
+      case "received":
         return "💰";
       case "payout":
         return "📤";
-      case "bonus":
-        return "🎁";
       default:
         return "💳";
     }
@@ -150,22 +100,74 @@ export function Wallet({}: WalletProps) {
             <div className="mb-4">
               <p className="text-3xl font-bold">
                 {showBalance
-                  ? `NPR ${totalBalance.toLocaleString()}`
+                  ? `NPR ${wallet.availableBalance.toLocaleString()}`
                   : "NPR ****"}
               </p>
-              <p className="text-sm text-emerald-100">
-                Pending: NPR {pendingEarnings.toLocaleString()}
-              </p>
+              {wallet.processingBalance > 0 && (
+                <p className="text-sm text-emerald-100">
+                  Processing: NPR {wallet.processingBalance.toLocaleString()}
+                </p>
+              )}
             </div>
 
             <div className="flex items-center gap-4 text-sm">
               <div className="flex items-center gap-1">
                 <TrendingUp className="h-4 w-4" />
-                <span>Total Earned: NPR {totalEarnings.toLocaleString()}</span>
+                <span>
+                  Total Earned:{" "}
+                  {showBalance
+                    ? `NPR ${wallet.totalEarnings.toLocaleString()}`
+                    : "NPR ****"}
+                </span>
               </div>
             </div>
           </CardContent>
         </Card>
+
+        {/* Pending Payments Section */}
+        {wallet.pendingPayments.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span>⏳</span>
+                Pending Payments
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {wallet.pendingPayments.map((payment) => (
+                  <div
+                    key={payment.id}
+                    className="flex items-center justify-between rounded-lg border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800 dark:bg-yellow-900/20"
+                  >
+                    <div>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {payment.campaignName}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {payment.brandName} • Completed{" "}
+                        {new Date(payment.completedDate).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-yellow-700 dark:text-yellow-300">
+                        NPR {payment.amount.toLocaleString()}
+                      </p>
+                      <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300">
+                        Awaiting Payment
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  Total Pending: NPR {totalPendingAmount.toLocaleString()}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 gap-4">
@@ -173,28 +175,28 @@ export function Wallet({}: WalletProps) {
             <CardContent className="p-4 text-center">
               <div className="mb-2 text-2xl">📊</div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                This Month
+                Available
               </p>
               <p className="text-lg font-bold text-gray-900 dark:text-white">
-                NPR {(totalEarnings * 0.6).toLocaleString()}
+                NPR {wallet.availableBalance.toLocaleString()}
               </p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4 text-center">
-              <div className="mb-2 text-2xl">🎯</div>
+              <div className="mb-2 text-2xl">⏳</div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Campaigns
+                Pending
               </p>
               <p className="text-lg font-bold text-gray-900 dark:text-white">
-                {mockTransactions.filter((t) => t.type === "earning").length}
+                NPR {totalPendingAmount.toLocaleString()}
               </p>
             </CardContent>
           </Card>
         </div>
 
         {/* Payout Section */}
-        <PayoutSection totalBalance={totalBalance} />
+        <PayoutSection totalBalance={wallet.availableBalance} />
 
         {/* Transaction History */}
         <Card>
@@ -203,7 +205,7 @@ export function Wallet({}: WalletProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {mockTransactions.map((transaction) => (
+              {wallet.transactionHistory.map((transaction) => (
                 <div
                   key={transaction.id}
                   className="flex items-center gap-3 rounded-lg border border-gray-200 p-3 dark:border-slate-600"
@@ -216,9 +218,11 @@ export function Wallet({}: WalletProps) {
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
                       {transaction.description}
                     </p>
-                    {transaction.campaignTitle && (
+                    {transaction.brandName && (
                       <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {transaction.campaignTitle} • {transaction.brandName}
+                        {transaction.brandName}
+                        {transaction.campaignId &&
+                          ` • Campaign ${transaction.campaignId}`}
                       </p>
                     )}
                     <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -229,14 +233,13 @@ export function Wallet({}: WalletProps) {
                   <div className="text-right">
                     <p
                       className={`text-sm font-bold ${
-                        transaction.amount > 0
+                        transaction.type === "received"
                           ? "text-green-600 dark:text-green-400"
                           : "text-red-600 dark:text-red-400"
                       }`}
                     >
-                      {transaction.amount > 0 ? "+" : ""}
-                      {transaction.currency}{" "}
-                      {Math.abs(transaction.amount).toLocaleString()}
+                      {transaction.type === "received" ? "+" : "-"}
+                      NPR {transaction.amount.toLocaleString()}
                     </p>
                     <Badge
                       className={getStatusColor(transaction.status)}
