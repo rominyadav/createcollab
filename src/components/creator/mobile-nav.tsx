@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import {
   Briefcase,
   Home,
+  LogOut,
   MessageCircle,
   Plus,
   Search,
@@ -12,6 +13,7 @@ import {
   Wallet,
 } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { NavigationBar } from "@/components/user-ui/navigation-bar";
 
 interface MobileNavProps {
@@ -89,6 +91,20 @@ export function MobileNav({
             orientation="vertical"
             className="space-y-2"
           />
+        </div>
+
+        <div className="border-t p-4">
+          <Button
+            variant="ghost"
+            className="w-full justify-start gap-3 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700"
+            onClick={() => {
+              // Add logout logic here
+              console.log("Logout clicked");
+            }}
+          >
+            <LogOut className="h-5 w-5" />
+            Logout
+          </Button>
         </div>
       </div>
     </>
