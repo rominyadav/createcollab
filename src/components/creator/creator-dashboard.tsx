@@ -121,9 +121,13 @@ export function CreatorDashboard({ creator }: CreatorDashboardProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
+    <div className="bg-background min-h-screen">
       {/* Navigation */}
-      <MobileNav activeTab={activeTab} onTabChange={handleTabChange} />
+      <MobileNav
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        creatorName={creator.name}
+      />
 
       {/* Main Content */}
       <main className="overflow-y-auto pb-16 md:ml-64 md:pb-0">

@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import {
   ChevronDown,
@@ -13,7 +19,9 @@ import {
 } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface Video {
   id: number;
@@ -40,7 +48,7 @@ interface VideoPlayerProps {
   onIndexChange: (index: number) => void;
 }
 
-export function VideoPlayer({
+const VideoPlayer = React.memo(function VideoPlayer({
   videos,
   currentIndex,
   onClose,
@@ -49,48 +57,83 @@ export function VideoPlayer({
   const [isLiked, setIsLiked] = useState(false);
   const currentVideo = videos[currentIndex];
 
-  const getYouTubeEmbedUrl = (url: string) => {
+  const getYouTubeEmbedUrl = useCallback((url: string) => {
     const videoId = url.match(
       /(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([^&\n?#]+)/
     );
     return videoId
-      ? `https://www.youtube.com/embed/${videoId[1]}?autoplay=1&rel=0`
+      ? `https://www.youtube.com/embed/${videoId[1]}?autoplay=1&rel=0&modestbranding=1`
       : null;
-  };
+  }, []);
 
-  const getTikTokEmbedUrl = (url: string) => {
+  const getTikTokEmbedUrl = useCallback((url: string) => {
     const videoId = url.match(/\/video\/(\d+)/);
     return videoId ? `https://www.tiktok.com/embed/v2/${videoId[1]}` : null;
-  };
+  }, []);
 
-  const isYouTubeVideo =
-    currentVideo.videoUrl.includes("youtube.com") ||
-    currentVideo.videoUrl.includes("youtu.be");
-  const isTikTokVideo = currentVideo.videoUrl.includes("tiktok.com");
+  const videoData = useMemo(() => {
+    const isYouTubeVideo =
+      currentVideo.videoUrl.includes("youtube.com") ||
+      currentVideo.videoUrl.includes("youtu.be");
+    const isTikTokVideo = currentVideo.videoUrl.includes("tiktok.com");
 
-  const embedUrl = isYouTubeVideo
-    ? getYouTubeEmbedUrl(currentVideo.videoUrl)
-    : isTikTokVideo
-      ? getTikTokEmbedUrl(currentVideo.videoUrl)
-      : null;
+    const embedUrl = isYouTubeVideo
+      ? getYouTubeEmbedUrl(currentVideo.videoUrl)
+      : isTikTokVideo
+        ? getTikTokEmbedUrl(currentVideo.videoUrl)
+        : null;
 
-  const handlePrevious = () => {
+    return { isYouTubeVideo, isTikTokVideo, embedUrl };
+  }, [currentVideo.videoUrl, getYouTubeEmbedUrl, getTikTokEmbedUrl]);
+
+  const handlePrevious = useCallback(() => {
     if (currentIndex > 0) {
       onIndexChange(currentIndex - 1);
     }
-  };
+  }, [currentIndex, onIndexChange]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (currentIndex < videos.length - 1) {
       onIndexChange(currentIndex + 1);
     }
-  };
+  }, [currentIndex, videos.length, onIndexChange]);
 
-  const handleLike = () => {
+  const handleLike = useCallback(() => {
     setIsLiked(!isLiked);
-  };
+  }, [isLiked]);
+
+  // Preload adjacent videos
+  useEffect(() => {
+    const preloadVideo = (index: number) => {
+      if (index >= 0 && index < videos.length) {
+        const video = videos[index];
+        if (
+          video.videoUrl.includes("youtube.com") ||
+          video.videoUrl.includes("youtu.be")
+        ) {
+          const videoId = video.videoUrl.match(
+            /(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([^&\n?#]+)/
+          );
+          if (videoId) {
+            const link = document.createElement("link");
+            link.rel = "prefetch";
+            link.href = `https://www.youtube.com/embed/${videoId[1]}`;
+            document.head.appendChild(link);
+          }
+        }
+      }
+    };
+
+    // Preload next and previous videos
+    preloadVideo(currentIndex + 1);
+    preloadVideo(currentIndex - 1);
+  }, [currentIndex, videos]);
 
   useEffect(() => {
+    let touchStartY = 0;
+    let isSwiping = false;
+    let wheelTimeout: NodeJS.Timeout | null = null;
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
@@ -105,6 +148,14 @@ export function VideoPlayer({
 
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
+      e.stopPropagation();
+
+      if (wheelTimeout) return;
+
+      wheelTimeout = setTimeout(() => {
+        wheelTimeout = null;
+      }, 300);
+
       if (e.deltaY > 0) {
         handleNext();
       } else {
@@ -112,21 +163,68 @@ export function VideoPlayer({
       }
     };
 
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+      isSwiping = false;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isSwiping) {
+        const currentY = e.touches[0].clientY;
+        const deltaY = Math.abs(touchStartY - currentY);
+        if (deltaY > 10) {
+          isSwiping = true;
+          e.preventDefault();
+        }
+      } else {
+        e.preventDefault();
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (isSwiping) {
+        const touchEndY = e.changedTouches[0].clientY;
+        const deltaY = touchStartY - touchEndY;
+
+        if (Math.abs(deltaY) > 50) {
+          if (deltaY > 0) {
+            handleNext();
+          } else {
+            handlePrevious();
+          }
+        }
+      }
+      isSwiping = false;
+    };
+
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("wheel", handleWheel, { passive: false });
+    document.addEventListener("touchstart", handleTouchStart, {
+      passive: true,
+    });
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+    document.addEventListener("touchend", handleTouchEnd, { passive: true });
+    document.body.style.overflow = "hidden";
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       document.removeEventListener("wheel", handleWheel);
+      document.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
+      document.body.style.overflow = "";
+      if (wheelTimeout) {
+        clearTimeout(wheelTimeout);
+      }
     };
-  }, [currentIndex, videos.length, onClose, handleNext, handlePrevious]);
+  }, [handleNext, handlePrevious, onClose]);
 
   return (
     <div className="fixed inset-0 z-50 bg-black">
       {/* Close Button */}
       <Button
         variant="ghost"
-        size="sm"
+        size="icon"
         onClick={onClose}
         className="absolute top-4 right-4 z-10 text-white hover:bg-white/20"
       >
@@ -137,18 +235,21 @@ export function VideoPlayer({
       <div className="relative flex h-full items-center justify-center">
         {/* Video */}
         <div
-          className={`relative mx-auto w-full max-w-sm bg-black ${
+          className={`relative mx-auto w-full max-w-sm bg-black transition-opacity duration-150 ${
             currentVideo.aspectRatio === "16:9"
               ? "aspect-video"
               : "aspect-[9/16]"
           }`}
         >
-          {(isYouTubeVideo || isTikTokVideo) && embedUrl ? (
+          {(videoData.isYouTubeVideo || videoData.isTikTokVideo) &&
+          videoData.embedUrl ? (
             <iframe
-              src={embedUrl}
+              key={currentVideo.id}
+              src={videoData.embedUrl}
               className="absolute inset-0 h-full w-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
+              loading="eager"
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
@@ -167,7 +268,7 @@ export function VideoPlayer({
         <div className="absolute top-1/2 right-4 flex -translate-y-1/2 transform flex-col gap-4">
           <Button
             variant="ghost"
-            size="sm"
+            size="icon"
             onClick={handlePrevious}
             disabled={currentIndex === 0}
             className="text-white hover:bg-white/20 disabled:opacity-30"
@@ -176,7 +277,7 @@ export function VideoPlayer({
           </Button>
           <Button
             variant="ghost"
-            size="sm"
+            size="icon"
             onClick={handleNext}
             disabled={currentIndex === videos.length - 1}
             className="text-white hover:bg-white/20 disabled:opacity-30"
@@ -244,4 +345,6 @@ export function VideoPlayer({
       </div>
     </div>
   );
-}
+});
+
+export { VideoPlayer };

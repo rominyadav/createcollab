@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface CategoryFilterProps {
   categories: string[];
@@ -14,18 +14,21 @@ export function CategoryFilter({
   onCategoryChange,
 }: CategoryFilterProps) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-2">
-      {categories.map((category) => (
-        <Button
-          key={category}
-          variant={selectedCategory === category ? "default" : "outline"}
-          size="sm"
-          onClick={() => onCategoryChange(category)}
-          className="whitespace-nowrap"
-        >
-          {category === "all" ? "All" : category}
-        </Button>
-      ))}
-    </div>
+    <Tabs value={selectedCategory} onValueChange={onCategoryChange}>
+      <TabsList
+        className="bg-muted grid w-full"
+        style={{ gridTemplateColumns: `repeat(${categories.length}, 1fr)` }}
+      >
+        {categories.map((category) => (
+          <TabsTrigger
+            key={category}
+            value={category}
+            className="text-xs data-[state=active]:bg-emerald-500 data-[state=active]:text-white"
+          >
+            {category === "all" ? "All" : category}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </Tabs>
   );
 }

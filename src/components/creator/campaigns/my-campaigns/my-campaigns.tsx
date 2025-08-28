@@ -4,7 +4,8 @@ import { useState } from "react";
 
 import { CheckCircle, Clock, XCircle } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PageHeader } from "@/components/user-ui/page-header";
 
 import { Campaign, CampaignCard } from "../shared";
 
@@ -99,29 +100,32 @@ export function MyCampaigns({ onViewCampaign }: MyCampaignsProps) {
 
   return (
     <div className="pb-20 md:pb-8">
-      {/* Header */}
-      <div className="sticky top-0 z-10 border-b border-gray-200 bg-white p-4 dark:border-slate-600 dark:bg-slate-800">
-        <h1 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">
-          My Campaigns
-        </h1>
-
+      <PageHeader title="My Campaigns">
         {/* Status Filter */}
-        <div className="flex gap-2 overflow-x-auto pb-2">
-          {statusOptions.map((status) => (
-            <Button
-              key={status}
-              variant={selectedStatus === status ? "default" : "outline"}
-              size="sm"
-              onClick={() => setSelectedStatus(status)}
-              className="whitespace-nowrap"
+        <div className="px-4 pb-4">
+          <Tabs value={selectedStatus} onValueChange={setSelectedStatus}>
+            <TabsList
+              className="bg-muted grid w-full"
+              style={{
+                gridTemplateColumns: `repeat(${statusOptions.length}, 1fr)`,
+              }}
             >
-              {status === "all"
-                ? "All"
-                : status.charAt(0).toUpperCase() + status.slice(1)}
-            </Button>
-          ))}
+              {statusOptions.map((status) => (
+                <TabsTrigger
+                  key={status}
+                  value={status}
+                  className="flex items-center gap-1 text-xs data-[state=active]:bg-emerald-500 data-[state=active]:text-white"
+                >
+                  {getStatusIcon(status)}
+                  {status === "all"
+                    ? "All"
+                    : status.charAt(0).toUpperCase() + status.slice(1)}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
         </div>
-      </div>
+      </PageHeader>
 
       {/* Campaigns List */}
       <div className="space-y-4 p-4">

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import videosData from "@/components/mock-data/videos-mockdata.json";
+import { PageHeader } from "@/components/user-ui/page-header";
 
 import { EmptyState, EndOfContent, LoadingState } from "./feed/loading-state";
 import { VideoGrid } from "./feed/video-grid";
@@ -95,12 +96,7 @@ export function Feed({ onVideoClick }: FeedProps) {
 
   return (
     <div className="min-h-screen pb-20 md:pb-8">
-      {/* Header */}
-      <div className="sticky top-0 z-10 border-b border-gray-200 bg-white/95 p-4 backdrop-blur-sm dark:border-slate-600 dark:bg-slate-800/95">
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-          Feed
-        </h1>
-      </div>
+      <PageHeader title="Feed" />
 
       {/* Video Grid */}
       <div className="p-2 sm:p-4 md:p-6">

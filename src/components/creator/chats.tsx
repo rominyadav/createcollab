@@ -3,12 +3,16 @@
 import { useState } from "react";
 
 import {
+  Building2,
   Check,
   CheckCheck,
   MoreVertical,
   Phone,
   Search,
   Send,
+  Shield,
+  UserCheck,
+  Users,
   Video,
 } from "lucide-react";
 
@@ -16,6 +20,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PageHeader } from "@/components/user-ui/page-header";
 
 interface ChatMessage {
   id: number;
@@ -29,7 +35,7 @@ interface Chat {
   id: number;
   name: string;
   avatar: string;
-  type: "brand" | "moderator" | "support";
+  type: "brand" | "moderator" | "support" | "friend";
   lastMessage: string;
   time: string;
   unreadCount: number;
@@ -77,8 +83,8 @@ const mockChats: Chat[] = [
   },
   {
     id: 2,
-    name: "Support Team",
-    avatar: "ST",
+    name: "CreateCollab Support",
+    avatar: "CC",
     type: "support",
     lastMessage: "Your verification documents have been approved!",
     time: "1:45 PM",
@@ -141,18 +147,88 @@ const mockChats: Chat[] = [
       },
     ],
   },
+  {
+    id: 4,
+    name: "Sarah Johnson",
+    avatar: "SJ",
+    type: "friend",
+    lastMessage: "Hey! Saw your latest video, it was amazing! 🔥",
+    time: "3:15 PM",
+    unreadCount: 0,
+    status: "online",
+    messages: [
+      {
+        id: 1,
+        sender: "creator",
+        message: "Hey Sarah! How's your new campaign going?",
+        time: "3:00 PM",
+        status: "read",
+      },
+      {
+        id: 2,
+        sender: "brand",
+        message: "Hey! Saw your latest video, it was amazing! 🔥",
+        time: "3:15 PM",
+        status: "delivered",
+      },
+    ],
+  },
+  {
+    id: 5,
+    name: "CreateCollab Moderator",
+    avatar: "CM",
+    type: "moderator",
+    lastMessage:
+      "Your content has been reviewed and approved for monetization.",
+    time: "11:30 AM",
+    unreadCount: 0,
+    status: "online",
+    messages: [
+      {
+        id: 1,
+        sender: "moderator",
+        message:
+          "Your content has been reviewed and approved for monetization.",
+        time: "11:30 AM",
+        status: "sent",
+      },
+    ],
+  },
 ];
 
 export function Chats({}: ChatsProps) {
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [newMessage, setNewMessage] = useState("");
+  const [activeTab, setActiveTab] = useState("all");
 
-  const filteredChats = mockChats.filter(
-    (chat) =>
-      chat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const getFilteredChats = (tabType: string) => {
+    let chats = mockChats;
+
+    switch (tabType) {
+      case "brands":
+        chats = mockChats.filter((chat) => chat.type === "brand");
+        break;
+      case "friends":
+        chats = mockChats.filter((chat) => chat.type === "friend");
+        break;
+      case "createcollab":
+        chats = mockChats.filter(
+          (chat) => chat.type === "support" || chat.type === "moderator"
+        );
+        break;
+      default:
+        chats = mockChats;
+    }
+
+    return chats.filter(
+      (chat) =>
+        chat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  };
+
+  const filteredChats = getFilteredChats(activeTab);
 
   const handleSendMessage = () => {
     if (!newMessage.trim() || !selectedChat) return;
@@ -201,6 +277,8 @@ export function Chats({}: ChatsProps) {
         return "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300";
       case "support":
         return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300";
+      case "friend":
+        return "bg-pink-100 text-pink-800 dark:bg-pink-900/20 dark:text-pink-300";
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300";
     }
@@ -214,6 +292,8 @@ export function Chats({}: ChatsProps) {
         return "👨‍💼";
       case "support":
         return "🛠️";
+      case "friend":
+        return "👥";
       default:
         return "💬";
     }
@@ -221,82 +301,171 @@ export function Chats({}: ChatsProps) {
 
   return (
     <div className="pb-20 md:pb-8">
-      {/* Header */}
-      <div className="sticky top-0 z-10 border-b border-gray-200 bg-white p-4 dark:border-slate-600 dark:bg-slate-800">
-        <h1 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">
-          Chats
-        </h1>
-
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <Input
-            placeholder="Search conversations..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-      </div>
+      <PageHeader title="Chats" />
 
       <div className="flex h-[calc(100vh-180px)]">
         {/* Chat List */}
-        <div className="w-full border-r border-gray-200 bg-white md:w-80 dark:border-slate-600 dark:bg-slate-800">
+        <div className="bg-background w-full border-r md:w-80">
+          {/* Search - Mobile */}
+          <div className="relative p-4 md:hidden">
+            <Search className="text-muted-foreground absolute top-1/2 left-7 h-4 w-4 -translate-y-1/2" />
+            <Input
+              placeholder="Search conversations..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          {/* Search & Tabs - Desktop */}
+          <div className="hidden border-b p-4 md:block">
+            <div className="relative mb-4">
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <Input
+                placeholder="Search conversations..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="bg-muted grid w-full grid-cols-4">
+                <TabsTrigger
+                  value="all"
+                  className="flex items-center gap-1 data-[state=active]:bg-emerald-500 data-[state=active]:text-white"
+                >
+                  <Users className="h-3 w-3" />
+                  All
+                </TabsTrigger>
+                <TabsTrigger
+                  value="brands"
+                  className="flex items-center gap-1 data-[state=active]:bg-emerald-500 data-[state=active]:text-white"
+                >
+                  <Building2 className="h-3 w-3" />
+                  Brands
+                </TabsTrigger>
+                <TabsTrigger
+                  value="friends"
+                  className="flex items-center gap-1 data-[state=active]:bg-emerald-500 data-[state=active]:text-white"
+                >
+                  <UserCheck className="h-3 w-3" />
+                  Friends
+                </TabsTrigger>
+                <TabsTrigger
+                  value="createcollab"
+                  className="flex items-center gap-1 data-[state=active]:bg-emerald-500 data-[state=active]:text-white"
+                >
+                  <Shield className="h-3 w-3" />
+                  Support
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+
+          {/* Mobile Tabs */}
+          <div className="px-4 pb-4 md:hidden">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="bg-muted grid w-full grid-cols-4">
+                <TabsTrigger
+                  value="all"
+                  className="flex items-center gap-1 data-[state=active]:bg-emerald-500 data-[state=active]:text-white"
+                >
+                  <Users className="h-3 w-3" />
+                  All
+                </TabsTrigger>
+                <TabsTrigger
+                  value="brands"
+                  className="flex items-center gap-1 data-[state=active]:bg-emerald-500 data-[state=active]:text-white"
+                >
+                  <Building2 className="h-3 w-3" />
+                  Brands
+                </TabsTrigger>
+                <TabsTrigger
+                  value="friends"
+                  className="flex items-center gap-1 data-[state=active]:bg-emerald-500 data-[state=active]:text-white"
+                >
+                  <UserCheck className="h-3 w-3" />
+                  Friends
+                </TabsTrigger>
+                <TabsTrigger
+                  value="createcollab"
+                  className="flex items-center gap-1 data-[state=active]:bg-emerald-500 data-[state=active]:text-white"
+                >
+                  <Shield className="h-3 w-3" />
+                  Support
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+
           <div className="h-full overflow-y-auto">
-            {filteredChats.map((chat) => (
-              <div
-                key={chat.id}
-                onClick={() => setSelectedChat(chat)}
-                className={`cursor-pointer border-b border-gray-100 p-4 hover:bg-gray-50 dark:border-slate-700 dark:hover:bg-slate-700 ${
-                  selectedChat?.id === chat.id
-                    ? "border-r-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20"
-                    : ""
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="relative">
-                    <Avatar className="h-12 w-12">
-                      <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 font-bold text-white">
-                        {chat.avatar}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div
-                      className={`absolute -right-1 -bottom-1 h-3 w-3 rounded-full border-2 border-white ${getStatusColor(chat.status)}`}
-                    />
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <div className="mb-1 flex items-center justify-between">
-                      <h3 className="truncate font-medium text-gray-900 dark:text-white">
-                        {chat.name}
-                      </h3>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {chat.time}
-                      </span>
+            {filteredChats.length === 0 ? (
+              <div className="flex flex-col items-center justify-center p-8 text-center">
+                <div className="mb-4 text-4xl">💬</div>
+                <h3 className="mb-2 text-lg font-medium">
+                  No conversations found
+                </h3>
+                <p className="text-muted-foreground">
+                  Try adjusting your search or check other tabs
+                </p>
+              </div>
+            ) : (
+              filteredChats.map((chat) => (
+                <div
+                  key={chat.id}
+                  onClick={() => setSelectedChat(chat)}
+                  className={`cursor-pointer border-b border-gray-100 p-4 hover:bg-gray-50 dark:border-slate-700 dark:hover:bg-slate-700 ${
+                    selectedChat?.id === chat.id
+                      ? "border-r-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20"
+                      : ""
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="relative">
+                      <Avatar className="h-12 w-12">
+                        <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 font-bold text-white">
+                          {chat.avatar}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div
+                        className={`absolute -right-1 -bottom-1 h-3 w-3 rounded-full border-2 border-white ${getStatusColor(chat.status)}`}
+                      />
                     </div>
 
-                    <div className="mb-2 flex items-center gap-2">
-                      <Badge
-                        className={getTypeColor(chat.type)}
-                        variant="outline"
-                      >
-                        <span className="mr-1">{getTypeIcon(chat.type)}</span>
-                        {chat.type}
-                      </Badge>
-                      {chat.unreadCount > 0 && (
-                        <Badge className="bg-red-500 text-white">
-                          {chat.unreadCount}
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-1 flex items-center justify-between">
+                        <h3 className="truncate font-medium text-gray-900 dark:text-white">
+                          {chat.name}
+                        </h3>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {chat.time}
+                        </span>
+                      </div>
+
+                      <div className="mb-2 flex items-center gap-2">
+                        <Badge
+                          className={getTypeColor(chat.type)}
+                          variant="outline"
+                        >
+                          <span className="mr-1">{getTypeIcon(chat.type)}</span>
+                          {chat.type}
                         </Badge>
-                      )}
-                    </div>
+                        {chat.unreadCount > 0 && (
+                          <Badge className="bg-red-500 text-white">
+                            {chat.unreadCount}
+                          </Badge>
+                        )}
+                      </div>
 
-                    <p className="truncate text-sm text-gray-600 dark:text-gray-400">
-                      {chat.lastMessage}
-                    </p>
+                      <p className="truncate text-sm text-gray-600 dark:text-gray-400">
+                        {chat.lastMessage}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 

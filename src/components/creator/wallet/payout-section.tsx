@@ -7,6 +7,7 @@ import { CreditCard, Download, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface PayoutSectionProps {
   totalBalance: number;
@@ -60,28 +61,29 @@ export function PayoutSection({ totalBalance }: PayoutSectionProps) {
           <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
             Payment Method
           </label>
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              variant={
-                selectedPaymentMethod === "khalti" ? "default" : "outline"
-              }
-              onClick={() => setSelectedPaymentMethod("khalti")}
-              className="flex items-center gap-2"
-            >
-              <Smartphone className="h-4 w-4" />
-              Khalti
-            </Button>
-            <Button
-              variant={
-                selectedPaymentMethod === "esewa" ? "default" : "outline"
-              }
-              onClick={() => setSelectedPaymentMethod("esewa")}
-              className="flex items-center gap-2"
-            >
-              <CreditCard className="h-4 w-4" />
-              eSewa
-            </Button>
-          </div>
+          <Tabs
+            value={selectedPaymentMethod}
+            onValueChange={(value) =>
+              setSelectedPaymentMethod(value as "khalti" | "esewa")
+            }
+          >
+            <TabsList className="bg-muted grid w-full grid-cols-2">
+              <TabsTrigger
+                value="khalti"
+                className="flex items-center gap-2 data-[state=active]:bg-emerald-500 data-[state=active]:text-white"
+              >
+                <Smartphone className="h-4 w-4" />
+                Khalti
+              </TabsTrigger>
+              <TabsTrigger
+                value="esewa"
+                className="flex items-center gap-2 data-[state=active]:bg-emerald-500 data-[state=active]:text-white"
+              >
+                <CreditCard className="h-4 w-4" />
+                eSewa
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
 
         <Button

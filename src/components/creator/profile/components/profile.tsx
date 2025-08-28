@@ -6,8 +6,11 @@ import { Globe, Grid, MapPin, Settings, Users, Video } from "lucide-react";
 import { FaFacebook, FaInstagram, FaTiktok, FaYoutube } from "react-icons/fa";
 
 import { Creator } from "@/components/mock-data/creator-mockdata";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PageHeader } from "@/components/user-ui/page-header";
 
 import { ProfileHeader } from "../shared/profile-header";
 import { VideoGrid } from "../shared/video-grid";
@@ -58,22 +61,14 @@ export function Profile({
 
   return (
     <div className="pb-20 md:pb-8">
-      {/* Header */}
-      <div className="sticky top-0 z-10 border-b border-gray-200 bg-white p-4 dark:border-slate-600 dark:bg-slate-800">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-            Profile
-          </h1>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onSettingsClick}
-            className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-          >
-            <Settings className="h-5 w-5" />
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        title="Profile"
+        action={{
+          icon: Settings,
+          onClick: onSettingsClick,
+          label: "Settings",
+        }}
+      />
 
       <div className="space-y-6 p-4">
         <ProfileHeader
@@ -84,95 +79,127 @@ export function Profile({
         {/* Bio */}
         <Card>
           <CardContent className="p-4">
-            <p className="text-center text-gray-700 dark:text-gray-300">
-              {creator.bio}
-            </p>
+            <p className="text-muted-foreground text-center">{creator.bio}</p>
           </CardContent>
         </Card>
 
         {/* Location & Stats */}
         <div className="grid grid-cols-2 gap-4">
           <Card>
-            <CardContent className="p-4">
-              <div className="mb-2 flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-gray-400" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Location
-                </span>
-              </div>
-              <p className="text-sm text-gray-900 dark:text-white">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <MapPin className="text-muted-foreground h-4 w-4" />
+                Location
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <p className="text-sm">
                 {creator.location.city}, {creator.location.country}
               </p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardContent className="p-4">
-              <div className="mb-2 flex items-center gap-2">
-                <Users className="h-4 w-4 text-gray-400" />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Engagement
-                </span>
-              </div>
-              <p className="text-sm text-gray-900 dark:text-white">
-                {creator.engagement}
-              </p>
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <Users className="text-muted-foreground h-4 w-4" />
+                Engagement
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <p className="text-sm">{creator.engagement}</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Social Links */}
         <Card>
-          <CardContent className="p-4">
-            <h3 className="mb-3 font-medium text-gray-900 dark:text-white">
-              Social Media
-            </h3>
+          <CardHeader>
+            <CardTitle className="text-base">Social Media</CardTitle>
+          </CardHeader>
+          <CardContent>
             <div className="grid grid-cols-2 gap-2">
               {creator.socialLinks.map((link, index) => (
-                <a
+                <Button
                   key={index}
-                  href={`https://${link}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 rounded-lg border border-gray-200 p-2 transition-colors hover:bg-gray-50 dark:border-slate-600 dark:hover:bg-slate-700"
+                  variant="outline"
+                  size="sm"
+                  asChild
+                  className="h-auto justify-start gap-2 p-2"
                 >
-                  {getSocialIcon(link)}
-                  <span className="truncate text-sm text-gray-700 dark:text-gray-300">
-                    {link.replace(/^(https?:\/\/)?(www\.)?/, "")}
-                  </span>
-                </a>
+                  <a
+                    href={`https://${link}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {getSocialIcon(link)}
+                    <span className="truncate text-sm">
+                      {link.replace(/^(https?:\/\/)?(www\.)?/, "")}
+                    </span>
+                  </a>
+                </Button>
               ))}
             </div>
           </CardContent>
         </Card>
 
         {/* Video Tabs */}
-        <div className="space-y-4">
-          <div className="flex border-b border-gray-200 dark:border-slate-600">
-            <Button
-              variant={activeTab === "public" ? "default" : "ghost"}
-              onClick={() => setActiveTab("public")}
-              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-emerald-500"
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) =>
+            setActiveTab(value as "public" | "campaign")
+          }
+          className="space-y-4"
+        >
+          <TabsList className="bg-muted grid w-full grid-cols-2">
+            <TabsTrigger
+              value="public"
+              className="flex items-center gap-2 data-[state=active]:bg-emerald-500 data-[state=active]:text-white"
             >
-              <Grid className="mr-2 h-4 w-4" />
-              Public Videos ({creator.videos.length})
-            </Button>
-            <Button
-              variant={activeTab === "campaign" ? "default" : "ghost"}
-              onClick={() => setActiveTab("campaign")}
-              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-emerald-500"
+              <Grid className="h-4 w-4" />
+              Public Videos
+              <Badge
+                variant="secondary"
+                className="ml-1 border-0 bg-white/20 text-current"
+              >
+                {creator.videos.length}
+              </Badge>
+            </TabsTrigger>
+            <TabsTrigger
+              value="campaign"
+              className="flex items-center gap-2 data-[state=active]:bg-emerald-500 data-[state=active]:text-white"
             >
-              <Video className="mr-2 h-4 w-4" />
-              Campaign Videos ({campaignVideos.length})
-            </Button>
-          </div>
+              <Video className="h-4 w-4" />
+              Campaign Videos
+              <Badge
+                variant="secondary"
+                className="ml-1 border-0 bg-white/20 text-current"
+              >
+                {campaignVideos.length}
+              </Badge>
+            </TabsTrigger>
+          </TabsList>
 
-          <VideoGrid
-            videos={activeTab === "public" ? creator.videos : campaignVideos}
-            onVideoClick={onVideoClick}
-            type={activeTab}
-          />
-        </div>
+          <TabsContent value="public" className="space-y-4">
+            <VideoGrid
+              videos={creator.videos}
+              onVideoClick={onVideoClick}
+              type="public"
+              creatorName={creator.name}
+              creatorAvatar={creator.avatar}
+            />
+          </TabsContent>
+
+          <TabsContent value="campaign" className="space-y-4">
+            <VideoGrid
+              videos={campaignVideos}
+              onVideoClick={onVideoClick}
+              type="campaign"
+              creatorName={creator.name}
+              creatorAvatar={creator.avatar}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
