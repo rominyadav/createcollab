@@ -58,12 +58,21 @@ export function VideoPlayer({
       : null;
   };
 
+  const getTikTokEmbedUrl = (url: string) => {
+    const videoId = url.match(/\/video\/(\d+)/);
+    return videoId ? `https://www.tiktok.com/embed/v2/${videoId[1]}` : null;
+  };
+
   const isYouTubeVideo =
     currentVideo.videoUrl.includes("youtube.com") ||
     currentVideo.videoUrl.includes("youtu.be");
+  const isTikTokVideo = currentVideo.videoUrl.includes("tiktok.com");
+
   const embedUrl = isYouTubeVideo
     ? getYouTubeEmbedUrl(currentVideo.videoUrl)
-    : null;
+    : isTikTokVideo
+      ? getTikTokEmbedUrl(currentVideo.videoUrl)
+      : null;
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
@@ -134,7 +143,7 @@ export function VideoPlayer({
               : "aspect-[9/16]"
           }`}
         >
-          {isYouTubeVideo && embedUrl ? (
+          {(isYouTubeVideo || isTikTokVideo) && embedUrl ? (
             <iframe
               src={embedUrl}
               className="absolute inset-0 h-full w-full"
