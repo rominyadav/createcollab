@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   CheckCircle,
@@ -33,37 +33,19 @@ interface CreatorVideo {
   uploadedAt: string;
 }
 
+interface PricingTier {
+  type: "fixed" | "range";
+  amount?: number;
+  min?: number;
+  max?: number;
+}
+
 interface CreatorPricing {
-  "15sec": {
-    type: "fixed" | "range";
-    amount?: number;
-    min?: number;
-    max?: number;
-  };
-  "30sec": {
-    type: "fixed" | "range";
-    amount?: number;
-    min?: number;
-    max?: number;
-  };
-  "60sec": {
-    type: "fixed" | "range";
-    amount?: number;
-    min?: number;
-    max?: number;
-  };
-  "1-5min": {
-    type: "fixed" | "range";
-    amount?: number;
-    min?: number;
-    max?: number;
-  };
-  "5min+": {
-    type: "fixed" | "range";
-    amount?: number;
-    min?: number;
-    max?: number;
-  };
+  "15sec": PricingTier;
+  "30sec": PricingTier;
+  "60sec": PricingTier;
+  "1-5min": PricingTier;
+  "5min+": PricingTier;
 }
 
 interface Creator {
@@ -115,52 +97,84 @@ export function CreatorProfileReview({
 }: CreatorProfileReviewProps) {
   const [showChat, setShowChat] = useState(false);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300";
-      case "approved":
-        return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300";
-      case "rejected":
-        return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
-      case "blocked":
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300";
-    }
-  };
+  const statusColors = {
+    pending:
+      "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300",
+    approved:
+      "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300",
+    rejected: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300",
+    blocked: "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300",
+  } as const;
 
-  const getProfileCompletionColor = (completion: string) => {
-    return completion === "Complete"
-      ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300"
-      : "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300";
-  };
+  const getStatusColor = (status: string) =>
+    statusColors[status as keyof typeof statusColors] || statusColors.blocked;
 
-  const getCreatorScoreColor = (score: number) => {
+  const profileCompletionData = useMemo(
+    () => ({
+      color:
+        creator.profileCompletion === "Complete"
+          ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300"
+          : "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300",
+    }),
+    [creator.profileCompletion]
+  );
+
+  const scoreData = useMemo(() => {
+    const score = creator.creatorScore;
     if (score >= 90)
-      return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300";
+      return {
+        badgeColor:
+          "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300",
+        label: "Excellent",
+        barColor: "bg-emerald-500",
+      };
     if (score >= 80)
-      return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300";
+      return {
+        badgeColor:
+          "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300",
+        label: "Very Good",
+        barColor: "bg-blue-500",
+      };
     if (score >= 70)
-      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300";
+      return {
+        badgeColor:
+          "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300",
+        label: "Good",
+        barColor: "bg-yellow-500",
+      };
     if (score >= 60)
-      return "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300";
-    return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
-  };
+      return {
+        badgeColor:
+          "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300",
+        label: "Fair",
+        barColor: "bg-orange-500",
+      };
+    return {
+      badgeColor:
+        "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300",
+      label: "Poor",
+      barColor: "bg-red-500",
+    };
+  }, [creator.creatorScore]);
 
-  const getCreatorScoreLabel = (score: number) => {
-    if (score >= 90) return "Excellent";
-    if (score >= 80) return "Very Good";
-    if (score >= 70) return "Good";
-    if (score >= 60) return "Fair";
-    return "Poor";
-  };
-
-  const getPaymentVerificationColor = (verified: boolean) => {
-    return verified
-      ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300"
-      : "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
-  };
+  const verificationData = useMemo(
+    () => ({
+      payment: {
+        color: creator.paymentVerification.verified
+          ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300"
+          : "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300",
+        text: creator.paymentVerification.verified ? "Verified" : "Unverified",
+      },
+      profile: {
+        variant: (creator.verified ? "default" : "secondary") as
+          | "default"
+          | "secondary",
+        className: creator.verified ? "bg-green-600" : "",
+        text: creator.verified ? "Verified" : "Pending",
+      },
+    }),
+    [creator.paymentVerification.verified, creator.verified]
+  );
 
   const formatPricing = (pricing: {
     type: "fixed" | "range";
@@ -175,18 +189,23 @@ export function CreatorProfileReview({
     }
   };
 
-  const getSocialIcon = (platform: string) => {
-    const lowerPlatform = platform.toLowerCase();
-    if (lowerPlatform.includes("facebook") || lowerPlatform.includes("fb"))
-      return <FaFacebook className="h-4 w-4 text-blue-600" />;
-    if (lowerPlatform.includes("instagram") || lowerPlatform.includes("insta"))
-      return <FaInstagram className="h-4 w-4 text-pink-600" />;
-    if (lowerPlatform.includes("tiktok"))
-      return <FaTiktok className="h-4 w-4 text-black dark:text-white" />;
-    if (lowerPlatform.includes("youtube") || lowerPlatform.includes("yt"))
-      return <FaYoutube className="h-4 w-4 text-red-600" />;
-    return <Users className="h-4 w-4 text-gray-400" />;
-  };
+  const socialIconsMap = useMemo(() => {
+    return creator.socialLinks.map((link) => {
+      const lowerPlatform = link.toLowerCase();
+      if (lowerPlatform.includes("facebook") || lowerPlatform.includes("fb"))
+        return <FaFacebook className="h-4 w-4 text-blue-600" />;
+      if (
+        lowerPlatform.includes("instagram") ||
+        lowerPlatform.includes("insta")
+      )
+        return <FaInstagram className="h-4 w-4 text-pink-600" />;
+      if (lowerPlatform.includes("tiktok"))
+        return <FaTiktok className="h-4 w-4 text-black dark:text-white" />;
+      if (lowerPlatform.includes("youtube") || lowerPlatform.includes("yt"))
+        return <FaYoutube className="h-4 w-4 text-red-600" />;
+      return <Users className="h-4 w-4 text-gray-400" />;
+    });
+  }, [creator.socialLinks]);
 
   const toggleChat = () => {
     setShowChat(!showChat);
@@ -403,11 +422,7 @@ export function CreatorProfileReview({
                       <span className="text-sm text-gray-600 dark:text-slate-400">
                         Completion
                       </span>
-                      <Badge
-                        className={getProfileCompletionColor(
-                          creator.profileCompletion
-                        )}
-                      >
+                      <Badge className={profileCompletionData.color}>
                         {creator.profileCompletion}
                       </Badge>
                     </div>
@@ -416,10 +431,10 @@ export function CreatorProfileReview({
                         Verification
                       </span>
                       <Badge
-                        variant={creator.verified ? "default" : "secondary"}
-                        className={creator.verified ? "bg-green-600" : ""}
+                        variant={verificationData.profile.variant}
+                        className={verificationData.profile.className}
                       >
-                        {creator.verified ? "Verified" : "Pending"}
+                        {verificationData.profile.text}
                       </Badge>
                     </div>
                   </CardContent>
@@ -459,7 +474,7 @@ export function CreatorProfileReview({
                           rel="noopener noreferrer"
                           className="group flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 p-3 transition-colors hover:bg-gray-50 dark:border-slate-600 dark:hover:bg-slate-600"
                         >
-                          {getSocialIcon(link)}
+                          {socialIconsMap[index]}
                           <span className="text-sm text-gray-700 group-hover:text-emerald-600 dark:text-slate-300 dark:group-hover:text-emerald-400">
                             {link}
                           </span>
@@ -498,31 +513,17 @@ export function CreatorProfileReview({
                           Overall Score
                         </span>
                         <div className="flex items-center gap-2">
-                          <Badge
-                            className={getCreatorScoreColor(
-                              creator.creatorScore
-                            )}
-                          >
+                          <Badge className={scoreData.badgeColor}>
                             {creator.creatorScore}/100
                           </Badge>
                           <Badge variant="outline" className="text-xs">
-                            {getCreatorScoreLabel(creator.creatorScore)}
+                            {scoreData.label}
                           </Badge>
                         </div>
                       </div>
                       <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-slate-600">
                         <div
-                          className={`h-2 rounded-full transition-all duration-300 ${
-                            creator.creatorScore >= 90
-                              ? "bg-emerald-500"
-                              : creator.creatorScore >= 80
-                                ? "bg-blue-500"
-                                : creator.creatorScore >= 70
-                                  ? "bg-yellow-500"
-                                  : creator.creatorScore >= 60
-                                    ? "bg-orange-500"
-                                    : "bg-red-500"
-                          }`}
+                          className={`h-2 rounded-full transition-all duration-300 ${scoreData.barColor}`}
                           style={{ width: `${creator.creatorScore}%` }}
                         ></div>
                       </div>
@@ -569,14 +570,8 @@ export function CreatorProfileReview({
                       <span className="text-sm text-gray-600 dark:text-slate-400">
                         Payment Verified
                       </span>
-                      <Badge
-                        className={getPaymentVerificationColor(
-                          creator.paymentVerification.verified
-                        )}
-                      >
-                        {creator.paymentVerification.verified
-                          ? "Verified"
-                          : "Unverified"}
+                      <Badge className={verificationData.payment.color}>
+                        {verificationData.payment.text}
                       </Badge>
                     </div>
                   </CardContent>
@@ -588,7 +583,13 @@ export function CreatorProfileReview({
                     <CardContent className="p-4">
                       <div className="space-y-3">
                         <Button
-                          onClick={() => onApprove(creator.id)}
+                          onClick={() => {
+                            try {
+                              onApprove(creator.id);
+                            } catch {
+                              // Handle approval error silently
+                            }
+                          }}
                           variant="emerald"
                           className="w-full"
                         >
@@ -597,7 +598,13 @@ export function CreatorProfileReview({
                         </Button>
                         <Button
                           variant="destructive"
-                          onClick={() => onReject(creator.id)}
+                          onClick={() => {
+                            try {
+                              onReject(creator.id);
+                            } catch {
+                              // Handle rejection error silently
+                            }
+                          }}
                           className="w-full"
                         >
                           <XCircle className="mr-2 h-4 w-4" />

@@ -104,7 +104,7 @@ export function BrandReviews() {
 
   const handleApproval = useCallback(
     (brandId: number, action: "approve" | "reject") => {
-      console.log(`Brand ${brandId} ${action}d`);
+      console.log("Brand approval action", { brandId, action });
       setSelectedBrand(null);
     },
     []

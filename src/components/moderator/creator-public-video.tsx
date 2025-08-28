@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Calendar, Eye, MapPin, Users } from "lucide-react";
 
@@ -43,7 +43,7 @@ const mockCreatorPublicVideos: CreatorPublicVideo[] = [
     videoUrl: "https://example.com/video1",
     videoLayout: "9:16",
     duration: "7:23",
-
+    reports: 0,
     category: "Lifestyle",
     tags: ["productivity", "routine", "tips"],
   },
@@ -62,6 +62,7 @@ const mockCreatorPublicVideos: CreatorPublicVideo[] = [
     videoUrl: "https://example.com/video2",
     videoLayout: "16:9",
     duration: "12:45",
+    reports: 0,
     category: "Food & Travel",
     tags: ["street food", "kathmandu", "food tour", "nepal"],
   },
@@ -80,6 +81,7 @@ const mockCreatorPublicVideos: CreatorPublicVideo[] = [
     videoUrl: "https://example.com/video3",
     videoLayout: "16:9",
     duration: "18:32",
+    reports: 0,
     category: "Gaming",
     tags: ["gaming", "highlights", "wins", "fails"],
   },
@@ -98,6 +100,7 @@ const mockCreatorPublicVideos: CreatorPublicVideo[] = [
     videoUrl: "https://example.com/video4",
     videoLayout: "9:16",
     duration: "9:15",
+    reports: 0,
     category: "Home & DIY",
     tags: ["diy", "home decoration", "crafts", "budget"],
   },
@@ -356,17 +359,24 @@ export function CreatorPublicVideo({ onPreview }: CreatorPublicVideoProps) {
           </Button>
 
           <div className="flex items-center gap-1">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <Button
-                key={page}
-                variant={currentPage === page ? "emerald" : "outline"}
-                size="sm"
-                onClick={() => handlePageChange(page)}
-                className="h-10 w-10"
-              >
-                {page}
-              </Button>
-            ))}
+            {useMemo(
+              () =>
+                [...Array(totalPages)].map((_, i) => {
+                  const page = i + 1;
+                  return (
+                    <Button
+                      key={page}
+                      variant={currentPage === page ? "emerald" : "outline"}
+                      size="sm"
+                      onClick={() => handlePageChange(page)}
+                      className="h-10 w-10"
+                    >
+                      {page}
+                    </Button>
+                  );
+                }),
+              [totalPages, currentPage]
+            )}
           </div>
 
           <Button

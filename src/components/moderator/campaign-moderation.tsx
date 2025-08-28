@@ -527,8 +527,9 @@ export function CampaignModeration() {
                   Previous
                 </Button>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
+                {[...Array(totalPages)].map((_, i) => {
+                  const page = i + 1;
+                  return (
                     <Button
                       key={page}
                       variant={currentPage === page ? "default" : "outline"}
@@ -538,8 +539,8 @@ export function CampaignModeration() {
                     >
                       {page}
                     </Button>
-                  )
-                )}
+                  );
+                })}
 
                 <Button
                   variant="outline"

@@ -77,6 +77,7 @@ interface Brand {
     maxUses: number;
     usedCount: number;
     minOrderAmount: number;
+    currency: string;
     status: string;
   }>;
   creatorCollaborations: Array<{
