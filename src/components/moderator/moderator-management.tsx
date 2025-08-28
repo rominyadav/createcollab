@@ -1,8 +1,7 @@
-import { Edit, Plus, Trash2 } from "lucide-react";
-
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
+import { Icon } from "@/components/ui/icon";
 
 interface Moderator {
   id: number;
@@ -40,22 +39,25 @@ export function ModeratorManagement() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             Moderator Management
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             Manage moderator accounts and permissions
           </p>
         </div>
         <Button variant="emerald" className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
+          <Icon name="plus" size="sm" />
           Add Moderator
         </Button>
       </div>
 
       <div className="grid gap-6">
         {moderators.map((moderator) => (
-          <Card key={moderator.id}>
+          <Card
+            key={moderator.id}
+            className="border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700"
+          >
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
@@ -68,17 +70,21 @@ export function ModeratorManagement() {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 className="text-lg font-semibold">{moderator.name}</h3>
-                    <p className="text-gray-600">{moderator.email}</p>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {moderator.name}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {moderator.email}
+                    </p>
                     <div className="mt-1 flex items-center gap-2">
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
                         {moderator.role}
                       </span>
                       <span
                         className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
                           moderator.status === "active"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-gray-100 text-gray-800"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200"
+                            : "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200"
                         }`}
                       >
                         {moderator.status}
@@ -92,7 +98,7 @@ export function ModeratorManagement() {
                     size="sm"
                     onClick={() => handleAction(moderator.id, "edit")}
                   >
-                    <Edit className="mr-2 h-4 w-4" />
+                    <Icon name="edit" size="sm" className="mr-2" />
                     Edit
                   </Button>
                   <Button
@@ -100,7 +106,7 @@ export function ModeratorManagement() {
                     size="sm"
                     onClick={() => handleAction(moderator.id, "delete")}
                   >
-                    <Trash2 className="mr-2 h-4 w-4" />
+                    <Icon name="trash" size="sm" className="mr-2" />
                     Delete
                   </Button>
                 </div>

@@ -201,6 +201,43 @@ const mockCampaigns: Campaign[] = [
 
 const itemsPerPage = 5;
 
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "pending":
+      return "bg-yellow-100 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200";
+    case "approved":
+      return "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-200";
+    case "rejected":
+      return "bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-200";
+    case "active":
+      return "bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200";
+    case "completed":
+      return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
+    default:
+      return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200";
+  }
+};
+
+const getRewardTypeIcon = (type: string) => {
+  switch (type) {
+    case "cash":
+      return <DollarSign className="h-4 w-4" />;
+    case "product":
+      return <Gift className="h-4 w-4" />;
+    case "coupon":
+      return <Gift className="h-4 w-4" />;
+    case "mixed":
+      return (
+        <div className="flex gap-1">
+          <DollarSign className="h-3 w-3" />
+          <Gift className="h-3 w-3" />
+        </div>
+      );
+    default:
+      return <Gift className="h-4 w-4" />;
+  }
+};
+
 export function CampaignModeration() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<Campaign["status"] | "all">(
@@ -228,43 +265,6 @@ export function CampaignModeration() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentCampaigns = filteredCampaigns.slice(startIndex, endIndex);
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "approved":
-        return "bg-green-100 text-green-800";
-      case "rejected":
-        return "bg-red-100 text-red-800";
-      case "active":
-        return "bg-blue-100 text-blue-800";
-      case "completed":
-        return "bg-gray-100 text-gray-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getRewardTypeIcon = (type: string) => {
-    switch (type) {
-      case "cash":
-        return <DollarSign className="h-4 w-4" />;
-      case "product":
-        return <Gift className="h-4 w-4" />;
-      case "coupon":
-        return <Gift className="h-4 w-4" />;
-      case "mixed":
-        return (
-          <div className="flex gap-1">
-            <DollarSign className="h-3 w-3" />
-            <Gift className="h-3 w-3" />
-          </div>
-        );
-      default:
-        return <Gift className="h-4 w-4" />;
-    }
-  };
 
   const handleReview = (campaign: Campaign) => {
     setSelectedCampaign(campaign);
@@ -295,10 +295,10 @@ export function CampaignModeration() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
             Campaign Moderation
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             Review and manage campaign submissions
           </p>
         </div>
@@ -313,7 +313,7 @@ export function CampaignModeration() {
       </div>
 
       {/* Filters and Search */}
-      <Card>
+      <Card className="border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700">
         <CardHeader>
           <div className="flex flex-col gap-4 lg:flex-row">
             {/* Search */}
@@ -323,7 +323,7 @@ export function CampaignModeration() {
                 placeholder="Search campaigns by title, brand, or description..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="border-gray-300 bg-white pl-10 text-gray-900 placeholder:text-gray-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white dark:placeholder:text-gray-400"
               />
             </div>
 
@@ -342,7 +342,7 @@ export function CampaignModeration() {
                       | "completed"
                   )
                 }
-                className="rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                className="rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
               >
                 <option value="all">All Status</option>
                 <option value="pending">Pending</option>
@@ -355,7 +355,7 @@ export function CampaignModeration() {
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                className="rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:text-white"
               >
                 <option value="">All Categories</option>
                 {categories.map((category) => (
@@ -370,38 +370,41 @@ export function CampaignModeration() {
       </Card>
 
       {/* Campaigns List */}
-      <Card>
+      <Card className="border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 dark:bg-slate-600">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
                     Campaign
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
                     Brand
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
                     Budget
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
                     Reward
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
                     Creators
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase">
+                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-300">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 bg-white">
+              <tbody className="divide-y divide-gray-200 bg-white dark:divide-slate-600 dark:bg-slate-700">
                 {currentCampaigns.map((campaign) => (
-                  <tr key={campaign.id} className="hover:bg-gray-50">
+                  <tr
+                    key={campaign.id}
+                    className="hover:bg-gray-50 dark:hover:bg-slate-600"
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="h-10 w-10 flex-shrink-0">
@@ -410,13 +413,13 @@ export function CampaignModeration() {
                           </div>
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
                             {campaign.title}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-500 dark:text-gray-300">
                             {campaign.category}
                           </div>
-                          <div className="flex items-center gap-2 text-xs text-gray-400">
+                          <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-400">
                             <Calendar className="h-3 w-3" />
                             {campaign.createdAt}
                           </div>
@@ -424,10 +427,10 @@ export function CampaignModeration() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">
                         {campaign.brand}
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-gray-500">
+                      <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-300">
                         <MapPin className="h-3 w-3" />
                         {campaign.location}
                       </div>
@@ -439,14 +442,14 @@ export function CampaignModeration() {
                       </Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">
                         {campaign.budget}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         {getRewardTypeIcon(campaign.rewardType)}
-                        <span className="text-sm text-gray-900 capitalize">
+                        <span className="text-sm text-gray-900 capitalize dark:text-white">
                           {campaign.rewardType}
                         </span>
                       </div>
@@ -454,7 +457,7 @@ export function CampaignModeration() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         <Users className="h-4 w-4 text-gray-400" />
-                        <span className="text-sm text-gray-900">
+                        <span className="text-sm text-gray-900 dark:text-white">
                           {campaign.joinedCreators}/{campaign.targetCreators}
                         </span>
                       </div>
@@ -506,10 +509,10 @@ export function CampaignModeration() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <Card>
+        <Card className="border-gray-200 bg-white dark:border-slate-600 dark:bg-slate-700">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-700">
+              <div className="text-sm text-gray-700 dark:text-gray-300">
                 Showing {startIndex + 1} to{" "}
                 {Math.min(endIndex, filteredCampaigns.length)} of{" "}
                 {filteredCampaigns.length} results
@@ -524,8 +527,9 @@ export function CampaignModeration() {
                   Previous
                 </Button>
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                  (page) => (
+                {[...Array(totalPages)].map((_, i) => {
+                  const page = i + 1;
+                  return (
                     <Button
                       key={page}
                       variant={currentPage === page ? "default" : "outline"}
@@ -535,8 +539,8 @@ export function CampaignModeration() {
                     >
                       {page}
                     </Button>
-                  )
-                )}
+                  );
+                })}
 
                 <Button
                   variant="outline"

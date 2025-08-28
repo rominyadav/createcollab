@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 
-import { AlertCircle, Bell, CheckCircle, Info, X, XCircle } from "lucide-react";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
 
 interface Notification {
   id: string;
@@ -99,13 +98,13 @@ export function NotificationSystem() {
   const getNotificationIcon = (type: Notification["type"]) => {
     switch (type) {
       case "success":
-        return <CheckCircle className="h-5 w-5 text-green-600" />;
+        return <Icon name="checkCircle" variant="success" />;
       case "warning":
-        return <AlertCircle className="h-5 w-5 text-yellow-600" />;
+        return <Icon name="alertCircle" variant="warning" />;
       case "info":
-        return <Info className="h-5 w-5 text-blue-600" />;
+        return <Icon name="info" variant="info" />;
       case "error":
-        return <XCircle className="h-5 w-5 text-red-600" />;
+        return <Icon name="xCircle" variant="destructive" />;
     }
   };
 
@@ -131,7 +130,7 @@ export function NotificationSystem() {
         onClick={() => setShowNotifications(!showNotifications)}
         className="relative h-9 w-9 rounded-md"
       >
-        <Bell className="h-4 w-4" />
+        <Icon name="bell" size="sm" />
         {unreadCount > 0 && (
           <Badge
             variant="destructive"
@@ -144,12 +143,14 @@ export function NotificationSystem() {
 
       {/* Notifications Panel */}
       {showNotifications && (
-        <div className="absolute top-12 right-0 z-50 max-h-[70vh] w-[500px] overflow-hidden rounded-lg border bg-white shadow-2xl">
+        <div className="absolute top-12 right-0 z-50 max-h-[70vh] w-[500px] overflow-hidden rounded-lg border border-gray-200 bg-white shadow-2xl dark:border-slate-600 dark:bg-slate-800">
           {/* Header */}
-          <div className="flex items-center justify-between border-b bg-gray-50 p-4">
+          <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 p-4 dark:border-slate-600 dark:bg-slate-700">
             <div className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-gray-600" />
-              <h3 className="font-semibold text-gray-900">Notifications</h3>
+              <Icon name="bell" variant="muted" />
+              <h3 className="font-semibold text-gray-900 dark:text-white">
+                Notifications
+              </h3>
               {unreadCount > 0 && (
                 <Badge variant="default" className="bg-emerald-600 text-xs">
                   {unreadCount} new
@@ -173,7 +174,7 @@ export function NotificationSystem() {
                 onClick={() => setShowNotifications(false)}
                 className="h-8 w-8 p-0"
               >
-                <X className="h-4 w-4" />
+                <Icon name="x" size="sm" />
               </Button>
             </div>
           </div>
@@ -181,8 +182,13 @@ export function NotificationSystem() {
           {/* Notifications List */}
           <div className="max-h-[calc(70vh-80px)] overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
-                <Bell className="mx-auto mb-3 h-12 w-12 text-gray-300" />
+              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                <Icon
+                  name="bell"
+                  size="2xl"
+                  variant="muted"
+                  className="mx-auto mb-3"
+                />
                 <p>No notifications yet</p>
               </div>
             ) : (
@@ -201,8 +207,8 @@ export function NotificationSystem() {
                           <h4
                             className={`text-sm font-medium ${
                               notification.read
-                                ? "text-gray-600"
-                                : "text-gray-900"
+                                ? "text-gray-600 dark:text-gray-400"
+                                : "text-gray-900 dark:text-white"
                             }`}
                           >
                             {notification.title}
@@ -213,14 +219,14 @@ export function NotificationSystem() {
                             onClick={() => removeNotification(notification.id)}
                             className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
                           >
-                            <X className="h-3 w-3" />
+                            <Icon name="x" size="xs" />
                           </Button>
                         </div>
                         <p
                           className={`mt-1 text-sm ${
                             notification.read
-                              ? "text-gray-500"
-                              : "text-gray-700"
+                              ? "text-gray-500 dark:text-gray-400"
+                              : "text-gray-700 dark:text-gray-300"
                           }`}
                         >
                           {notification.message}
@@ -250,7 +256,7 @@ export function NotificationSystem() {
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="border-t bg-gray-50 p-3 text-center">
+            <div className="border-t border-gray-200 bg-gray-50 p-3 text-center dark:border-slate-600 dark:bg-slate-700">
               <Button
                 variant="outline"
                 size="sm"

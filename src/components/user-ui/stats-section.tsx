@@ -122,7 +122,7 @@ export default function StatsSection({ animatedElements }: StatsSectionProps) {
     // Start animation when stats section comes into view
     const timer = setTimeout(animateCounters, 300);
     return () => clearTimeout(timer);
-  }, [animatedElements, hasAnimated]);
+  }, [animatedElements, hasAnimated, stats]);
 
   const formatNumber = (stat: StatItem, value: number) => {
     if (stat.prefix && stat.suffix) {
