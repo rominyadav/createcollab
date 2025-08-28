@@ -5,12 +5,12 @@ import { useEffect, useState } from "react";
 import { Creator } from "@/components/mock-data/creator-mockdata";
 import videosData from "@/components/mock-data/videos-mockdata.json";
 
+import { ExploreCampaigns } from "./campaigns/explore/explore-campaigns";
+import { MyCampaigns } from "./campaigns/my-campaigns/my-campaigns";
 import { Chats } from "./chats";
-import { ExploreCampaigns } from "./explore-campaigns";
 import { Feed } from "./feed";
 import { MobileNav } from "./mobile-nav";
-import { MyCampaigns } from "./my-campaigns";
-import { Profile } from "./profile";
+import { Profile } from "./profile/components/profile";
 import { Upload } from "./upload";
 import { storage } from "./utils/storage";
 import { VideoPlayer } from "./video-player";
