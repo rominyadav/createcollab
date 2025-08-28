@@ -160,11 +160,13 @@ export function CreatorDashboard({ creator }: CreatorDashboardProps) {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
-      {/* Main Content */}
-      <main className="pb-16">{renderContent()}</main>
-
-      {/* Mobile Navigation */}
+      {/* Navigation */}
       <MobileNav activeTab={activeTab} onTabChange={handleTabChange} />
+
+      {/* Main Content */}
+      <main className="overflow-y-auto pb-16 md:ml-64 md:pb-0">
+        <div className="w-full">{renderContent()}</div>
+      </main>
 
       {/* Video Player Modal */}
       {showVideoPlayer && (

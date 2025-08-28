@@ -73,7 +73,7 @@ export function Profile({
   ];
 
   return (
-    <div className="pb-20">
+    <div className="pb-20 md:pb-8">
       {/* Header */}
       <div className="sticky top-0 z-10 border-b border-gray-200 bg-white p-4 dark:border-slate-600 dark:bg-slate-800">
         <div className="flex items-center justify-between">

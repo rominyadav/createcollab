@@ -142,84 +142,143 @@ export function Feed({ onVideoClick }: FeedProps) {
     setLoading(true);
     // Simulate API call
     setTimeout(() => {
-      setVideos((prev) => [...prev, ...mockVideos.slice(0, 3)]);
+      // Add more videos based on screen size
+      const isDesktop = window.innerWidth >= 768;
+      const videosToAdd = isDesktop ? 12 : 6;
+      const newVideos = Array.from({ length: videosToAdd }, (_, i) => ({
+        ...mockVideos[i % mockVideos.length],
+        id: Date.now() + i,
+      }));
+      setVideos((prev) => [...prev, ...newVideos]);
       setLoading(false);
     }, 1000);
   };
 
   useEffect(() => {
     const handleScroll = () => {
-      if (
-        window.innerHeight + document.documentElement.scrollTop !==
-          document.documentElement.offsetHeight ||
-        loading
-      ) {
-        return;
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+
+      // Trigger load more when user is within 200px of bottom
+      if (scrollTop + windowHeight >= documentHeight - 200 && !loading) {
+        loadMoreVideos();
       }
-      loadMoreVideos();
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [loading]);
 
+  // Load more videos initially if screen is large and needs more content
+  useEffect(() => {
+    const checkIfNeedMoreContent = () => {
+      const documentHeight = document.documentElement.scrollHeight;
+      const windowHeight = window.innerHeight;
+
+      // If content doesn't fill the screen, load more
+      if (documentHeight <= windowHeight && !loading && videos.length < 50) {
+        loadMoreVideos();
+      }
+    };
+
+    // Check after initial render and when videos change
+    const timer = setTimeout(checkIfNeedMoreContent, 100);
+    return () => clearTimeout(timer);
+  }, [videos, loading]);
+
   return (
-    <div className="pb-20">
-      <div className="grid grid-cols-3 gap-1">
-        {videos.map((video) => (
-          <div
-            key={`${video.id}-${Math.random()}`}
-            className="group relative aspect-[9/16] cursor-pointer bg-gray-100 dark:bg-slate-700"
-            onClick={() => onVideoClick(video)}
-          >
-            {/* Video Thumbnail */}
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300 dark:from-slate-600 dark:to-slate-700">
-              <div className="text-center">
-                <div className="mb-1 text-2xl">🎬</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">
-                  {video.duration}
-                </div>
-              </div>
-            </div>
-
-            {/* Play Button Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition-opacity group-hover:opacity-100">
-              <Play className="h-8 w-8 text-white" />
-            </div>
-
-            {/* Video Info Overlay */}
-            <div className="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-              <div className="mb-1 flex items-center gap-1">
-                <Avatar className="h-4 w-4">
-                  <AvatarFallback className="bg-emerald-500 text-xs text-white">
-                    {video.creatorAvatar}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="truncate text-xs text-white">
-                  {video.creatorName}
-                </span>
-              </div>
-              <p className="mb-1 line-clamp-2 text-xs text-white">
-                {video.title}
-              </p>
-              <div className="flex items-center gap-2 text-xs text-white">
-                <span>{video.views}</span>
-                <span>•</span>
-                <span>{video.uploadedAt}</span>
-              </div>
-            </div>
-
-            {/* Duration Badge */}
-            <div className="absolute top-2 right-2 rounded bg-black/70 px-1 py-0.5 text-xs text-white">
-              {video.duration}
-            </div>
-          </div>
-        ))}
+    <div className="min-h-screen pb-20 md:pb-8">
+      {/* Header */}
+      <div className="sticky top-0 z-10 border-b border-gray-200 bg-white/95 p-4 backdrop-blur-sm dark:border-slate-600 dark:bg-slate-800/95">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+          Feed
+        </h1>
       </div>
 
+      {/* Video Grid */}
+      <div className="p-2 sm:p-4 md:p-6">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 md:grid-cols-4 md:gap-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10">
+          {videos.map((video) => (
+            <div
+              key={`${video.id}-${Math.random()}`}
+              className="group relative aspect-[9/16] cursor-pointer overflow-hidden rounded-lg bg-gray-100 shadow-sm transition-all duration-200 hover:shadow-md dark:bg-slate-700"
+              onClick={() => onVideoClick(video)}
+            >
+              {/* Video Thumbnail */}
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300 dark:from-slate-600 dark:to-slate-700">
+                <div className="text-center">
+                  <div className="mb-1 text-3xl sm:text-4xl">🎬</div>
+                  <div className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    {video.duration}
+                  </div>
+                </div>
+              </div>
+
+              {/* Play Button Overlay */}
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-all duration-200 group-hover:opacity-100">
+                <div className="rounded-full bg-white/20 p-3 backdrop-blur-sm">
+                  <Play className="h-6 w-6 fill-white text-white sm:h-8 sm:w-8" />
+                </div>
+              </div>
+
+              {/* Video Info Overlay */}
+              <div className="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-2 sm:p-3">
+                <div className="mb-1 flex items-center gap-1.5">
+                  <Avatar className="h-4 w-4 sm:h-5 sm:w-5">
+                    <AvatarFallback className="bg-emerald-500 text-xs font-bold text-white">
+                      {video.creatorAvatar}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="truncate text-xs font-medium text-white sm:text-sm">
+                    {video.creatorName}
+                  </span>
+                </div>
+                <p className="mb-1 line-clamp-2 text-xs leading-tight font-medium text-white sm:text-sm">
+                  {video.title}
+                </p>
+                <div className="flex items-center gap-2 text-xs text-white/80">
+                  <span>{video.views}</span>
+                  <span>•</span>
+                  <span>{video.uploadedAt}</span>
+                </div>
+              </div>
+
+              {/* Duration Badge */}
+              <div className="absolute top-2 right-2 rounded-md bg-black/80 px-1.5 py-0.5 text-xs font-medium text-white backdrop-blur-sm">
+                {video.duration}
+              </div>
+
+              {/* Category Badge */}
+              <div className="absolute top-2 left-2 rounded-md bg-emerald-500/90 px-1.5 py-0.5 text-xs font-medium text-white backdrop-blur-sm">
+                {video.category}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Loading State */}
       {loading && (
-        <div className="flex justify-center py-4">
-          <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-emerald-500"></div>
+        <div className="flex justify-center py-8">
+          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent"></div>
+            <span className="text-sm font-medium">Loading more videos...</span>
+          </div>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {videos.length === 0 && !loading && (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="mb-4 text-6xl">🎬</div>
+          <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+            No videos yet
+          </h3>
+          <p className="max-w-sm text-gray-600 dark:text-gray-400">
+            Start following creators or check back later for new content
+          </p>
         </div>
       )}
     </div>

@@ -220,7 +220,7 @@ export function Chats({}: ChatsProps) {
   };
 
   return (
-    <div className="pb-20">
+    <div className="pb-20 md:pb-8">
       {/* Header */}
       <div className="sticky top-0 z-10 border-b border-gray-200 bg-white p-4 dark:border-slate-600 dark:bg-slate-800">
         <h1 className="mb-3 text-xl font-bold text-gray-900 dark:text-white">
