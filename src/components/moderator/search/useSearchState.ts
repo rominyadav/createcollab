@@ -8,7 +8,7 @@ interface UseSearchStateProps<T> {
   onStateChange?: (state: T) => void;
 }
 
-export function useSearchState<T extends Record<string, any>>({
+export function useSearchState<T extends Record<string, unknown>>({
   storageKey,
   initialState,
   onStateChange,
@@ -22,7 +22,7 @@ export function useSearchState<T extends Record<string, any>>({
     if (savedState) {
       setState({ ...initialState, ...savedState });
     }
-  }, [storageKey]);
+  }, [storageKey, initialState]);
 
   const updateState = useCallback(
     (updates: Partial<T>) => {

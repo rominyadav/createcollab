@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import {
   Calendar,
@@ -232,7 +232,7 @@ export function CreatorPublicVideoReview({
                           <div
                             className="h-full rounded-full bg-emerald-500 transition-all duration-100"
                             style={{
-                              width: `${useMemo(() => (currentTime / (videoRef.current?.duration || 1)) * 100, [currentTime, videoRef.current?.duration])}%`,
+                              width: `${(currentTime / (videoRef.current?.duration || 1)) * 100}%`,
                             }}
                           />
                         </div>

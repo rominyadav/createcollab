@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -152,10 +150,7 @@ export function BrandProfileReview({
   onReject,
   onClose,
 }: BrandProfileReviewProps) {
-  const [selectedCreator, setSelectedCreator] = useState<number | null>(null);
-
   const handleCreatorClick = (creatorId: number) => {
-    setSelectedCreator(creatorId);
     // In a real app, this would navigate to the creator profile
     console.log(`Navigating to creator ${creatorId}`);
   };

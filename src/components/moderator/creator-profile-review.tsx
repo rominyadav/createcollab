@@ -190,20 +190,25 @@ export function CreatorProfileReview({
   };
 
   const socialIconsMap = useMemo(() => {
-    return creator.socialLinks.map((link) => {
+    return creator.socialLinks.map((link, index) => {
       const lowerPlatform = link.toLowerCase();
       if (lowerPlatform.includes("facebook") || lowerPlatform.includes("fb"))
-        return <FaFacebook className="h-4 w-4 text-blue-600" />;
+        return <FaFacebook key={index} className="h-4 w-4 text-blue-600" />;
       if (
         lowerPlatform.includes("instagram") ||
         lowerPlatform.includes("insta")
       )
-        return <FaInstagram className="h-4 w-4 text-pink-600" />;
+        return <FaInstagram key={index} className="h-4 w-4 text-pink-600" />;
       if (lowerPlatform.includes("tiktok"))
-        return <FaTiktok className="h-4 w-4 text-black dark:text-white" />;
+        return (
+          <FaTiktok
+            key={index}
+            className="h-4 w-4 text-black dark:text-white"
+          />
+        );
       if (lowerPlatform.includes("youtube") || lowerPlatform.includes("yt"))
-        return <FaYoutube className="h-4 w-4 text-red-600" />;
-      return <Users className="h-4 w-4 text-gray-400" />;
+        return <FaYoutube key={index} className="h-4 w-4 text-red-600" />;
+      return <Users key={index} className="h-4 w-4 text-gray-400" />;
     });
   }, [creator.socialLinks]);
 

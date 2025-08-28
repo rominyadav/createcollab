@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Calendar, Eye, MapPin, Users } from "lucide-react";
 
@@ -359,24 +359,20 @@ export function CreatorPublicVideo({ onPreview }: CreatorPublicVideoProps) {
           </Button>
 
           <div className="flex items-center gap-1">
-            {useMemo(
-              () =>
-                [...Array(totalPages)].map((_, i) => {
-                  const page = i + 1;
-                  return (
-                    <Button
-                      key={page}
-                      variant={currentPage === page ? "emerald" : "outline"}
-                      size="sm"
-                      onClick={() => handlePageChange(page)}
-                      className="h-10 w-10"
-                    >
-                      {page}
-                    </Button>
-                  );
-                }),
-              [totalPages, currentPage]
-            )}
+            {[...Array(totalPages)].map((_, i) => {
+              const page = i + 1;
+              return (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? "emerald" : "outline"}
+                  size="sm"
+                  onClick={() => handlePageChange(page)}
+                  className="h-10 w-10"
+                >
+                  {page}
+                </Button>
+              );
+            })}
           </div>
 
           <Button
