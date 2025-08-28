@@ -2,38 +2,30 @@
 
 import { useState } from "react";
 
-import { Upload as UploadIcon, Video, X } from "lucide-react";
+import { CheckCircle, Upload as UploadIcon, Video, X } from "lucide-react";
 
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-interface BrandUploadProps {
+import { Campaign } from "./campaign-card";
+
+interface CampaignVideoUploadProps {
+  campaign: Campaign;
   onClose: () => void;
-  brandName: string;
 }
 
-export function BrandUpload({ onClose, brandName }: BrandUploadProps) {
+export function CampaignVideoUpload({
+  campaign,
+  onClose,
+}: CampaignVideoUploadProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
-  const [currentTag, setCurrentTag] = useState("");
-  const [category, setCategory] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-
-  const categories = [
-    "Product Demo",
-    "Behind the Scenes",
-    "Brand Story",
-    "Tutorial",
-    "Announcement",
-    "Event Coverage",
-    "Customer Stories",
-    "Company Culture",
-  ];
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -42,40 +34,29 @@ export function BrandUpload({ onClose, brandName }: BrandUploadProps) {
     }
   };
 
-  const handleAddTag = () => {
-    if (currentTag.trim() && !tags.includes(currentTag.trim())) {
-      setTags([...tags, currentTag.trim()]);
-      setCurrentTag("");
-    }
-  };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter((tag) => tag !== tagToRemove));
-  };
-
   const handleUpload = async () => {
-    if (!selectedFile || !title.trim() || !category) {
-      alert("Please fill in all required fields");
+    if (!selectedFile || !title.trim()) {
+      alert("Please select a video file and enter a title");
       return;
     }
 
     setIsUploading(true);
 
+    // Simulate upload process
     setTimeout(() => {
-      console.log("Uploading brand video:", {
+      console.log("Uploading campaign video:", {
+        campaignId: campaign.id,
         file: selectedFile.name,
         title,
         description,
-        category,
-        tags,
-        brandName,
       });
 
       setIsUploading(false);
       onClose();
 
+      // Show success message
       alert(
-        "Brand video uploaded successfully! It will be reviewed before going live."
+        "Campaign video uploaded successfully! The brand will review your submission."
       );
     }, 3000);
   };
@@ -94,7 +75,7 @@ export function BrandUpload({ onClose, brandName }: BrandUploadProps) {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <UploadIcon className="h-5 w-5" />
-            Upload Brand Video
+            Upload Campaign Video
           </CardTitle>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <X className="h-4 w-4" />
@@ -102,26 +83,71 @@ export function BrandUpload({ onClose, brandName }: BrandUploadProps) {
         </CardHeader>
 
         <CardContent className="space-y-6">
+          {/* Campaign Info */}
+          <Card className="border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-900/20">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 font-bold text-white">
+                    {campaign.brandLogo}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <h4 className="font-medium text-emerald-900 dark:text-emerald-100">
+                    {campaign.title}
+                  </h4>
+                  <p className="text-sm text-emerald-700 dark:text-emerald-200">
+                    {campaign.brandName} • {campaign.currency}{" "}
+                    {campaign.price.toLocaleString()}
+                  </p>
+                </div>
+                <Badge className="bg-emerald-600 text-white">
+                  {campaign.category}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Deliverables Checklist */}
+          <Card className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20">
+            <CardContent className="p-4">
+              <h4 className="mb-3 font-medium text-blue-900 dark:text-blue-100">
+                Campaign Deliverables
+              </h4>
+              <div className="space-y-2">
+                {campaign.deliverables.map((deliverable, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-blue-600" />
+                    <span className="text-sm text-blue-800 dark:text-blue-200">
+                      {deliverable}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* File Upload */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Video File *
+              Campaign Video *
             </label>
             {!selectedFile ? (
               <div className="rounded-lg border-2 border-dashed border-gray-300 p-8 text-center dark:border-slate-600">
                 <Video className="mx-auto mb-4 h-12 w-12 text-gray-400" />
                 <p className="mb-4 text-gray-600 dark:text-gray-400">
-                  Upload your brand&apos;s official video content
+                  Upload your campaign video for brand review
                 </p>
                 <input
                   type="file"
                   accept="video/*"
                   onChange={handleFileSelect}
                   className="hidden"
-                  id="brand-video-upload"
+                  id="campaign-video-upload"
                 />
                 <Button asChild variant="outline">
                   <label
-                    htmlFor="brand-video-upload"
+                    htmlFor="campaign-video-upload"
                     className="cursor-pointer"
                   >
                     Choose Video File
@@ -134,7 +160,9 @@ export function BrandUpload({ onClose, brandName }: BrandUploadProps) {
             ) : (
               <div className="rounded-lg border border-gray-200 p-4 dark:border-slate-600">
                 <div className="flex items-center gap-3">
-                  <Video className="h-10 w-10 text-emerald-600" />
+                  <div className="flex-shrink-0">
+                    <Video className="h-10 w-10 text-emerald-600" />
+                  </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium text-gray-900 dark:text-white">
                       {selectedFile.name}
@@ -155,12 +183,13 @@ export function BrandUpload({ onClose, brandName }: BrandUploadProps) {
             )}
           </div>
 
+          {/* Title */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Title *
+              Video Title *
             </label>
             <Input
-              placeholder="Enter video title"
+              placeholder="Enter video title for this campaign"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               maxLength={100}
@@ -170,101 +199,41 @@ export function BrandUpload({ onClose, brandName }: BrandUploadProps) {
             </p>
           </div>
 
+          {/* Description */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Description
+              Campaign Notes
             </label>
             <Textarea
-              placeholder="Describe your brand video..."
+              placeholder="Add any notes about your campaign video submission..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              maxLength={500}
+              rows={3}
+              maxLength={300}
             />
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              {description.length}/500 characters
+              {description.length}/300 characters
             </p>
           </div>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Content Type *
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {categories.map((cat) => (
-                <Button
-                  key={cat}
-                  variant={category === cat ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setCategory(cat)}
-                  className={`text-xs ${
-                    category === cat
-                      ? "bg-emerald-600 text-white hover:bg-emerald-700"
-                      : ""
-                  }`}
-                >
-                  {cat}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Tags
-            </label>
-            <div className="mb-2 flex gap-2">
-              <Input
-                placeholder="Add a tag"
-                value={currentTag}
-                onChange={(e) => setCurrentTag(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleAddTag()}
-                className="flex-1"
-              />
-              <Button
-                onClick={handleAddTag}
-                size="sm"
-                disabled={!currentTag.trim()}
-                className="bg-emerald-600 hover:bg-emerald-700"
-              >
-                Add
-              </Button>
-            </div>
-            {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {tags.map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant="secondary"
-                    className="flex items-center gap-1"
-                  >
-                    #{tag}
-                    <button
-                      onClick={() => handleRemoveTag(tag)}
-                      className="ml-1 hover:text-red-500"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <Card className="border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-900/20">
+          {/* Upload Guidelines */}
+          <Card className="border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-900/20">
             <CardContent className="p-4">
-              <h4 className="mb-2 font-medium text-emerald-900 dark:text-emerald-100">
-                Brand Upload Guidelines
+              <h4 className="mb-2 font-medium text-orange-900 dark:text-orange-100">
+                Campaign Video Guidelines
               </h4>
-              <ul className="space-y-1 text-sm text-emerald-800 dark:text-emerald-200">
-                <li>• Official brand content will be featured prominently</li>
-                <li>• Videos represent your brand on the platform</li>
-                <li>• High-quality content builds brand credibility</li>
-                <li>• No campaign linking required for brand uploads</li>
+              <ul className="space-y-1 text-sm text-orange-800 dark:text-orange-200">
+                <li>• Ensure video meets all campaign requirements</li>
+                <li>• Brand will review and approve your submission</li>
+                <li>• Payment will be processed after approval</li>
+                <li>
+                  • Follow brand guidelines and deliverable specifications
+                </li>
               </ul>
             </CardContent>
           </Card>
 
+          {/* Upload Button */}
           <div className="flex gap-3">
             <Button
               onClick={onClose}
@@ -277,9 +246,7 @@ export function BrandUpload({ onClose, brandName }: BrandUploadProps) {
             <Button
               onClick={handleUpload}
               className="flex-1 bg-emerald-600 hover:bg-emerald-700"
-              disabled={
-                !selectedFile || !title.trim() || !category || isUploading
-              }
+              disabled={!selectedFile || !title.trim() || isUploading}
             >
               {isUploading ? (
                 <>
@@ -289,7 +256,7 @@ export function BrandUpload({ onClose, brandName }: BrandUploadProps) {
               ) : (
                 <>
                   <UploadIcon className="mr-2 h-4 w-4" />
-                  Upload Video
+                  Submit Campaign Video
                 </>
               )}
             </Button>

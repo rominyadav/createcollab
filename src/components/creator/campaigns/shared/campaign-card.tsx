@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 
-import { Calendar, Clock, Eye, Users } from "lucide-react";
+import { Calendar, Clock, Eye, Upload, Users } from "lucide-react";
 
 import { CampaignView } from "@/components/creator/campaign-view";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+
+import { CampaignVideoUpload } from "./campaign-video-upload";
 
 export interface Campaign {
   id: number;
@@ -48,6 +50,7 @@ export function CampaignCard({
   onApply,
 }: CampaignCardProps) {
   const [showCampaignView, setShowCampaignView] = useState(false);
+  const [showVideoUpload, setShowVideoUpload] = useState(false);
   const truncateText = (text: string, maxLength: number) => {
     return text.length > maxLength
       ? text.substring(0, maxLength) + "..."
@@ -150,25 +153,38 @@ export function CampaignCard({
           {truncateText(campaign.description, 100)}
         </p>
 
-        {/* Action Button */}
+        {/* Action Buttons */}
         <div className="flex items-center justify-between">
           <div className="text-xs text-gray-500 dark:text-gray-400">
             Created: {new Date(campaign.createdDate).toLocaleDateString()}
           </div>
           {isVerified ? (
-            <Button
-              onClick={() => {
-                setShowCampaignView(true);
-                onViewCampaign?.(campaign);
-              }}
-              variant="default"
-              size="sm"
-              disabled={campaign.status === "full"}
-              className="bg-emerald-600 hover:bg-emerald-700"
-            >
-              <Eye className="mr-1 h-4 w-4" />
-              View Campaign
-            </Button>
+            <div className="flex gap-2">
+              {isApplied && (
+                <Button
+                  onClick={() => setShowVideoUpload(true)}
+                  variant="outline"
+                  size="sm"
+                  className="border-emerald-600 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                >
+                  <Upload className="mr-1 h-4 w-4" />
+                  Upload Video
+                </Button>
+              )}
+              <Button
+                onClick={() => {
+                  setShowCampaignView(true);
+                  onViewCampaign?.(campaign);
+                }}
+                variant="default"
+                size="sm"
+                disabled={campaign.status === "full"}
+                className="bg-emerald-600 hover:bg-emerald-700"
+              >
+                <Eye className="mr-1 h-4 w-4" />
+                View Campaign
+              </Button>
+            </div>
           ) : (
             <Button variant="outline" size="sm" disabled>
               Verification Required
@@ -184,6 +200,14 @@ export function CampaignCard({
             onApply={onApply}
             isApplied={isApplied}
             isVerified={isVerified}
+          />
+        )}
+
+        {/* Campaign Video Upload Modal */}
+        {showVideoUpload && (
+          <CampaignVideoUpload
+            campaign={campaign}
+            onClose={() => setShowVideoUpload(false)}
           />
         )}
       </CardContent>
