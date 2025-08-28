@@ -22,7 +22,7 @@ import { Card, CardContent } from "@/components/ui/card";
 interface ProfileProps {
   creator: Creator;
   onSettingsClick: () => void;
-  onVideoClick: (video: any) => void;
+  onVideoClick: (video: unknown) => void;
 }
 
 export function Profile({

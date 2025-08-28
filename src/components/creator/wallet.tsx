@@ -12,7 +12,6 @@ import {
   Wallet as WalletIcon,
 } from "lucide-react";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -88,7 +87,7 @@ const mockTransactions: Transaction[] = [
   },
 ];
 
-export function Wallet({ creatorId }: WalletProps) {
+export function Wallet({}: WalletProps) {
   const [showBalance, setShowBalance] = useState(true);
   const [payoutAmount, setPayoutAmount] = useState("");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<

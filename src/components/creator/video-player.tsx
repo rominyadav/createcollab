@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 import {
   ChevronDown,
@@ -47,7 +47,6 @@ export function VideoPlayer({
   onIndexChange,
 }: VideoPlayerProps) {
   const [isLiked, setIsLiked] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   const currentVideo = videos[currentIndex];
 

@@ -2,14 +2,7 @@
 
 import { useState } from "react";
 
-import {
-  Calendar,
-  CheckCircle,
-  Clock,
-  Eye,
-  Users,
-  XCircle,
-} from "lucide-react";
+import { Calendar, CheckCircle, Clock, Eye, XCircle } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";

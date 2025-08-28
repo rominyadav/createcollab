@@ -2,14 +2,7 @@
 
 import { useState } from "react";
 
-import {
-  FileText,
-  Image,
-  Play,
-  Upload as UploadIcon,
-  Video,
-  X,
-} from "lucide-react";
+import { Upload as UploadIcon, Video, X } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

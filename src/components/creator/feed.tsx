@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react";
 
-import { Heart, MessageCircle, MoreVertical, Play, Share } from "lucide-react";
+import { Play } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 
 interface Video {
   id: number;

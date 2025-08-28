@@ -118,7 +118,7 @@ export function CreatorDashboard({ creator }: CreatorDashboardProps) {
     setCurrentVideoIndex(index);
   };
 
-  const handleViewCampaign = (campaign: any) => {
+  const handleViewCampaign = (campaign: unknown) => {
     console.log("Viewing campaign:", campaign);
     // In real app, this would navigate to campaign details
   };

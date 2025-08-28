@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  Home,
-  MessageCircle,
-  Plus,
-  Search,
-  User,
-  Video,
-  Wallet,
-} from "lucide-react";
+import { Home, MessageCircle, Plus, Search, User, Wallet } from "lucide-react";
 
 interface MobileNavProps {
   activeTab: string;

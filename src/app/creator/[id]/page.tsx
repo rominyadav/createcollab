@@ -22,7 +22,7 @@ export default function CreatorPage() {
             Creator Not Found
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            The creator profile you're looking for doesn't exist.
+            The creator profile you&apos;re looking for doesn&apos;t exist.
           </p>
         </div>
       </div>
