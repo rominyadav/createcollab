@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Creator } from "@/components/mock-data/creator-mockdata";
+import videosData from "@/components/mock-data/videos-mockdata.json";
 
 import { Chats } from "./chats";
 import { ExploreCampaigns } from "./explore-campaigns";
@@ -11,6 +12,7 @@ import { MobileNav } from "./mobile-nav";
 import { MyCampaigns } from "./my-campaigns";
 import { Profile } from "./profile";
 import { Upload } from "./upload";
+import { storage } from "./utils/storage";
 import { VideoPlayer } from "./video-player";
 import { Wallet } from "./wallet";
 
@@ -36,59 +38,7 @@ interface Video {
   category: string;
 }
 
-const mockVideos: Video[] = [
-  {
-    id: 1,
-    title: "Summer Fashion Trends 2024",
-    thumbnail: "/api/placeholder/300/400",
-    videoUrl: "/api/placeholder/video/1",
-    duration: "2:15",
-    views: "15.2K",
-    likes: "2.1K",
-    comments: "342",
-    shares: "89",
-    creatorId: 1,
-    creatorName: "Sarah Johnson",
-    creatorAvatar: "SJ",
-    uploadedAt: "2 days ago",
-    aspectRatio: "9:16",
-    category: "Fashion",
-  },
-  {
-    id: 2,
-    title: "iPhone 15 Pro Review",
-    thumbnail: "/api/placeholder/300/400",
-    videoUrl: "/api/placeholder/video/2",
-    duration: "8:45",
-    views: "12.3K",
-    likes: "1.8K",
-    comments: "256",
-    shares: "67",
-    creatorId: 2,
-    creatorName: "Mike Chen",
-    creatorAvatar: "MC",
-    uploadedAt: "3 days ago",
-    aspectRatio: "9:16",
-    category: "Tech",
-  },
-  {
-    id: 3,
-    title: "Morning Routine 2024",
-    thumbnail: "/api/placeholder/300/400",
-    videoUrl: "/api/placeholder/video/3",
-    duration: "12:30",
-    views: "28.9K",
-    likes: "4.2K",
-    comments: "512",
-    shares: "156",
-    creatorId: 3,
-    creatorName: "Emma Wilson",
-    creatorAvatar: "EW",
-    uploadedAt: "1 day ago",
-    aspectRatio: "9:16",
-    category: "Lifestyle",
-  },
-];
+const allVideos: Video[] = videosData as Video[];
 
 export function CreatorDashboard({ creator }: CreatorDashboardProps) {
   const [activeTab, setActiveTab] = useState("feed");
@@ -96,16 +46,28 @@ export function CreatorDashboard({ creator }: CreatorDashboardProps) {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [showUpload, setShowUpload] = useState(false);
 
+  // Load saved tab from localStorage on mount
+  useEffect(() => {
+    const savedTab = storage.get<string>(
+      `creator-${creator.id}-active-tab`,
+      "feed"
+    );
+    if (savedTab) {
+      setActiveTab(savedTab);
+    }
+  }, [creator.id]);
+
   const handleTabChange = (tab: string) => {
     if (tab === "upload") {
       setShowUpload(true);
     } else {
       setActiveTab(tab);
+      storage.set(`creator-${creator.id}-active-tab`, tab);
     }
   };
 
   const handleVideoClick = (video: Video) => {
-    const videoIndex = mockVideos.findIndex((v) => v.id === video.id);
+    const videoIndex = allVideos.findIndex((v) => v.id === video.id);
     setCurrentVideoIndex(videoIndex >= 0 ? videoIndex : 0);
     setShowVideoPlayer(true);
   };
@@ -171,7 +133,7 @@ export function CreatorDashboard({ creator }: CreatorDashboardProps) {
       {/* Video Player Modal */}
       {showVideoPlayer && (
         <VideoPlayer
-          videos={mockVideos}
+          videos={allVideos}
           currentIndex={currentVideoIndex}
           onClose={handleCloseVideoPlayer}
           onIndexChange={handleVideoIndexChange}

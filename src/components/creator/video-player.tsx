@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   ChevronDown,
@@ -47,8 +47,23 @@ export function VideoPlayer({
   onIndexChange,
 }: VideoPlayerProps) {
   const [isLiked, setIsLiked] = useState(false);
-
   const currentVideo = videos[currentIndex];
+
+  const getYouTubeEmbedUrl = (url: string) => {
+    const videoId = url.match(
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/
+    );
+    return videoId
+      ? `https://www.youtube.com/embed/${videoId[1]}?autoplay=1&rel=0`
+      : null;
+  };
+
+  const isYouTubeVideo =
+    currentVideo.videoUrl.includes("youtube.com") ||
+    currentVideo.videoUrl.includes("youtu.be");
+  const embedUrl = isYouTubeVideo
+    ? getYouTubeEmbedUrl(currentVideo.videoUrl)
+    : null;
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
@@ -66,6 +81,37 @@ export function VideoPlayer({
     setIsLiked(!isLiked);
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        handlePrevious();
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        handleNext();
+      }
+    };
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      if (e.deltaY > 0) {
+        handleNext();
+      } else {
+        handlePrevious();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("wheel", handleWheel);
+    };
+  }, [currentIndex, videos.length, onClose, handleNext, handlePrevious]);
+
   return (
     <div className="fixed inset-0 z-50 bg-black">
       {/* Close Button */}
@@ -81,14 +127,31 @@ export function VideoPlayer({
       {/* Video Container */}
       <div className="relative flex h-full items-center justify-center">
         {/* Video */}
-        <div className="relative mx-auto aspect-[9/16] w-full max-w-sm bg-black">
-          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-            <div className="text-center text-white">
-              <div className="mb-4 text-6xl">🎬</div>
-              <p className="text-lg">{currentVideo.title}</p>
-              <p className="mt-2 text-sm opacity-70">{currentVideo.duration}</p>
+        <div
+          className={`relative mx-auto w-full max-w-sm bg-black ${
+            currentVideo.aspectRatio === "16:9"
+              ? "aspect-video"
+              : "aspect-[9/16]"
+          }`}
+        >
+          {isYouTubeVideo && embedUrl ? (
+            <iframe
+              src={embedUrl}
+              className="absolute inset-0 h-full w-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+              <div className="text-center text-white">
+                <div className="mb-4 text-6xl">🎬</div>
+                <p className="text-lg">{currentVideo.title}</p>
+                <p className="mt-2 text-sm opacity-70">
+                  {currentVideo.duration}
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Navigation Arrows */}
