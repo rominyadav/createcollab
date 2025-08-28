@@ -1,9 +1,8 @@
 import { useCallback, useMemo, useState } from "react";
 
-import { Building2, Search } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Icon } from "@/components/ui/icon";
 
 import brandMockData from "../../mock-data/brand-mockdata.json";
 import { BrandProfileView } from "../brand-profile-view";
@@ -220,7 +219,7 @@ export function BrandSearch() {
     <div className="space-y-6">
       <SearchHeader
         title="Brand Search"
-        icon={<Building2 className="h-5 w-5" />}
+        icon={<Icon name="building" variant="primary" />}
         showAdvancedSearch={state.showAdvancedSearch}
         onToggleAdvanced={() =>
           updateState({ showAdvancedSearch: !state.showAdvancedSearch })
@@ -253,7 +252,7 @@ export function BrandSearch() {
               className="flex items-center gap-2"
               variant="emerald"
             >
-              <Search className="h-4 w-4" />
+              <Icon name="search" size="sm" />
               {isSearching ? "Searching..." : "Search"}
             </Button>
           </div>
@@ -262,7 +261,7 @@ export function BrandSearch() {
 
       <SearchResults
         title="Search Results"
-        icon={<Building2 className="h-5 w-5" />}
+        icon={<Icon name="building" variant="primary" />}
         results={filteredBrands}
         currentPage={state.currentPage}
         totalPages={totalPages}
@@ -280,7 +279,12 @@ export function BrandSearch() {
       {filteredBrands.length === 0 && !isSearching && (
         <Card>
           <CardContent className="py-12 text-center">
-            <Search className="mx-auto mb-4 h-16 w-16 text-gray-300 dark:text-gray-600" />
+            <Icon
+              name="search"
+              size="2xl"
+              variant="muted"
+              className="mx-auto mb-4"
+            />
             <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
               No brands found
             </h3>

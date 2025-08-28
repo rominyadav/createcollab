@@ -1,10 +1,9 @@
 import React from "react";
 
-import { MapPin } from "lucide-react";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Icon } from "@/components/ui/icon";
 
 import { Pagination } from "../shared";
 
@@ -97,7 +96,7 @@ export const CreatorResultItem = React.memo<CreatorResultItemProps>(
             {creator.niche} • {creator.followers} followers
           </p>
           <div className="mt-1 flex items-center gap-2">
-            <MapPin className="h-3 w-3 text-gray-400 dark:text-gray-500" />
+            <Icon name="mapPin" size="xs" variant="muted" />
             <span className="text-xs text-gray-500 dark:text-gray-400">
               {creator.location.city}, {creator.location.state},{" "}
               {creator.location.country}

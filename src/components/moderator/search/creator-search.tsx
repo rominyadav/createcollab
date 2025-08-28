@@ -1,9 +1,8 @@
 import { useCallback, useMemo, useState } from "react";
 
-import { Search, Users } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Icon } from "@/components/ui/icon";
 
 import creatorMockData from "../../mock-data/creator-mockdata.json";
 import { CreatorProfileView } from "../creator-profile-view";
@@ -187,7 +186,7 @@ export function CreatorSearch() {
     <div className="space-y-6">
       <SearchHeader
         title="Creator Search"
-        icon={<Search className="h-5 w-5" />}
+        icon={<Icon name="search" variant="primary" />}
         showAdvancedSearch={state.showAdvancedSearch}
         onToggleAdvanced={() =>
           updateState({ showAdvancedSearch: !state.showAdvancedSearch })
@@ -220,7 +219,7 @@ export function CreatorSearch() {
               className="flex items-center gap-2"
               variant="emerald"
             >
-              <Search className="h-4 w-4" />
+              <Icon name="search" size="sm" />
               {isSearching ? "Searching..." : "Search"}
             </Button>
           </div>
@@ -229,7 +228,7 @@ export function CreatorSearch() {
 
       <SearchResults
         title="Search Results"
-        icon={<Users className="h-5 w-5" />}
+        icon={<Icon name="users" variant="primary" />}
         results={filteredCreators}
         currentPage={state.currentPage}
         totalPages={totalPages}
@@ -247,7 +246,12 @@ export function CreatorSearch() {
       {filteredCreators.length === 0 && !isSearching && (
         <Card>
           <CardContent className="py-12 text-center">
-            <Search className="mx-auto mb-4 h-16 w-16 text-gray-300 dark:text-gray-600" />
+            <Icon
+              name="search"
+              size="2xl"
+              variant="muted"
+              className="mx-auto mb-4"
+            />
             <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">
               No creators found
             </h3>

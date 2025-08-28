@@ -1,10 +1,9 @@
 import React from "react";
 
-import { CheckCircle, Eye, XCircle } from "lucide-react";
-
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
+import { Icon } from "@/components/ui/icon";
 
 interface ReviewCardProps {
   id: number;
@@ -64,15 +63,15 @@ export const ReviewCard = React.memo<ReviewCardProps>(
           </div>
           <div className="flex space-x-2">
             <Button variant="outline" size="sm" onClick={onReview}>
-              <Eye className="mr-2 h-4 w-4" />
+              <Icon name="eye" size="sm" className="mr-2" />
               Review
             </Button>
             <Button variant="emerald" size="sm" onClick={onApprove}>
-              <CheckCircle className="mr-2 h-4 w-4" />
+              <Icon name="checkCircle" size="sm" className="mr-2" />
               Approve
             </Button>
             <Button variant="destructive" size="sm" onClick={onReject}>
-              <XCircle className="mr-2 h-4 w-4" />
+              <Icon name="xCircle" size="sm" className="mr-2" />
               Reject
             </Button>
           </div>

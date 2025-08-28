@@ -2,11 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { Send, X } from "lucide-react";
-
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Icon } from "@/components/ui/icon";
 import { Textarea } from "@/components/ui/textarea";
 
 interface Message {
@@ -118,7 +117,7 @@ export function MiniChat({
               onClick={onClose}
               className="h-6 w-6 p-0 hover:bg-gray-100 dark:hover:bg-slate-700"
             >
-              <X className="h-4 w-4" />
+              <Icon name="x" size="sm" />
             </Button>
           </div>
         </CardHeader>
@@ -175,7 +174,7 @@ export function MiniChat({
                 disabled={!newMessage.trim()}
                 className="h-auto self-end px-3 py-2"
               >
-                <Send className="h-4 w-4" />
+                <Icon name="mail" size="sm" />
               </Button>
             </div>
             <p className="mt-2 text-center text-xs text-gray-500 dark:text-slate-400">

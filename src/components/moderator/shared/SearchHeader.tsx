@@ -1,9 +1,8 @@
 import React from "react";
 
-import { SlidersHorizontal, X } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Icon } from "@/components/ui/icon";
 
 interface SearchHeaderProps {
   title: string;
@@ -29,7 +28,7 @@ export const SearchHeader = React.memo<SearchHeaderProps>(
               onClick={onToggleAdvanced}
               className="flex items-center gap-2"
             >
-              <SlidersHorizontal className="h-4 w-4" />
+              <Icon name="filter" size="sm" />
               {showAdvancedSearch ? "Hide" : "Advanced"} Search
             </Button>
             <Button
@@ -38,7 +37,7 @@ export const SearchHeader = React.memo<SearchHeaderProps>(
               onClick={onClearFilters}
               className="flex items-center gap-2"
             >
-              <X className="h-4 w-4" />
+              <Icon name="x" size="sm" />
               Clear
             </Button>
           </div>
