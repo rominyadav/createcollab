@@ -94,6 +94,35 @@ export function Feed({ onVideoClick }: FeedProps) {
     return () => clearTimeout(timer);
   }, [videos, loading, hasMore, loadMoreVideos]);
 
+  // Prevent pull-to-refresh on mobile
+  useEffect(() => {
+    let touchStartY = 0;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const touchY = e.touches[0].clientY;
+      const touchDelta = touchY - touchStartY;
+
+      // Prevent pull-to-refresh when at top of page and swiping down
+      if (touchDelta > 0 && window.scrollY === 0) {
+        e.preventDefault();
+      }
+    };
+
+    document.addEventListener("touchstart", handleTouchStart, {
+      passive: true,
+    });
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+
+    return () => {
+      document.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("touchmove", handleTouchMove);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen pb-20 md:pb-8">
       <PageHeader title="Feed" />
