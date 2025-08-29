@@ -414,7 +414,7 @@ export function CreatorSearch() {
         renderItem={(creator) => (
           <CreatorResultItem
             key={creator.id}
-            creator={creator}
+            creator={creator as any}
             onViewProfile={() => handleViewProfile(creator as any)}
           />
         )}
