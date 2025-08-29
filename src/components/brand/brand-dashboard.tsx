@@ -180,6 +180,8 @@ export function BrandDashboard({ brand, creator }: BrandDashboardProps) {
       {showCreateCampaign && (
         <CreateCampaign
           brandId={brand.id}
+          brandName={brand.name}
+          brandLogo={brand.logo}
           onClose={() => setShowCreateCampaign(false)}
         />
       )}
