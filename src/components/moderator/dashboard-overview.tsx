@@ -321,10 +321,10 @@ export function DashboardOverview() {
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`rounded-lg p-2 ${action.bgColor} dark:bg-slate-600`}
+                          className={`rounded-lg p-2 ${(action as any).bgColor || "bg-gray-100"} dark:bg-slate-600`}
                         >
                           <Icon
-                            className={`h-5 w-5 ${action.color} dark:text-white`}
+                            className={`h-5 w-5 ${(action as any).color || "text-gray-600"} dark:text-white`}
                           />
                         </div>
                         <div>
@@ -336,11 +336,19 @@ export function DashboardOverview() {
                           </p>
                         </div>
                       </div>
-                      <Badge variant={action.variant} className="text-xs">
+                      <Badge
+                        variant={
+                          action.variant === "warning" ||
+                          action.variant === "info"
+                            ? "default"
+                            : action.variant
+                        }
+                        className="text-xs"
+                      >
                         {action.count}
                       </Badge>
                     </div>
-                    <Button variant="emerald" size="sm" className="mt-3 w-full">
+                    <Button variant="default" size="sm" className="mt-3 w-full">
                       {action.action}
                     </Button>
                   </div>
@@ -450,7 +458,7 @@ export function DashboardOverview() {
             <div className="text-sm text-blue-700 dark:text-blue-300">
               Pending Creators
             </div>
-            <Button variant="emerald" size="sm" className="mt-2 w-full">
+            <Button variant="default" size="sm" className="mt-2 w-full">
               Review Now
             </Button>
           </CardContent>
@@ -464,7 +472,7 @@ export function DashboardOverview() {
             <div className="text-sm text-green-700 dark:text-green-300">
               Pending Brands
             </div>
-            <Button variant="emerald" size="sm" className="mt-2 w-full">
+            <Button variant="default" size="sm" className="mt-2 w-full">
               Review Now
             </Button>
           </CardContent>
@@ -478,7 +486,7 @@ export function DashboardOverview() {
             <div className="text-sm text-red-700 dark:text-red-300">
               Reported Videos
             </div>
-            <Button variant="emerald" size="sm" className="mt-2 w-full">
+            <Button variant="default" size="sm" className="mt-2 w-full">
               Moderate Now
             </Button>
           </CardContent>
@@ -492,7 +500,7 @@ export function DashboardOverview() {
             <div className="text-sm text-purple-700 dark:text-purple-300">
               Unread Messages
             </div>
-            <Button variant="emerald" size="sm" className="mt-2 w-full">
+            <Button variant="default" size="sm" className="mt-2 w-full">
               Reply Now
             </Button>
           </CardContent>

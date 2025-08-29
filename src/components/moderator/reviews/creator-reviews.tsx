@@ -97,7 +97,7 @@ export function CreatorReviews() {
             primaryInfo={`${creator.followers} followers • ${creator.niche}`}
             secondaryInfo="Submitted Recently"
             email={creator.email}
-            onReview={() => handleReviewClick(creator)}
+            onReview={() => handleReviewClick(creator as any)}
             onApprove={() => handleApproval(creator.id, "approve")}
             onReject={() => handleApproval(creator.id, "reject")}
           />
@@ -106,7 +106,7 @@ export function CreatorReviews() {
 
       {selectedCreator && (
         <CreatorProfileReview
-          creator={selectedCreator}
+          creator={selectedCreator as any}
           onApprove={(creatorId) => handleApproval(creatorId, "approve")}
           onReject={(creatorId) => handleApproval(creatorId, "reject")}
           onClose={handleCloseReview}

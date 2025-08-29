@@ -281,7 +281,7 @@ export function CreatorSearch() {
               {state.selectedCountry === "Nepal" && (
                 <div className="border-t pt-4">
                   <h4 className="mb-3 flex items-center gap-2 text-sm font-medium text-gray-900 dark:text-white">
-                    <Icon name="map-pin" size="sm" />
+                    <Icon name="mapPin" size="sm" />
                     Nepal Location Filters
                   </h4>
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -380,7 +380,7 @@ export function CreatorSearch() {
                       onClick={handleGetCurrentLocation}
                       className="flex w-full items-center gap-2"
                     >
-                      <Icon name="map-pin" size="sm" />
+                      <Icon name="mapPin" size="sm" />
                       Use My Location
                     </Button>
                   </div>
@@ -415,7 +415,7 @@ export function CreatorSearch() {
           <CreatorResultItem
             key={creator.id}
             creator={creator}
-            onViewProfile={() => handleViewProfile(creator)}
+            onViewProfile={() => handleViewProfile(creator as any)}
           />
         )}
       />
@@ -453,7 +453,7 @@ export function CreatorSearch() {
 
       {selectedCreator && (
         <CreatorProfileView
-          creator={selectedCreator}
+          creator={selectedCreator as any}
           onClose={handleCloseProfile}
         />
       )}

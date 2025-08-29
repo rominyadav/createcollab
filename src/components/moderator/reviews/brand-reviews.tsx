@@ -140,7 +140,7 @@ export function BrandReviews() {
             secondaryInfo={`${brand.email} • ${brand.phone}`}
             email={`${brand.location.city}, ${brand.location.state}, ${brand.location.country}`}
             additionalInfo={`Submitted ${brand.submitted}`}
-            onReview={() => handleReviewClick(brand)}
+            onReview={() => handleReviewClick(brand as any)}
             onApprove={() => handleApproval(brand.id, "approve")}
             onReject={() => handleApproval(brand.id, "reject")}
             avatarGradient="from-green-400 to-blue-500"
@@ -150,7 +150,7 @@ export function BrandReviews() {
 
       {selectedBrand && (
         <BrandProfileReview
-          brand={selectedBrand}
+          brand={selectedBrand as any}
           onApprove={(brandId) => handleApproval(brandId, "approve")}
           onReject={(brandId) => handleApproval(brandId, "reject")}
           onClose={handleCloseReview}

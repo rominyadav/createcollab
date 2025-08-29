@@ -271,7 +271,7 @@ export function BrandSearch() {
           <BrandResultItem
             key={brand.id}
             brand={brand}
-            onViewProfile={() => handleViewProfile(brand)}
+            onViewProfile={() => handleViewProfile(brand as any)}
           />
         )}
       />
