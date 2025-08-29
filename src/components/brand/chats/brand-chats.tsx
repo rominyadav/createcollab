@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import {
+  ArrowLeft,
   Building2,
   Check,
   CheckCheck,
@@ -156,7 +157,7 @@ const mockChats: Chat[] = [
   },
 ];
 
-export function BrandChats({}: BrandChatsProps) {
+export function BrandChats({ brandId, creatorId }: BrandChatsProps) {
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [newMessage, setNewMessage] = useState("");
@@ -264,7 +265,9 @@ export function BrandChats({}: BrandChatsProps) {
 
       <div className="flex h-[calc(100vh-180px)]">
         {/* Chat List */}
-        <div className="bg-background w-full border-r md:w-80">
+        <div
+          className={`bg-background w-full border-r md:w-80 ${selectedChat ? "hidden md:block" : ""}`}
+        >
           {/* Search & Tabs - Desktop */}
           <div className="hidden border-b p-4 md:block">
             <div className="relative mb-4">
@@ -427,14 +430,24 @@ export function BrandChats({}: BrandChatsProps) {
           </div>
         </div>
 
-        {/* Chat Area - Desktop */}
-        <div className="hidden flex-1 flex-col md:flex">
+        {/* Chat Area */}
+        <div
+          className={`flex-1 flex-col ${selectedChat ? "flex" : "hidden md:flex"}`}
+        >
           {selectedChat ? (
             <>
               {/* Chat Header */}
               <div className="border-b border-gray-200 bg-white p-4 dark:border-slate-600 dark:bg-slate-800">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedChat(null)}
+                      className="md:hidden"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                    </Button>
                     <Avatar className="h-10 w-10">
                       <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
                         {selectedChat.avatar}
