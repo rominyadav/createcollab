@@ -156,7 +156,7 @@ const mockChats: Chat[] = [
   },
 ];
 
-export function BrandChats({ brandId, creatorId }: BrandChatsProps) {
+export function BrandChats({}: BrandChatsProps) {
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [newMessage, setNewMessage] = useState("");

@@ -41,7 +41,6 @@ interface CreateCampaignProps {
 }
 
 export function CreateCampaign({
-  brandId,
   brandName,
   brandLogo,
   onClose,

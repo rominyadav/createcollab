@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import videosData from "@/components/mock-data/videos-mockdata.json";
 import { PageHeader } from "@/components/user-ui/page-header";
@@ -37,7 +37,7 @@ export function Feed({ onVideoClick }: FeedProps) {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(allVideos.length > 6);
 
-  const loadMoreVideos = () => {
+  const loadMoreVideos = useCallback(() => {
     if (!hasMore || loading) return;
 
     setLoading(true);
@@ -58,7 +58,7 @@ export function Feed({ onVideoClick }: FeedProps) {
       }
       setLoading(false);
     }, 500);
-  };
+  }, [videos.length, hasMore, loading]);
 
   useEffect(() => {
     const handleScroll = () => {

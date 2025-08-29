@@ -12,7 +12,9 @@ export default function CreatorPage() {
   const creatorId = parseInt(params.id as string);
 
   // Find creator by ID
-  const creator = creatorMockData.find((c: Creator) => c.id === creatorId);
+  const creator = creatorMockData.find((c: any) => c.id === creatorId) as
+    | Creator
+    | undefined;
 
   if (!creator) {
     return (
