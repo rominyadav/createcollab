@@ -146,7 +146,7 @@ export function MyCampaigns({ onViewCampaign }: MyCampaignsProps) {
             <CampaignCard
               key={campaign.id}
               campaign={campaign}
-              onViewCampaign={onViewCampaign}
+              onViewCampaign={onViewCampaign as any}
               showProgress={true}
               progress={campaign.progress}
               isApplied={true}
