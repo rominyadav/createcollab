@@ -38,5 +38,5 @@ export default function BrandPage() {
     );
   }
 
-  return <BrandDashboard brand={brand} creator={creator} />;
+  return <BrandDashboard brand={brand} creator={creator as any} />;
 }
