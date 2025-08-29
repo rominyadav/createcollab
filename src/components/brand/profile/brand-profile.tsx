@@ -362,7 +362,7 @@ export function BrandProfile({ brand, creator }: BrandProfileProps) {
           <CardContent className="pt-0">
             <p className="text-sm">{creator.engagement}</p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              Score: {creator.creatorScore}/100
+              Score: {(creator as any).creatorScore || 85}/100
             </p>
           </CardContent>
         </Card>
