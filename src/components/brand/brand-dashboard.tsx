@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-import { Creator } from "@/components/mock-data/creator-mockdata";
 import videosData from "@/components/mock-data/videos-mockdata.json";
 
 import { Feed } from "../creator/feed";
@@ -16,6 +15,33 @@ import { BrandProfile } from "./profile/brand-profile";
 import { CreatorSearch } from "./search/creator-search";
 import { BrandUpload } from "./upload/brand-upload";
 import { BrandWallet } from "./wallet/brand-wallet";
+
+interface Creator {
+  id: number;
+  name: string;
+  avatar: string;
+  followers: string;
+  following: string;
+  niche: string;
+  email: string;
+  bio: string;
+  socialLinks: string[];
+  pricing: any;
+  shippingAddress: string;
+  profileCompletion: string;
+  status: "pending" | "approved" | "rejected" | "blocked";
+  verified: boolean;
+  location: {
+    city: string;
+    state: string;
+    country: string;
+    district?: string;
+    province?: string;
+    coordinates?: { lat: number; lng: number };
+  };
+  engagement: string;
+  videos: any[];
+}
 
 interface Brand {
   id: number;
@@ -208,6 +234,8 @@ export function BrandDashboard({ brand, creator }: BrandDashboardProps) {
       {showCreateCampaign && (
         <CreateCampaign
           brandId={brand.id}
+          brandName={brand.name}
+          brandLogo={brand.logo}
           onClose={() => setShowCreateCampaign(false)}
         />
       )}
