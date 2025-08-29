@@ -137,7 +137,7 @@ export function CreatorDashboard({ creator }: CreatorDashboardProps) {
           <Profile
             creator={creator}
             onSettingsClick={handleSettingsClick}
-            onVideoClick={handleVideoClick}
+            onVideoClick={handleVideoClick as any}
           />
         );
       default:
