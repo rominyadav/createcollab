@@ -17,6 +17,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+import { BrandMiniChat } from "../chats/brand-mini-chat";
+
 interface Creator {
   id: number;
   name: string;
@@ -61,7 +63,7 @@ export function BrandCreatorProfileView({
   brandId,
   onClose,
 }: BrandCreatorProfileViewProps) {
-  const [showChat, setShowChat] = useState(false);
+  const [showMiniChat, setShowMiniChat] = useState(false);
 
   const formatPricing = (pricing: {
     type: string;
@@ -133,19 +135,10 @@ export function BrandCreatorProfileView({
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <Button
-                  onClick={() => setShowChat(true)}
-                  className="bg-emerald-600 hover:bg-emerald-700"
-                >
-                  <MessageCircle className="mr-2 h-4 w-4" />
-                  Message
-                </Button>
-                <Button variant="outline" onClick={onClose}>
-                  <X className="h-4 w-4" />
-                  Close
-                </Button>
-              </div>
+              <Button variant="outline" onClick={onClose}>
+                <X className="h-4 w-4" />
+                Close
+              </Button>
             </div>
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -389,11 +382,11 @@ export function BrandCreatorProfileView({
                   <CardContent className="p-4">
                     <div className="space-y-3">
                       <Button
-                        onClick={() => setShowChat(true)}
+                        onClick={() => setShowMiniChat(true)}
                         className="w-full bg-emerald-600 hover:bg-emerald-700"
                       >
                         <MessageCircle className="mr-2 h-4 w-4" />
-                        Start Conversation
+                        Message
                       </Button>
                       <Button variant="outline" className="w-full">
                         Invite to Campaign
@@ -407,19 +400,13 @@ export function BrandCreatorProfileView({
         </div>
       </div>
 
-      {/* Chat notification */}
-      {showChat && (
-        <div className="fixed right-6 bottom-6 rounded-lg bg-emerald-600 p-4 text-white shadow-lg">
-          <p className="text-sm">Chat feature will be implemented soon!</p>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowChat(false)}
-            className="mt-2 text-white hover:bg-emerald-700"
-          >
-            Close
-          </Button>
-        </div>
+      {/* Mini Chat */}
+      {showMiniChat && (
+        <BrandMiniChat
+          creatorName={creator.name}
+          creatorAvatar={creator.avatar}
+          onClose={() => setShowMiniChat(false)}
+        />
       )}
     </div>
   );
