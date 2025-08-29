@@ -3,8 +3,9 @@
 import { useParams } from "next/navigation";
 
 import { CreatorDashboard } from "@/components/creator/creator-dashboard";
-import { Creator } from "@/components/mock-data/creator-mockdata";
 import creatorMockData from "@/components/mock-data/creator-mockdata.json";
+
+import { Creator } from "@/types/creator";
 
 export default function CreatorPage() {
   const params = useParams();
