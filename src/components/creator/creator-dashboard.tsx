@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 
-import { Creator } from "@/components/mock-data/creator-mockdata";
 import videosData from "@/components/mock-data/videos-mockdata.json";
+
+import { Creator } from "@/types/creator";
 
 import { ExploreCampaigns } from "./campaigns/explore/explore-campaigns";
 import { MyCampaigns } from "./campaigns/my-campaigns/my-campaigns";

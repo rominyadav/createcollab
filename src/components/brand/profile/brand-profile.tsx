@@ -4,13 +4,14 @@ import { useState } from "react";
 
 import { Building2, Globe, MapPin, Settings, User, Users } from "lucide-react";
 
-import { Creator } from "@/components/mock-data/creator-mockdata";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/user-ui/page-header";
+
+import { Creator } from "@/types/creator";
 
 interface Brand {
   id: number;

@@ -1,8 +1,9 @@
 "use client";
 
-import { Creator } from "@/components/mock-data/creator-mockdata";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+
+import { Creator } from "@/types/creator";
 
 interface ProfileHeaderProps {
   creator: Creator;

@@ -5,12 +5,13 @@ import { useState } from "react";
 import { Globe, Grid, MapPin, Settings, Users, Video } from "lucide-react";
 import { FaFacebook, FaInstagram, FaTiktok, FaYoutube } from "react-icons/fa";
 
-import { Creator } from "@/components/mock-data/creator-mockdata";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/user-ui/page-header";
+
+import { Creator } from "@/types/creator";
 
 import { ProfileHeader } from "../shared/profile-header";
 import { VideoGrid } from "../shared/video-grid";

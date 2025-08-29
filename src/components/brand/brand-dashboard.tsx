@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 
-import { Creator } from "@/components/mock-data/creator-mockdata";
 import videosData from "@/components/mock-data/videos-mockdata.json";
+
+import { Creator } from "@/types/creator";
 
 import { Feed } from "../creator/feed";
 import { storage } from "../creator/utils/storage";
