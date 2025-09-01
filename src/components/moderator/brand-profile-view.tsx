@@ -1,27 +1,10 @@
-import { useState } from "react";
-
-import {
-  Building2,
-  Calendar,
-  CreditCard,
-  DollarSign,
-  Eye,
-  FileText,
-  Globe,
-  MapPin,
-  Phone,
-  Star,
-  Tag,
-  TrendingUp,
-  UserCheck,
-  Users,
-  X,
-} from "lucide-react";
+import { useMemo } from "react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Icon } from "@/components/ui/icon";
 import { Separator } from "@/components/ui/separator";
 
 import { ThemeToggle } from "./theme-toggle";
@@ -95,6 +78,7 @@ interface Brand {
     usedCount: number;
     minOrderAmount: number;
     status: string;
+    currency?: string;
   }>;
   creatorCollaborations: Array<{
     creatorId: number;
@@ -161,13 +145,22 @@ const getCouponStatusColor = (status: string) => {
 };
 
 export function BrandProfileView({ brand, onClose }: BrandProfileViewProps) {
-  const [selectedCreator, setSelectedCreator] = useState<number | null>(null);
-
   const handleCreatorClick = (creatorId: number) => {
-    setSelectedCreator(creatorId);
     // In a real app, this would navigate to the creator profile
     console.log(`Navigating to creator ${creatorId}`);
   };
+
+  const stats = useMemo(
+    () => ({
+      activeCoupons: brand.coupons.filter((c) => c.status === "active").length,
+      pendingDeposits: brand.depositRequests.filter(
+        (r) => r.status === "pending"
+      ).length,
+      activeCampaigns: brand.campaigns.filter((c) => c.status === "active")
+        .length,
+    }),
+    [brand.coupons, brand.depositRequests, brand.campaigns]
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -205,7 +198,7 @@ export function BrandProfileView({ brand, onClose }: BrandProfileViewProps) {
                   onClick={onClose}
                   className="rounded-xl border-gray-300 bg-gray-100 px-4 py-2 text-gray-700 transition-all duration-200 hover:border-gray-400 hover:bg-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:hover:border-slate-500 dark:hover:bg-slate-600"
                 >
-                  <X className="h-4 w-4" />
+                  <Icon name="x" size="sm" />
                   Close
                 </Button>
               </div>
@@ -220,7 +213,7 @@ export function BrandProfileView({ brand, onClose }: BrandProfileViewProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Building2 className="h-5 w-5" />
+                      <Icon name="building" variant="primary" />
                       Brand Information
                     </CardTitle>
                   </CardHeader>
@@ -268,7 +261,7 @@ export function BrandProfileView({ brand, onClose }: BrandProfileViewProps) {
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-gray-400" />
+                      <Icon name="mapPin" variant="muted" size="sm" />
                       <span className="text-gray-900 dark:text-white">
                         {brand.location.address}, {brand.location.city},{" "}
                         {brand.location.state}, {brand.location.country}
@@ -281,7 +274,7 @@ export function BrandProfileView({ brand, onClose }: BrandProfileViewProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <FileText className="h-5 w-5" />
+                      <Icon name="fileText" variant="primary" />
                       Company Documents
                     </CardTitle>
                   </CardHeader>
@@ -327,7 +320,7 @@ export function BrandProfileView({ brand, onClose }: BrandProfileViewProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Users className="h-5 w-5" />
+                      <Icon name="users" variant="primary" />
                       Brand Admin Users
                     </CardTitle>
                   </CardHeader>
@@ -374,7 +367,7 @@ export function BrandProfileView({ brand, onClose }: BrandProfileViewProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <CreditCard className="h-5 w-5" />
+                      <Icon name="creditCard" variant="primary" />
                       Account & Billing
                     </CardTitle>
                   </CardHeader>
@@ -432,7 +425,7 @@ export function BrandProfileView({ brand, onClose }: BrandProfileViewProps) {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-gray-400" />
+                      <Icon name="calendar" variant="muted" size="sm" />
                       <span className="text-sm text-gray-500 dark:text-gray-400">
                         Subscription expires: {brand.billing.subscriptionExpiry}
                       </span>
@@ -444,7 +437,7 @@ export function BrandProfileView({ brand, onClose }: BrandProfileViewProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <DollarSign className="h-5 w-5" />
+                      <Icon name="dollarSign" variant="primary" />
                       Deposit Requests
                     </CardTitle>
                   </CardHeader>
@@ -487,7 +480,7 @@ export function BrandProfileView({ brand, onClose }: BrandProfileViewProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Tag className="h-5 w-5" />
+                      <Icon name="tag" variant="primary" />
                       Coupons & Discounts
                     </CardTitle>
                   </CardHeader>
@@ -529,7 +522,7 @@ export function BrandProfileView({ brand, onClose }: BrandProfileViewProps) {
                 <Card className="lg:col-span-2">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <UserCheck className="h-5 w-5" />
+                      <Icon name="userCheck" variant="primary" />
                       Creator Collaborations
                     </CardTitle>
                   </CardHeader>
@@ -553,7 +546,11 @@ export function BrandProfileView({ brand, onClose }: BrandProfileViewProps) {
                             <p>{collab.campaigns} campaigns</p>
                             <p>₹{collab.totalSpent.toLocaleString()}</p>
                             <div className="flex items-center justify-center gap-1">
-                              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                              <Icon
+                                name="star"
+                                size="xs"
+                                className="fill-yellow-400 text-yellow-400"
+                              />
                               <span>{collab.rating}</span>
                             </div>
                             <p className="text-xs text-gray-500 dark:text-gray-500">
@@ -570,7 +567,7 @@ export function BrandProfileView({ brand, onClose }: BrandProfileViewProps) {
                 <Card className="lg:col-span-2">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5" />
+                      <Icon name="trendingUp" variant="primary" />
                       Active Campaigns
                     </CardTitle>
                   </CardHeader>
@@ -630,10 +627,7 @@ export function BrandProfileView({ brand, onClose }: BrandProfileViewProps) {
                         Active Coupons:
                       </span>
                       <span className="font-medium text-gray-900 dark:text-white">
-                        {
-                          brand.coupons.filter((c) => c.status === "active")
-                            .length
-                        }
+                        {stats.activeCoupons}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -649,11 +643,7 @@ export function BrandProfileView({ brand, onClose }: BrandProfileViewProps) {
                         Pending Deposits:
                       </span>
                       <span className="font-medium text-gray-900 dark:text-white">
-                        {
-                          brand.depositRequests.filter(
-                            (r) => r.status === "pending"
-                          ).length
-                        }
+                        {stats.pendingDeposits}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -661,10 +651,7 @@ export function BrandProfileView({ brand, onClose }: BrandProfileViewProps) {
                         Active Campaigns:
                       </span>
                       <span className="font-medium text-gray-900 dark:text-white">
-                        {
-                          brand.campaigns.filter((c) => c.status === "active")
-                            .length
-                        }
+                        {stats.activeCampaigns}
                       </span>
                     </div>
                   </div>
@@ -678,19 +665,19 @@ export function BrandProfileView({ brand, onClose }: BrandProfileViewProps) {
                   </h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-gray-400" />
+                      <Icon name="phone" variant="muted" size="sm" />
                       <span className="text-gray-900 dark:text-white">
                         {brand.phone}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Globe className="h-4 w-4 text-gray-400" />
+                      <Icon name="globe" variant="muted" size="sm" />
                       <span className="text-gray-900 dark:text-white">
                         {brand.website}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-gray-400" />
+                      <Icon name="mapPin" variant="muted" size="sm" />
                       <span className="text-gray-900 dark:text-white">
                         {brand.location.city}
                       </span>

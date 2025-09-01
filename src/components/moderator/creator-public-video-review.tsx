@@ -102,31 +102,43 @@ export function CreatorPublicVideoReview({
   };
 
   const togglePlayPause = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
+    try {
+      if (videoRef.current) {
+        if (isPlaying) {
+          videoRef.current.pause();
+        } else {
+          videoRef.current.play();
+        }
+        setIsPlaying(!isPlaying);
       }
-      setIsPlaying(!isPlaying);
+    } catch {
+      // Handle video control error silently
     }
   };
 
   const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
+    try {
+      if (videoRef.current) {
+        videoRef.current.muted = !isMuted;
+        setIsMuted(!isMuted);
+      }
+    } catch {
+      // Handle mute error silently
     }
   };
 
   const toggleFullscreen = () => {
-    if (videoRef.current) {
-      if (isFullscreen) {
-        document.exitFullscreen();
-      } else {
-        videoRef.current.requestFullscreen();
+    try {
+      if (videoRef.current) {
+        if (isFullscreen) {
+          document.exitFullscreen();
+        } else {
+          videoRef.current.requestFullscreen();
+        }
+        setIsFullscreen(!isFullscreen);
       }
-      setIsFullscreen(!isFullscreen);
+    } catch {
+      // Handle fullscreen error silently
     }
   };
 

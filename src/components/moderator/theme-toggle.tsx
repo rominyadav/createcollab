@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-import { Moon, Sun } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
+import { Icon } from "@/components/ui/icon";
 
 export function ThemeToggle() {
   const [isDark, setIsDark] = useState(false);
@@ -69,12 +68,12 @@ export function ThemeToggle() {
     >
       {isDark ? (
         <>
-          <Sun className="h-4 w-4" />
+          <Icon name="sun" size="sm" />
           Light
         </>
       ) : (
         <>
-          <Moon className="h-4 w-4" />
+          <Icon name="moon" size="sm" />
           Dark
         </>
       )}

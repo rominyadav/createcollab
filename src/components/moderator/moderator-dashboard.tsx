@@ -3,15 +3,15 @@
 import { useEffect, useState } from "react";
 
 import { ThemeProvider } from "../theme-provider";
-import { BrandReviews } from "./brand-reviews";
-import { BrandSearch } from "./brand-search";
 import { CampaignModeration } from "./campaign-moderation";
 import { CreatorReviews } from "./creator-reviews";
-import { CreatorSearch } from "./creator-search";
 import { DashboardOverview } from "./dashboard-overview";
 import { Messages } from "./messages";
 import { ModeratorManagement } from "./moderator-management";
 import { ModeratorNavigation } from "./moderator-navigation";
+import { BrandReviews } from "./reviews/brand-reviews";
+import { BrandSearch } from "./search/brand-search";
+import { CreatorSearch } from "./search/creator-search";
 import { VideoModeration } from "./video-moderation";
 
 export default function ModeratorDashboard() {
@@ -21,9 +21,13 @@ export default function ModeratorDashboard() {
   // Load active section from localStorage on component mount
   useEffect(() => {
     setMounted(true);
-    const savedSection = localStorage.getItem("moderator-active-section");
-    if (savedSection) {
-      setActiveSection(savedSection);
+    try {
+      const savedSection = localStorage.getItem("moderator-active-section");
+      if (savedSection) {
+        setActiveSection(savedSection);
+      }
+    } catch {
+      // Ignore localStorage errors
     }
   }, []);
 
@@ -31,35 +35,29 @@ export default function ModeratorDashboard() {
   const handleSectionChange = (section: string) => {
     setActiveSection(section);
     if (mounted) {
-      // Only save when mounted to prevent hydration issues
-      localStorage.setItem("moderator-active-section", section);
+      try {
+        localStorage.setItem("moderator-active-section", section);
+      } catch {
+        // Ignore localStorage errors
+      }
     }
   };
 
-  const renderContent = () => {
-    switch (activeSection) {
-      case "dashboard":
-        return <DashboardOverview />;
-      case "creators":
-        return <CreatorReviews />;
-      case "brands":
-        return <BrandReviews />;
-      case "videos":
-        return <VideoModeration />;
-      case "campaigns":
-        return <CampaignModeration />;
-      case "moderators":
-        return <ModeratorManagement />;
-      case "messages":
-        return <Messages />;
-      case "search":
-        return <CreatorSearch />;
-      case "brand-list":
-        return <BrandSearch />;
-      default:
-        return <DashboardOverview />;
-    }
-  };
+  const sectionComponents = {
+    dashboard: DashboardOverview,
+    creators: CreatorReviews,
+    brands: BrandReviews,
+    videos: VideoModeration,
+    campaigns: CampaignModeration,
+    moderators: ModeratorManagement,
+    messages: Messages,
+    search: CreatorSearch,
+    "brand-list": BrandSearch,
+  } as const;
+
+  const Component =
+    sectionComponents[activeSection as keyof typeof sectionComponents] ||
+    DashboardOverview;
 
   return (
     <ThemeProvider>
@@ -67,7 +65,9 @@ export default function ModeratorDashboard() {
         activeSection={activeSection}
         onSectionChange={handleSectionChange}
       >
-        <div className="bg-white p-6 dark:bg-slate-800">{renderContent()}</div>
+        <div className="bg-white p-6 dark:bg-slate-800">
+          <Component />
+        </div>
       </ModeratorNavigation>
     </ThemeProvider>
   );

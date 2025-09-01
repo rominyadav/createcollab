@@ -1,8 +1,7 @@
-import { Edit, Plus, Trash2 } from "lucide-react";
-
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader } from "@/components/ui/card";
+import { Icon } from "@/components/ui/icon";
 
 interface Moderator {
   id: number;
@@ -48,7 +47,7 @@ export function ModeratorManagement() {
           </p>
         </div>
         <Button variant="emerald" className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
+          <Icon name="plus" size="sm" />
           Add Moderator
         </Button>
       </div>
@@ -99,7 +98,7 @@ export function ModeratorManagement() {
                     size="sm"
                     onClick={() => handleAction(moderator.id, "edit")}
                   >
-                    <Edit className="mr-2 h-4 w-4" />
+                    <Icon name="edit" size="sm" className="mr-2" />
                     Edit
                   </Button>
                   <Button
@@ -107,7 +106,7 @@ export function ModeratorManagement() {
                     size="sm"
                     onClick={() => handleAction(moderator.id, "delete")}
                   >
-                    <Trash2 className="mr-2 h-4 w-4" />
+                    <Icon name="trash" size="sm" className="mr-2" />
                     Delete
                   </Button>
                 </div>

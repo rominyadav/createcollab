@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 
-import { Calendar, Eye, MapPin, Users } from "lucide-react";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Icon } from "@/components/ui/icon";
 
 interface CampaignVideo {
   id: number;
@@ -383,7 +382,7 @@ export function CampaignVideo({ onPreview }: CampaignVideoProps) {
                     size="sm"
                     className="flex items-center gap-2"
                   >
-                    <Eye className="h-4 w-4" />
+                    <Icon name="eye" size="sm" />
                     Preview
                   </Button>
                 </div>
@@ -417,9 +416,9 @@ export function CampaignVideo({ onPreview }: CampaignVideoProps) {
                       {video.creatorName}
                     </p>
                     <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                      <Users className="h-3 w-3" />
+                      <Icon name="users" size="xs" />
                       <span>{video.creatorFollowers}</span>
-                      <MapPin className="h-3 w-3" />
+                      <Icon name="mapPin" size="xs" />
                       <span className="truncate">{video.creatorLocation}</span>
                     </div>
                   </div>
@@ -432,7 +431,7 @@ export function CampaignVideo({ onPreview }: CampaignVideoProps) {
                       video.status.slice(1)}
                   </Badge>
                   <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                    <Calendar className="h-3 w-3" />
+                    <Icon name="calendar" size="xs" />
                     <span>{video.uploadedAt}</span>
                   </div>
                 </div>

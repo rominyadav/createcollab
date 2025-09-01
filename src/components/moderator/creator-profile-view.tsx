@@ -79,77 +79,102 @@ export function CreatorProfileView({
 }: CreatorProfileViewProps) {
   const [showChat, setShowChat] = useState(false);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300";
-      case "approved":
-        return "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300";
-      case "rejected":
-        return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
-      case "blocked":
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300";
-    }
-  };
+  const statusColors = {
+    pending:
+      "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300",
+    approved:
+      "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300",
+    rejected: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300",
+    blocked: "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-300",
+  } as const;
 
-  const getProfileCompletionColor = (completion: string) => {
-    return completion === "Complete"
+  const getStatusColor = (status: string) =>
+    statusColors[status as keyof typeof statusColors] || statusColors.blocked;
+
+  const getProfileCompletionColor = (completion: string) =>
+    completion === "Complete"
       ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300"
       : "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300";
-  };
 
-  const getCreatorScoreColor = (score: number) => {
-    if (score >= 90)
-      return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300";
-    if (score >= 80)
-      return "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300";
-    if (score >= 70)
-      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300";
-    if (score >= 60)
-      return "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300";
-    return "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
-  };
+  const scoreThresholds = [
+    {
+      min: 90,
+      color:
+        "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300",
+      label: "Excellent",
+    },
+    {
+      min: 80,
+      color: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300",
+      label: "Very Good",
+    },
+    {
+      min: 70,
+      color:
+        "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300",
+      label: "Good",
+    },
+    {
+      min: 60,
+      color:
+        "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-300",
+      label: "Fair",
+    },
+    {
+      min: 0,
+      color: "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300",
+      label: "Poor",
+    },
+  ];
 
-  const getCreatorScoreLabel = (score: number) => {
-    if (score >= 90) return "Excellent";
-    if (score >= 80) return "Very Good";
-    if (score >= 70) return "Good";
-    if (score >= 60) return "Fair";
-    return "Poor";
-  };
+  const getCreatorScoreColor = (score: number) =>
+    scoreThresholds.find((threshold) => score >= threshold.min)?.color ||
+    scoreThresholds[4].color;
 
-  const getPaymentVerificationColor = (verified: boolean) => {
-    return verified
+  const getCreatorScoreLabel = (score: number) =>
+    scoreThresholds.find((threshold) => score >= threshold.min)?.label ||
+    scoreThresholds[4].label;
+
+  const getPaymentVerificationColor = (verified: boolean) =>
+    verified
       ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300"
       : "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300";
-  };
 
   const formatPricing = (pricing: {
     type: string;
     amount?: number;
     min?: number;
     max?: number;
-  }) => {
-    if (pricing.type === "fixed") {
-      return `Rs ${pricing.amount}`;
-    } else {
-      return `Rs ${pricing.min}${pricing.max !== pricing.min ? ` - ${pricing.max}` : ""}`;
-    }
-  };
+  }) =>
+    pricing.type === "fixed"
+      ? `Rs ${pricing.amount}`
+      : `Rs ${pricing.min}${pricing.max !== pricing.min ? ` - ${pricing.max}` : ""}`;
+
+  const socialPlatforms = [
+    {
+      keywords: ["facebook", "fb"],
+      icon: <FaFacebook className="h-4 w-4 text-blue-600" />,
+    },
+    {
+      keywords: ["instagram", "insta"],
+      icon: <FaInstagram className="h-4 w-4 text-pink-600" />,
+    },
+    {
+      keywords: ["tiktok"],
+      icon: <FaTiktok className="h-4 w-4 text-black dark:text-white" />,
+    },
+    {
+      keywords: ["youtube", "yt"],
+      icon: <FaYoutube className="h-4 w-4 text-red-600" />,
+    },
+  ];
 
   const getSocialIcon = (platform: string) => {
     const lowerPlatform = platform.toLowerCase();
-    if (lowerPlatform.includes("facebook") || lowerPlatform.includes("fb"))
-      return <FaFacebook className="h-4 w-4 text-blue-600" />;
-    if (lowerPlatform.includes("instagram") || lowerPlatform.includes("insta"))
-      return <FaInstagram className="h-4 w-4 text-pink-600" />;
-    if (lowerPlatform.includes("tiktok"))
-      return <FaTiktok className="h-4 w-4 text-black dark:text-white" />;
-    if (lowerPlatform.includes("youtube") || lowerPlatform.includes("yt"))
-      return <FaYoutube className="h-4 w-4 text-red-600" />;
-    return <Users className="h-4 w-4 text-gray-400" />;
+    const matchedPlatform = socialPlatforms.find((p) =>
+      p.keywords.some((keyword) => lowerPlatform.includes(keyword))
+    );
+    return matchedPlatform?.icon || <Users className="h-4 w-4 text-gray-400" />;
   };
 
   const toggleChat = () => {
