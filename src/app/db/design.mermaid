@@ -1,0 +1,258 @@
+erDiagram
+    USERS {
+        int user_id PK
+        string email UK
+        string password_hash
+        string role
+        boolean email_verified
+        datetime created_at
+        datetime updated_at
+    }
+
+    CREATORS {
+        int creator_id PK
+        int user_id FK
+        string first_name
+        string last_name
+        string username
+        string profile_picture
+        string address
+        string phone_number
+        string pan_number
+        string pan_card_photo
+        string esewa_khalti_phone
+        boolean profile_completed
+        boolean verified
+        int followers_count
+        int total_views
+        datetime verified_at
+    }
+
+    BRANDS {
+        int brand_id PK
+        int owner_user_id FK
+        string company_name
+        string contact_person
+        string business_address
+        string business_phone
+        datetime created_at
+    }
+
+    BRAND_USERS {
+        int brand_id FK
+        int user_id FK
+        string role
+        datetime assigned_at
+        datetime created_at
+    }
+
+    MODERATORS {
+        int moderator_id PK
+        int user_id FK
+        boolean is_admin
+        string permissions
+        datetime assigned_at
+    }
+
+    CAMPAIGNS {
+        int campaign_id PK
+        int brand_id FK
+        string title
+        text description
+        decimal budget
+        datetime deadline
+        datetime created_at
+        datetime updated_at
+        string status
+    }
+
+    CREATOR_CAMPAIGN_REQUEST {
+        int id PK
+        int creator_id FK
+        int campaign_id FK
+        string status 
+    }
+
+    SOCIAL_MEDIA_PLATFORMS {
+        int platform_id PK
+        string platform_name
+        string base_url
+    }
+
+    CREATOR_SOCIAL_MEDIA {
+        int id PK
+        int creator_id FK
+        int platform_id FK
+        string profile_url
+        int followers_count
+        int total_views
+        datetime linked_at
+    }
+
+    CAMPAIGN_PARTICIPANTS {
+        int participation_id PK
+        int campaign_id FK
+        int creator_id FK
+        datetime joined_at
+        boolean contract_agreed
+        string status
+    }
+
+    CAMPAIGN_VIDEOS {
+        int video_id PK
+        int campaign_id FK
+        int creator_id FK
+        string title
+        string file_uri
+        string thumbnail
+        int filesize
+        datetime uploaded_at
+        string moderator_status
+        string brand_status
+        boolean is_public
+        datetime approved_at
+    }
+
+    VIDEO_POSTS {
+        int video_id PK
+        int campaign_id FK
+        int creator_id FK
+        int likes
+        string title
+        string file_uri
+        string thumbnail
+        string caption
+        int filesize
+        datetime uploaded_at
+        boolean is_public
+        datetime approved_at
+    }
+
+    VIDEO_COMMENTS {
+        int video_comments_id PK
+        int video_post_id FK
+        int commenter FK
+        string content
+        datetime created_at
+    }
+
+    VIDEO_LIKES {
+        int user_id FK
+        int video_post_id FK
+        datetime created_at
+    }
+
+    MESSAGES {
+        int message_id PK
+        int sender_id FK
+        int receiver_id FK
+        int campaign_id FK
+        text message_content
+        datetime sent_at
+        boolean read_status
+    }
+
+    PAYMENTS {
+        int payment_id PK
+        int campaign_id FK
+        int creator_id FK
+        int brand_id FK
+        decimal amount
+        string payment_method
+        string transaction_id
+        datetime payment_date
+        string status
+    }
+
+    WALLETS {
+        int wallet_id PK
+        int creator_id FK
+        decimal balance
+        datetime last_updated
+    }
+
+    WALLET_TRANSACTIONS {
+        int transaction_id PK
+        int wallet_id FK
+        int payment_id FK
+        string transaction_type
+        decimal amount
+        string description
+        datetime created_at
+    }
+
+    FOLLOWS {
+        int follow_id PK
+        int follower_id FK
+        int following_id FK
+        datetime followed_at
+    }
+
+    VIDEO_REVIEWS {
+        int review_id PK
+        int video_id FK
+        int reviewer_id FK
+        string reviewer_type
+        string status
+        text comments
+        datetime reviewed_at
+    }
+
+    OTP_VERIFICATIONS {
+        int otp_id PK
+        int user_id FK
+        string otp_code
+        string purpose
+        datetime expires_at
+        boolean used
+        datetime created_at
+    }
+
+    %% Relationships
+    USERS ||--o| CREATORS : "can be"
+    USERS ||--o| BRANDS : "can create"
+    USERS ||--o| MODERATORS : "can be"
+
+    BRANDS ||--o{ BRAND_USERS : "has members"
+    USERS ||--o{ BRAND_USERS : "can be"
+    
+    BRANDS ||--o{ CAMPAIGNS : "creates"
+    CAMPAIGNS ||--o{ CAMPAIGN_PARTICIPANTS : "has"
+    CREATORS ||--o{ CAMPAIGN_PARTICIPANTS : "joins"
+    CREATORS ||--o{ CREATOR_CAMPAIGN_REQUEST : "can create"
+    BRAND_USERS ||--o{ CREATOR_CAMPAIGN_REQUEST : "can accept"
+    CREATORS ||--o{ VIDEO_POSTS : "posts"
+    
+    CREATORS ||--o{ CREATOR_SOCIAL_MEDIA : "links"
+    SOCIAL_MEDIA_PLATFORMS ||--o{ CREATOR_SOCIAL_MEDIA : "platform for"
+    
+    CAMPAIGN_PARTICIPANTS ||--o{ CAMPAIGN_VIDEOS : "uploads"
+    CAMPAIGNS ||--o{ CAMPAIGN_VIDEOS : "contains"
+    CREATORS ||--o{ CAMPAIGN_VIDEOS : "creates"
+    
+    USERS ||--o{ MESSAGES : "sends"
+    USERS ||--o{ MESSAGES : "receives"
+    CAMPAIGNS ||--o{ MESSAGES : "related to"
+    
+    CAMPAIGNS ||--o{ PAYMENTS : "involves"
+    CREATORS ||--o{ PAYMENTS : "receives"
+    BRANDS ||--o{ PAYMENTS : "makes"
+    
+    CREATORS ||--|| WALLETS : "owns"
+    BRANDS ||--|| WALLETS : "owns"
+    WALLETS ||--o{ WALLET_TRANSACTIONS : "has"
+    PAYMENTS ||--o| WALLET_TRANSACTIONS : "creates"
+    
+    USERS ||--o{ FOLLOWS : "follower"
+    USERS ||--o{ FOLLOWS : "following"
+    
+    CAMPAIGN_VIDEOS ||--o{ VIDEO_REVIEWS : "reviewed in"
+    USERS ||--o{ VIDEO_REVIEWS : "reviews"
+    
+    USERS ||--o{ OTP_VERIFICATIONS : "generates"
+
+    VIDEO_POSTS ||--o{ VIDEO_COMMENTS : "has"
+    VIDEO_POSTS ||--o{ VIDEO_LIKES : "has"
+
+    USERS ||--o{ VIDEO_COMMENTS : "posts"
+    USERS ||--o{ VIDEO_LIKES : "can like"
