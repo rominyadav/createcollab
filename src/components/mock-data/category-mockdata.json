@@ -1,0 +1,122 @@
+{
+  "Technology": [
+    "Software Development",
+    "Mobile Apps",
+    "Web Development",
+    "AI & Machine Learning",
+    "Cybersecurity",
+    "Cloud Computing",
+    "IoT Devices",
+    "Gaming",
+    "Tech Reviews",
+    "Hardware"
+  ],
+  "Fashion": [
+    "Clothing",
+    "Accessories",
+    "Footwear",
+    "Jewelry",
+    "Beauty & Cosmetics",
+    "Skincare",
+    "Hair Care",
+    "Luxury Fashion",
+    "Sustainable Fashion",
+    "Street Style"
+  ],
+  "Food & Beverage": [
+    "Restaurants",
+    "Food Delivery",
+    "Cooking",
+    "Baking",
+    "Beverages",
+    "Healthy Eating",
+    "Vegan/Vegetarian",
+    "Local Cuisine",
+    "Food Reviews",
+    "Catering"
+  ],
+  "Health & Fitness": [
+    "Gym & Fitness",
+    "Yoga",
+    "Nutrition",
+    "Mental Health",
+    "Sports",
+    "Wellness",
+    "Medical Services",
+    "Supplements",
+    "Personal Training",
+    "Meditation"
+  ],
+  "Travel & Tourism": [
+    "Hotels",
+    "Airlines",
+    "Adventure Travel",
+    "Cultural Tourism",
+    "Travel Gear",
+    "Local Experiences",
+    "Travel Planning",
+    "Photography",
+    "Budget Travel",
+    "Luxury Travel"
+  ],
+  "Education": [
+    "Online Courses",
+    "Language Learning",
+    "Skill Development",
+    "Academic Tutoring",
+    "Professional Training",
+    "Educational Technology",
+    "Books & Literature",
+    "Research",
+    "Certification Programs",
+    "Study Abroad"
+  ],
+  "Entertainment": [
+    "Movies & TV",
+    "Music",
+    "Gaming",
+    "Comedy",
+    "Events",
+    "Streaming Services",
+    "Podcasts",
+    "Live Performances",
+    "Celebrity Culture",
+    "Pop Culture"
+  ],
+  "Home & Lifestyle": [
+    "Home Decor",
+    "Furniture",
+    "Gardening",
+    "DIY Projects",
+    "Interior Design",
+    "Kitchen & Appliances",
+    "Organization",
+    "Real Estate",
+    "Home Security",
+    "Cleaning Products"
+  ],
+  "Finance": [
+    "Banking",
+    "Investment",
+    "Insurance",
+    "Cryptocurrency",
+    "Personal Finance",
+    "Business Loans",
+    "Financial Planning",
+    "Tax Services",
+    "Credit Cards",
+    "Fintech"
+  ],
+  "Automotive": [
+    "Car Reviews",
+    "Electric Vehicles",
+    "Car Accessories",
+    "Motorcycles",
+    "Car Maintenance",
+    "Auto Insurance",
+    "Car Dealerships",
+    "Racing",
+    "Car Modifications",
+    "Public Transportation"
+  ]
+}
