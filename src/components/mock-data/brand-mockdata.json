@@ -33,30 +33,23 @@
     },
     "adminUsers": [
       {
-        "id": 1,
-        "name": "Rajesh Kumar",
-        "email": "rajesh@techcorp.com",
+        "id": 2,
+        "creatorId": 2,
+        "name": "Mike Chen",
+        "email": "mike.chen@email.com",
         "role": "CEO",
-        "phone": "+977-9841234567",
-        "avatar": "RK",
+        "phone": "+977-9852345678",
+        "avatar": "MC",
         "isPrimary": true
       },
       {
-        "id": 2,
-        "name": "Priya Sharma",
-        "email": "priya@techcorp.com",
+        "id": 4,
+        "creatorId": 4,
+        "name": "Raj Sharma",
+        "email": "raj.sharma@email.com",
         "role": "Marketing Director",
-        "phone": "+977-9852345678",
-        "avatar": "PS",
-        "isPrimary": false
-      },
-      {
-        "id": 3,
-        "name": "Amit Patel",
-        "email": "amit@techcorp.com",
-        "role": "Operations Manager",
-        "phone": "+977-9863456789",
-        "avatar": "AP",
+        "phone": "+977-9874567890",
+        "avatar": "RS",
         "isPrimary": false
       }
     ],
@@ -201,20 +194,22 @@
     "adminUsers": [
       {
         "id": 1,
-        "name": "Sita Thapa",
-        "email": "sita@stylehub.com",
+        "creatorId": 1,
+        "name": "Sarah Johnson",
+        "email": "sarah.j@email.com",
         "role": "Founder & CEO",
-        "phone": "+977-9874567890",
-        "avatar": "ST",
+        "phone": "+977-9841234567",
+        "avatar": "SJ",
         "isPrimary": true
       },
       {
-        "id": 2,
-        "name": "Bikash Gurung",
-        "email": "bikash@stylehub.com",
+        "id": 5,
+        "creatorId": 5,
+        "name": "Priya Shrestha",
+        "email": "priya.s@email.com",
         "role": "Creative Director",
         "phone": "+977-9885678901",
-        "avatar": "BG",
+        "avatar": "PS",
         "isPrimary": false
       }
     ],
@@ -319,22 +314,14 @@
     },
     "adminUsers": [
       {
-        "id": 1,
-        "name": "Ramesh Bhandari",
-        "email": "ramesh@foodiedelight.com",
+        "id": 3,
+        "creatorId": 3,
+        "name": "Emma Wilson",
+        "email": "emma.w@email.com",
         "role": "Managing Director",
-        "phone": "+977-9896789012",
-        "avatar": "RB",
+        "phone": "+977-9863456789",
+        "avatar": "EW",
         "isPrimary": true
-      },
-      {
-        "id": 2,
-        "name": "Anita Tamang",
-        "email": "anita@foodiedelight.com",
-        "role": "Marketing Manager",
-        "phone": "+977-9907890123",
-        "avatar": "AT",
-        "isPrimary": false
       }
     ],
     "billing": {
