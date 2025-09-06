@@ -2,7 +2,7 @@
 
 import Navigation from "@/components/ui/navigation";
 
-import { SignUpCard } from "@/features/auth/components/sign-up-card";
+import { ClerkSignUpCard } from "@/features/auth/components/clerk-sign-up-card";
 
 const SignUpPage = () => {
   return (
@@ -17,7 +17,7 @@ const SignUpPage = () => {
           <div className="mx-auto w-full max-w-6xl">
             <div className="grid items-center gap-6 lg:grid-cols-2 lg:gap-8">
               {/* Left Side - Header Content */}
-              <div className="space-y-4 text-left">
+              <div className="hidden space-y-4 text-left md:block">
                 <div className="inline-flex h-14 w-14 items-center justify-center rounded-xl border border-emerald-200/50 bg-gradient-to-br from-emerald-500/20 to-teal-600/20 shadow-lg sm:h-16 sm:w-16">
                   <span className="text-2xl sm:text-3xl">🚀</span>
                 </div>
@@ -65,7 +65,7 @@ const SignUpPage = () => {
 
               {/* Right Side - Sign Up Form */}
               <div className="flex justify-center lg:justify-end">
-                <SignUpCard />
+                <ClerkSignUpCard />
               </div>
             </div>
           </div>
