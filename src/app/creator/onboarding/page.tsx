@@ -1,13 +1,5 @@
-"use client";
-
-import { useEffect } from "react";
-
-import { assignCreatorRole } from "@/features/auth/actions/update-role";
+import CreatorOnboarding from "@/components/creator/creator-onboarding";
 
 export default function CreatorOnboardingPage() {
-  useEffect(() => {
-    assignCreatorRole();
-  }, []);
-
-  return <div>Creator Onboarding</div>;
+  return <CreatorOnboarding />;
 }
