@@ -3,9 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { useUser } from "@clerk/nextjs";
+import { useMutation, useQuery } from "convex/react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
+import { api } from "../../../convex/_generated/api";
 import Step1BasicInfo from "./onboarding/step1-basic-info";
 import Step2SocialLinks from "./onboarding/step2-social-links";
 import Step3Verification from "./onboarding/step3-verification";
@@ -131,13 +135,48 @@ export default function CreatorOnboarding() {
   };
 
   const handleFinishLater = () => {
-    router.push("/creators");
+    router.push("/");
   };
 
-  const handleSubmit = () => {
-    // Mock submission - in real app, this would save to backend
-    console.log("Submitting creator onboarding data:", formData);
-    router.push("/creators");
+  const { user } = useUser();
+  const updateCreator = useMutation(api.creators.updateCreatorProfile);
+  const getCreator = useQuery(
+    api.creators.getCreatorByClerkId,
+    user ? { clerkId: user.id } : "skip"
+  );
+
+  const handleSubmit = async () => {
+    if (user) {
+      try {
+        await updateCreator({
+          clerkId: user.id,
+          bio: formData.bio,
+          niche: formData.niche,
+          socialLinks: Object.entries(formData.socialPlatforms)
+            .filter(([_, enabled]) => enabled)
+            .map(([platform]) => platform),
+          address: {
+            street: formData.street,
+            city: formData.city,
+            province: formData.province,
+            country: formData.country,
+            zipCode: formData.zipCode,
+          },
+          phoneNumber: formData.phoneNumber,
+          legalName: formData.legalName,
+          panCard: formData.panCard,
+        });
+
+        const creator = getCreator;
+        if (creator?.uuid) {
+          router.push(`/creator/${creator.uuid}`);
+        } else {
+          router.push("/creator/onboarding");
+        }
+      } catch (error) {
+        console.error("Failed to save creator data:", error);
+      }
+    }
   };
 
   const updateFormData = (updates: Partial<CreatorOnboardingData>) => {

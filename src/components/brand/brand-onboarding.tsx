@@ -3,9 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { useUser } from "@clerk/nextjs";
+import { useMutation } from "convex/react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
+import { api } from "../../../convex/_generated/api";
 import BrandStep1BasicInfo from "./onboarding/brand-step1-basic-info";
 import BrandStep2SocialMedia from "./onboarding/brand-step2-social-media";
 import BrandStep3Documents from "./onboarding/brand-step3-documents";
@@ -125,12 +129,29 @@ export default function BrandOnboarding() {
   };
 
   const handleFinishLater = () => {
-    router.push("/brands");
+    router.push("/brand/1/1");
   };
 
-  const handleSubmit = () => {
-    console.log("Submitting brand onboarding data:", formData);
-    router.push("/brands");
+  const { user } = useUser();
+  const updateBrand = useMutation(api.brands.updateBrandProfile);
+
+  const handleSubmit = async () => {
+    if (user) {
+      try {
+        await updateBrand({
+          clerkId: user.id,
+          industry: formData.industry,
+          phone: formData.phone,
+          website: formData.website,
+          description: formData.description,
+          founded: formData.founded,
+          employees: formData.employees,
+        });
+        router.push("/brand/1/1");
+      } catch (error) {
+        console.error("Failed to save brand data:", error);
+      }
+    }
   };
 
   const updateFormData = (updates: Partial<BrandOnboardingData>) => {

@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { UserButton } from "@clerk/nextjs";
-import { useConvexAuth } from "convex/react";
+import { UserButton, useUser } from "@clerk/nextjs";
 
 import { Button } from "@/components/ui/button";
 
@@ -12,7 +11,7 @@ export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const { isAuthenticated } = useConvexAuth();
+  const { isSignedIn } = useUser();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,8 +59,22 @@ export default function Navigation() {
             >
               For Creators
             </Link>
-            {isAuthenticated ? (
-              <UserButton />
+            {isSignedIn ? (
+              <div className="flex items-center gap-4">
+                <Link
+                  href="/dashboard"
+                  className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
+                >
+                  Dashboard
+                </Link>
+                <UserButton
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-8 h-8",
+                    },
+                  }}
+                />
+              </div>
             ) : (
               <>
                 <Link
@@ -125,18 +138,35 @@ export default function Navigation() {
               >
                 For Creators
               </Link>
-              <Link
-                href="/sign-in"
-                className="block px-3 py-2 text-base font-medium text-slate-600 hover:text-slate-900"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Sign In
-              </Link>
-              <div className="px-3 py-2">
-                <Button variant="gradient" size="sm" className="w-full">
-                  <Link href="/sign-up">Get Started</Link>
-                </Button>
-              </div>
+              {isSignedIn ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    className="block px-3 py-2 text-base font-medium text-slate-600 hover:text-slate-900"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  <div className="px-3 py-2">
+                    <UserButton />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/sign-in"
+                    className="block px-3 py-2 text-base font-medium text-slate-600 hover:text-slate-900"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                  <div className="px-3 py-2">
+                    <Button variant="gradient" size="sm" className="w-full">
+                      <Link href="/sign-up">Get Started</Link>
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}

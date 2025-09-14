@@ -1,7 +1,7 @@
 "use client";
 
 import { Creator } from "@/components/mock-data/creator-mockdata";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
 interface ProfileHeaderProps {
@@ -23,8 +23,9 @@ export function ProfileHeader({
   return (
     <div className="text-center">
       <Avatar className="mx-auto mb-4 h-24 w-24">
+        <AvatarImage src={creator.avatar} alt={creator.name} />
         <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-2xl font-bold text-white">
-          {creator.avatar}
+          {creator.name.charAt(0)}
         </AvatarFallback>
       </Avatar>
 

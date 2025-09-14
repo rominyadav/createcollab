@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useState } from "react";
 
+import { useUser } from "@clerk/nextjs";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -32,9 +34,12 @@ export default function Step2SocialLinks({
   onBack,
 }: Step2Props) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const { user } = useUser();
 
-  // Mock Clerk auth profile picture - in real app this would come from useUser()
+  // Use Clerk profile picture
+  console.log("Clerk user imageUrl:", user?.imageUrl);
   const defaultProfileUrl =
+    user?.imageUrl ||
     "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
 
   const togglePlatform = (
@@ -97,7 +102,7 @@ export default function Step2SocialLinks({
           </div>
           <div>
             <Label className="text-base font-semibold">
-              {formData.name || "Creator"}
+              {formData.name || user?.fullName || "Creator"}
             </Label>
             <p className="text-muted-foreground text-xs">
               {formData.creatorType || "Content Creator"}

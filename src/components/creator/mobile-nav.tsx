@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { useClerk } from "@clerk/nextjs";
 import {
   Briefcase,
   Home,
@@ -37,6 +38,7 @@ export function MobileNav({
   onTabChange,
   creatorName = "Creator",
 }: MobileNavProps) {
+  const { signOut } = useClerk();
   const [greeting, setGreeting] = useState("");
   const [isGreetingReady, setIsGreetingReady] = useState(false);
 
@@ -96,14 +98,13 @@ export function MobileNav({
         <div className="border-t p-4">
           <Button
             variant="ghost"
-            className="w-full justify-start gap-3 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700"
+            className="w-full justify-start gap-3 text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
             onClick={() => {
-              // Add logout logic here
-              console.log("Logout clicked");
+              signOut(() => (window.location.href = "/"));
             }}
           >
             <LogOut className="h-5 w-5" />
-            Logout
+            Sign Out
           </Button>
         </div>
       </div>

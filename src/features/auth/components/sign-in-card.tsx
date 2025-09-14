@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useState } from "react";
 
+import { useSignIn } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { FaGithub } from "react-icons/fa";
@@ -26,6 +27,8 @@ import { loginSchema } from "../schemas";
 
 export const SignInCard = () => {
   const [userType, setUserType] = useState<"creator" | "brand">("creator");
+  const [isLoading, setIsLoading] = useState(false);
+  const { isLoaded, signIn, setActive } = useSignIn();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -35,8 +38,51 @@ export const SignInCard = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof loginSchema>) => {
-    console.log({ ...values, userType });
+  const onSubmit = async (values: z.infer<typeof loginSchema>) => {
+    if (!isLoaded || !signIn) return;
+
+    setIsLoading(true);
+    try {
+      const result = await signIn.create({
+        identifier: values.email,
+        password: values.password,
+      });
+
+      if (result.status === "complete") {
+        await setActive({ session: result.createdSessionId });
+
+        const redirectUrl =
+          userType === "creator" ? "/creator/onboarding" : "/brand/onboarding";
+
+        window.location.href = redirectUrl;
+      }
+    } catch (err: any) {
+      form.setError("email", {
+        message: err.errors?.[0]?.message || "Invalid credentials",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOAuthSignIn = async (
+    provider: "oauth_google" | "oauth_github"
+  ) => {
+    if (!isLoaded || !signIn) return;
+
+    setIsLoading(true);
+    try {
+      await signIn.authenticateWithRedirect({
+        strategy: provider,
+        redirectUrl: "/sso-callback",
+        redirectUrlComplete:
+          userType === "creator" ? "/creator/onboarding" : "/brand/onboarding",
+      });
+    } catch (err) {
+      console.error("OAuth error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -156,9 +202,10 @@ export const SignInCard = () => {
                 variant="emerald"
                 type="submit"
                 size="lg"
-                className="h-12 w-full rounded-lg font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-xl"
+                disabled={isLoading}
+                className="h-12 w-full rounded-lg font-semibold text-white shadow-lg transition-all duration-200 hover:shadow-xl disabled:opacity-50"
               >
-                Sign In
+                {isLoading ? "Signing In..." : "Sign In"}
               </Button>
             </div>
           </form>
@@ -171,7 +218,9 @@ export const SignInCard = () => {
           <Button
             variant="outline"
             size="lg"
-            className="border-border/50 hover:border-primary/30 hover:bg-primary/5 h-12 w-full rounded-lg font-medium transition-all duration-200"
+            disabled={isLoading}
+            onClick={() => handleOAuthSignIn("oauth_google")}
+            className="border-border/50 hover:border-primary/30 hover:bg-primary/5 h-12 w-full rounded-lg font-medium transition-all duration-200 disabled:opacity-50"
           >
             <FcGoogle className="mr-3 h-5 w-5" />
             Continue with Google
@@ -179,7 +228,9 @@ export const SignInCard = () => {
           <Button
             variant="outline"
             size="lg"
-            className="border-border/50 hover:border-primary/30 hover:bg-primary/5 h-12 w-full rounded-lg font-medium transition-all duration-200"
+            disabled={isLoading}
+            onClick={() => handleOAuthSignIn("oauth_github")}
+            className="border-border/50 hover:border-primary/30 hover:bg-primary/5 h-12 w-full rounded-lg font-medium transition-all duration-200 disabled:opacity-50"
           >
             <FaGithub className="mr-3 h-5 w-5" />
             Continue with GitHub
