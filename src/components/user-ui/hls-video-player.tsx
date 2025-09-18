@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { useMutation } from "convex/react";
 import Hls from "hls.js";
 import {
   Maximize,
@@ -21,6 +22,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Slider } from "@/components/ui/slider";
 
+import { api } from "@/lib/convex-api";
+
 interface HLSVideoPlayerProps {
   videoId?: string;
   hlsUrls?: {
@@ -35,7 +38,6 @@ interface HLSVideoPlayerProps {
   title?: string;
   autoPlay?: boolean;
   className?: string;
-  // Legacy support
   videoData?: {
     hlsUrls?: {
       p360?: string;
@@ -58,36 +60,62 @@ export function HLSVideoPlayer({
   title,
   autoPlay = false,
   className = "",
-  videoData, // Legacy support
+  videoData,
 }: HLSVideoPlayerProps) {
-  // Support both new and legacy prop formats
   const actualHlsUrls = hlsUrls || videoData?.hlsUrls;
   const actualFallbackUrl = fallbackUrl || videoData?.videoUrl;
-  const actualTitle = title || videoData?.title;
+
   const videoRef = useRef<HTMLVideoElement>(null);
+  const hlsRef = useRef<Hls | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState([100]);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [buffered, setBuffered] = useState(0);
   const [showControls, setShowControls] = useState(true);
   const [currentQuality, setCurrentQuality] = useState<string>("auto");
   const [availableQualities, setAvailableQualities] = useState<
     Array<{ key: string; label: string; url: string }>
   >([]);
-  const hlsRef = useRef<Hls | null>(null);
+  const [hasTrackedView, setHasTrackedView] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const incrementViews = useMutation(api.videoFeeds.incrementViews);
+
+  const hideControlsAfterDelay = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => setShowControls(false), 3000);
+  };
+
+  const showControlsAndResetTimer = () => {
+    setShowControls(true);
+    hideControlsAfterDelay();
+  };
+
+  // Keyboard support
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.code === "Space") {
+        e.preventDefault();
+        togglePlay();
+      }
+    };
+    document.addEventListener("keydown", handleKeyPress);
+    return () => document.removeEventListener("keydown", handleKeyPress);
+  }, [togglePlay]);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    // Cleanup previous HLS instance
     if (hlsRef.current) {
       hlsRef.current.destroy();
       hlsRef.current = null;
     }
 
-    // Setup available qualities - convert storage IDs to API URLs
     const qualities = [];
     if (actualHlsUrls) {
       if (actualHlsUrls.p2160)
@@ -132,7 +160,6 @@ export function HLSVideoPlayer({
       qualities.unshift({ key: "auto", label: "Auto", url: "" });
       setAvailableQualities(qualities);
 
-      // Auto-select best quality based on screen size
       const screenWidth = window.innerWidth;
       let autoQuality = "p720";
       if (screenWidth >= 3840) autoQuality = "p2160";
@@ -145,44 +172,41 @@ export function HLSVideoPlayer({
       const selectedQuality =
         qualities.find((q) => q.key === autoQuality) || qualities[1];
       if (selectedQuality && selectedQuality.url) {
-        // Use HLS.js for .m3u8 files
         if (Hls.isSupported()) {
           const hls = new Hls();
           hlsRef.current = hls;
           hls.loadSource(selectedQuality.url);
           hls.attachMedia(video);
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
-            console.log("HLS manifest loaded");
-            if (autoPlay) {
-              video.play().catch(() => {});
-            }
+            if (autoPlay) video.play().catch(() => {});
           });
         } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-          // Native HLS support (Safari)
           video.src = selectedQuality.url;
-          if (autoPlay) {
-            video.play().catch(() => {});
-          }
+          if (autoPlay) video.play().catch(() => {});
         }
         setCurrentQuality(selectedQuality.key);
       }
     } else if (actualFallbackUrl) {
-      // Fallback to original video
       video.src = actualFallbackUrl;
-      if (autoPlay) {
-        video.play().catch(() => {});
-      }
+      if (autoPlay) video.play().catch(() => {});
     }
 
     const updateTime = () => setCurrentTime(video.currentTime);
     const updateDuration = () => setDuration(video.duration);
+    const updateBuffered = () => {
+      if (video.buffered.length > 0) {
+        setBuffered(video.buffered.end(video.buffered.length - 1));
+      }
+    };
 
     video.addEventListener("timeupdate", updateTime);
     video.addEventListener("loadedmetadata", updateDuration);
+    video.addEventListener("progress", updateBuffered);
 
     return () => {
       video.removeEventListener("timeupdate", updateTime);
       video.removeEventListener("loadedmetadata", updateDuration);
+      video.removeEventListener("progress", updateBuffered);
       if (hlsRef.current) {
         hlsRef.current.destroy();
         hlsRef.current = null;
@@ -193,7 +217,6 @@ export function HLSVideoPlayer({
   const togglePlay = () => {
     const video = videoRef.current;
     if (!video) return;
-
     if (isPlaying) {
       video.pause();
     } else {
@@ -205,7 +228,6 @@ export function HLSVideoPlayer({
   const toggleMute = () => {
     const video = videoRef.current;
     if (!video) return;
-
     video.muted = !isMuted;
     setIsMuted(!isMuted);
   };
@@ -213,7 +235,6 @@ export function HLSVideoPlayer({
   const handleVolumeChange = (value: number[]) => {
     const video = videoRef.current;
     if (!video) return;
-
     const newVolume = value[0];
     video.volume = newVolume / 100;
     setVolume([newVolume]);
@@ -223,39 +244,34 @@ export function HLSVideoPlayer({
   const handleSeek = (value: number[]) => {
     const video = videoRef.current;
     if (!video) return;
-
     video.currentTime = value[0];
     setCurrentTime(value[0]);
   };
 
   const toggleFullscreen = () => {
-    const video = videoRef.current;
-    if (!video) return;
-
+    const container = containerRef.current;
+    if (!container) return;
     if (document.fullscreenElement) {
       document.exitFullscreen();
     } else {
-      video.requestFullscreen();
+      container.requestFullscreen();
     }
   };
 
   const changeQuality = (qualityKey: string) => {
     const video = videoRef.current;
     if (!video) return;
-
     const quality = availableQualities.find((q) => q.key === qualityKey);
     if (!quality || !quality.url) return;
 
     const currentTime = video.currentTime;
     const wasPlaying = !video.paused;
 
-    // Cleanup previous HLS instance
     if (hlsRef.current) {
       hlsRef.current.destroy();
       hlsRef.current = null;
     }
 
-    // Load new quality with HLS.js
     if (Hls.isSupported()) {
       const hls = new Hls();
       hlsRef.current = hls;
@@ -263,16 +279,12 @@ export function HLSVideoPlayer({
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
         video.currentTime = currentTime;
-        if (wasPlaying) {
-          video.play();
-        }
+        if (wasPlaying) video.play();
       });
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = quality.url;
       video.currentTime = currentTime;
-      if (wasPlaying) {
-        video.play();
-      }
+      if (wasPlaying) video.play();
     }
 
     setCurrentQuality(qualityKey);
@@ -286,38 +298,78 @@ export function HLSVideoPlayer({
 
   return (
     <div
+      ref={containerRef}
       className={`relative overflow-hidden rounded-lg bg-black ${className}`}
-      onMouseEnter={() => setShowControls(true)}
-      onMouseLeave={() => setShowControls(false)}
+      onMouseEnter={showControlsAndResetTimer}
+      onMouseMove={showControlsAndResetTimer}
     >
-      <video
-        ref={videoRef}
-        className="h-full w-full"
-        onClick={togglePlay}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-      />
+      <div className="relative h-full w-full" onClick={togglePlay}>
+        <video
+          ref={videoRef}
+          className="h-full w-full"
+          onPlay={() => {
+            setIsPlaying(true);
+            if (videoId && !hasTrackedView) {
+              incrementViews({ id: videoId });
+              setHasTrackedView(true);
+            }
+          }}
+          onPause={() => setIsPlaying(false)}
+        />
+      </div>
 
       {showControls && (
-        <div className="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-          {/* Progress Bar */}
-          <div className="mb-4">
-            <Slider
-              value={[currentTime]}
-              max={duration || 100}
-              step={1}
-              onValueChange={handleSeek}
-              className="w-full"
-            />
+        <div className="pointer-events-auto absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/80 to-transparent p-4">
+          <div className="mb-4" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="relative h-2 w-full cursor-pointer rounded-full bg-gray-600"
+              onClick={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const percent = (e.clientX - rect.left) / rect.width;
+                const newTime = percent * duration;
+                handleSeek([newTime]);
+              }}
+            >
+              {/* Buffered section */}
+              <div
+                className="absolute h-full rounded-full bg-gray-400"
+                style={{
+                  width:
+                    duration > 0
+                      ? `${Math.min((buffered / duration) * 100, 100)}%`
+                      : "0%",
+                }}
+              />
+              {/* Played section with luminous effect */}
+              <div
+                className="absolute h-full rounded-full bg-blue-200 shadow-[0_0_8px_rgba(147,197,253,0.6)]"
+                style={{
+                  width:
+                    duration > 0 ? `${(currentTime / duration) * 100}%` : "0%",
+                }}
+              />
+              {/* Seek handle */}
+              <div
+                className="absolute h-4 w-4 rounded-full bg-white shadow-lg"
+                style={{
+                  left:
+                    duration > 0 ? `${(currentTime / duration) * 100}%` : "0%",
+                  top: "50%",
+                  transform: "translateX(-50%) translateY(-50%)",
+                }}
+              />
+            </div>
           </div>
 
-          {/* Controls */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={togglePlay}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  togglePlay();
+                }}
                 className="text-white hover:bg-white/20"
               >
                 {isPlaying ? (
@@ -330,7 +382,10 @@ export function HLSVideoPlayer({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={toggleMute}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleMute();
+                }}
                 className="text-white hover:bg-white/20"
               >
                 {isMuted ? (
@@ -340,7 +395,7 @@ export function HLSVideoPlayer({
                 )}
               </Button>
 
-              <div className="w-20">
+              <div className="w-20" onClick={(e) => e.stopPropagation()}>
                 <Slider
                   value={volume}
                   max={100}
@@ -386,7 +441,10 @@ export function HLSVideoPlayer({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={toggleFullscreen}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleFullscreen();
+                }}
                 className="text-white hover:bg-white/20"
               >
                 <Maximize className="h-4 w-4" />
