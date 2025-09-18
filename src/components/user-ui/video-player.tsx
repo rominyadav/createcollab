@@ -13,6 +13,15 @@ interface VideoPlayerProps {
   autoPlay?: boolean;
   controls?: boolean;
   className?: string;
+  hlsUrls?: {
+    p360?: string;
+    p480?: string;
+    p720?: string;
+    p1080?: string;
+    p1440?: string;
+    p2160?: string;
+  };
+  isTranscoded?: boolean;
 }
 
 export function VideoPlayer({
@@ -22,6 +31,8 @@ export function VideoPlayer({
   autoPlay = false,
   controls = true,
   className = "",
+  hlsUrls,
+  isTranscoded = false,
 }: VideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const incrementViews = useMutation(api.videoFeeds.incrementViews);
@@ -42,10 +53,16 @@ export function VideoPlayer({
     return () => video.removeEventListener("play", handlePlay);
   }, [videoId, incrementViews]);
 
+  // Use HLS if available, otherwise fallback to original video
+  const videoSrc =
+    isTranscoded && hlsUrls
+      ? hlsUrls.p720 || hlsUrls.p480 || hlsUrls.p360 || videoUrl
+      : videoUrl;
+
   return (
     <video
       ref={videoRef}
-      src={videoUrl}
+      src={videoSrc}
       title={title}
       autoPlay={autoPlay}
       controls={controls}

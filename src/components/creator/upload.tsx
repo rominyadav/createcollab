@@ -133,7 +133,7 @@ export function Upload({ onClose }: UploadProps) {
       const videoUrl = videoFileId; // We'll get the actual URL in the component
 
       // Create video record
-      await createVideoFeed({
+      const videoId = await createVideoFeed({
         title,
         description,
         videoFileId,
@@ -149,6 +149,13 @@ export function Upload({ onClose }: UploadProps) {
         category,
         type: "public",
       });
+
+      // Trigger transcoding
+      fetch("/api/transcode", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ videoId, storageId: videoFileId }),
+      }).catch(console.error);
 
       setProgress(100);
 

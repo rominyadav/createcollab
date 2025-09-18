@@ -5,7 +5,7 @@ export const createVideoFeed = mutation({
   args: {
     title: v.string(),
     description: v.optional(v.string()),
-    videoFileId: v.id("_storage"),
+    videoFileId: v.optional(v.id("_storage")),
     thumbnailFileId: v.optional(v.id("_storage")),
     videoUrl: v.string(),
     thumbnailUrl: v.optional(v.string()),
@@ -28,6 +28,8 @@ export const createVideoFeed = mutation({
       shares: 0,
       uploadedAt: Date.now(),
       isPublic: args.type === "public",
+      isTranscoded: false,
+      transcodingStatus: "pending",
     });
     return videoId;
   },
@@ -63,7 +65,16 @@ export const getVideoFeeds = query({
 export const getVideoById = query({
   args: { id: v.id("videoFeeds") },
   handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
+    const video = await ctx.db.get(args.id);
+    if (video) {
+      console.log('getVideoById:', {
+        id: args.id,
+        title: video.title,
+        isTranscoded: video.isTranscoded,
+        hlsUrls: video.hlsUrls
+      });
+    }
+    return video;
   },
 });
 
@@ -147,5 +158,94 @@ export const checkUserLike = query({
       )
       .first();
     return !!like;
+  },
+});
+
+export const updateTranscodingStatus = mutation({
+  args: {
+    videoId: v.string(),
+    status: v.union(v.literal("pending"), v.literal("processing"), v.literal("completed"), v.literal("failed"))
+  },
+  handler: async (ctx, args) => {
+    const video = await ctx.db.get(args.videoId as any);
+    if (!video) return null;
+    
+    await ctx.db.patch(args.videoId as any, {
+      transcodingStatus: args.status
+    });
+    return true;
+  },
+});
+
+
+
+export const triggerTranscoding = mutation({
+  args: { videoId: v.id("videoFeeds") },
+  handler: async (ctx, args) => {
+    const video = await ctx.db.get(args.videoId);
+    if (!video || video.isTranscoded || video.transcodingStatus === "processing") {
+      return { success: false, message: "Video already transcoded or processing" };
+    }
+    
+    // Check if file is a video by checking the URL or file extension
+    const isVideo = video.videoUrl.match(/\.(mp4|avi|mov|wmv|flv|webm|mkv|m4v)$/i);
+    if (!isVideo) {
+      return { success: false, message: "File is not a video" };
+    }
+    
+    await ctx.db.patch(args.videoId, {
+      transcodingStatus: "pending"
+    });
+    
+    return { success: true, videoUrl: video.videoUrl, videoId: args.videoId };
+  },
+});
+
+export const completeTranscoding = mutation({
+  args: {
+    videoId: v.id("videoFeeds"),
+    hlsUrls: v.object({
+      p360: v.optional(v.id("_storage")),
+      p480: v.optional(v.id("_storage")),
+      p720: v.optional(v.id("_storage")),
+      p1080: v.optional(v.id("_storage")),
+      p1440: v.optional(v.id("_storage")),
+      p2160: v.optional(v.id("_storage")),
+    }),
+    originalResolution: v.object({ width: v.number(), height: v.number() })
+  },
+  handler: async (ctx, args) => {
+    console.log('completeTranscoding called with:', args);
+    
+    const video = await ctx.db.get(args.videoId);
+    if (!video) {
+      console.log('Video not found:', args.videoId);
+      return { success: false, message: "Video not found" };
+    }
+    
+    console.log('Found video:', video.title);
+    console.log('Updating with HLS URLs:', args.hlsUrls);
+    
+    // Update video with HLS URLs
+    await ctx.db.patch(args.videoId, {
+      hlsUrls: args.hlsUrls,
+      originalResolution: args.originalResolution,
+      isTranscoded: true,
+      transcodingStatus: "completed"
+    });
+    
+    console.log('Video updated successfully');
+    
+    // Delete raw video file but keep videoFileId for now
+    try {
+      if (video.videoFileId) {
+        await ctx.storage.delete(video.videoFileId);
+        console.log('Raw video deleted successfully');
+      }
+    } catch (error) {
+      console.error('Failed to delete raw video:', error);
+    }
+    
+    return { success: true, message: "Transcoding completed and raw video deleted" };
   },
 });

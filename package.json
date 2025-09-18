@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "next lint",
     "prepare": "husky",
-    "convex:dev": "convex dev"
+    "convex:dev": "convex dev",
+    "transcoder:build": "docker build -t video-transcoder ./docker/transcoder",
+    "transcoder:up": "docker-compose -f docker-compose.transcoder.yaml up -d",
+    "transcoder:down": "docker-compose -f docker-compose.transcoder.yaml down",
+    "transcoder:logs": "docker-compose -f docker-compose.transcoder.yaml logs -f"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.31.6",
@@ -24,6 +28,7 @@
     "@radix-ui/react-popover": "^1.1.15",
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-slider": "^1.2.1",
     "@radix-ui/react-slot": "^1.2.3",
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-toggle-group": "^1.1.11",
@@ -34,6 +39,7 @@
     "convex": "^1.26.2",
     "date-fns": "^4.1.0",
     "emoji-regex": "^10.4.0",
+    "hls.js": "^1.6.12",
     "hono": "^4.9.2",
     "lucide-react": "^0.540.0",
     "next": "15.4.6",
@@ -42,6 +48,7 @@
     "react-dom": "19.1.0",
     "react-hook-form": "^7.62.0",
     "react-icons": "^5.5.0",
+    "react-player": "^3.3.2",
     "recharts": "2.15.4",
     "tailwind-merge": "^3.3.1",
     "vaul": "^1.1.2",

@@ -99,7 +99,7 @@ export function VideoUpload({
       const videoUrl = `${process.env.NEXT_PUBLIC_CONVEX_URL}/api/storage/${videoFileId}`;
 
       // Create video record
-      await createVideoFeed({
+      const videoId = await createVideoFeed({
         title,
         description,
         videoFileId,
@@ -115,6 +115,13 @@ export function VideoUpload({
         campaignName,
         type,
       });
+
+      // Trigger transcoding
+      fetch("/api/transcode", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ videoId, storageId: videoFileId }),
+      }).catch(console.error);
 
       setProgress(100);
 

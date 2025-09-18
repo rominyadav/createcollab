@@ -1,0 +1,10 @@
+services:
+  transcoder:
+    build: ./docker/transcoder
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./transcoded:/tmp/transcoded
+    restart: unless-stopped

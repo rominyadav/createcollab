@@ -24,8 +24,90 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { HLSVideoPlayer } from "@/components/user-ui/hls-video-player";
 
 import { api } from "@/lib/convex-api";
+
+// Component for playing transcoded videos
+function TranscodedVideoPlayer({
+  storageId,
+  videoId,
+  onPlay,
+}: {
+  storageId: string;
+  videoId: string;
+  onPlay: () => void;
+}) {
+  const { user } = useUser();
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Get the actual file URL from Convex
+  const hlsFileUrl = useQuery(api.videoFeeds.getFileUrl, {
+    fileId: storageId as any,
+  });
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !hlsFileUrl) return;
+
+    console.log("Loading HLS video:", hlsFileUrl);
+
+    // Import hls.js dynamically
+    import("hls.js")
+      .then(({ default: Hls }) => {
+        if (Hls.isSupported()) {
+          const hls = new Hls();
+          hls.loadSource(hlsFileUrl);
+          hls.attachMedia(video);
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            console.log("HLS manifest loaded successfully");
+            video.play().catch(console.error);
+          });
+          hls.on(Hls.Events.ERROR, (event, data) => {
+            console.error("HLS error:", data);
+          });
+
+          return () => {
+            hls.destroy();
+          };
+        } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+          // Native HLS support (Safari)
+          video.src = hlsFileUrl;
+          video.play().catch(console.error);
+        } else {
+          console.error("HLS not supported in this browser");
+        }
+      })
+      .catch(console.error);
+  }, [hlsFileUrl]);
+
+  console.log("TranscodedVideoPlayer - storageId:", storageId);
+  console.log("TranscodedVideoPlayer - hlsFileUrl:", hlsFileUrl);
+
+  if (!hlsFileUrl) {
+    return (
+      <div className="absolute inset-0 flex items-center justify-center bg-gray-900 text-white">
+        <div className="text-center">
+          <div className="mb-2 text-4xl">⏳</div>
+          <div>Loading transcoded video...</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <video
+      ref={videoRef}
+      className="absolute inset-0 h-full w-full object-cover"
+      controls
+      playsInline
+      onPlay={onPlay}
+      onError={(e) => {
+        console.error("Video element error:", e);
+      }}
+    />
+  );
+}
 
 interface Video {
   _id: string;
@@ -70,10 +152,19 @@ const VideoPlayer = React.memo(function VideoPlayer({
       : parseInt(video.likes as string) || 0
   );
 
-  // Get the actual file URL from Convex
-  const fileUrl = useQuery(api.videoFeeds.getFileUrl, {
-    fileId: video.videoFileId as any,
+  // Get video data including HLS URLs
+  const videoData = useQuery(api.videoFeeds.getVideoById, {
+    id: video._id as any,
   });
+
+  // Get the actual file URL from Convex (for non-transcoded videos)
+  const fileUrl = useQuery(
+    api.videoFeeds.getFileUrl,
+    videoData?.videoFileId ? { fileId: videoData.videoFileId } : "skip"
+  );
+
+  console.log("Creator VideoPlayer - videoData:", videoData);
+  console.log("Creator VideoPlayer - fileUrl:", fileUrl);
 
   // Check if user has liked this video
   const isLiked = useQuery(
@@ -104,7 +195,32 @@ const VideoPlayer = React.memo(function VideoPlayer({
     return videoId ? `https://www.tiktok.com/embed/v2/${videoId[1]}` : null;
   }, []);
 
-  const videoData = useMemo(() => {
+  // Get HLS URLs from storage IDs
+  const hlsStorageId =
+    videoData?.isTranscoded && videoData?.hlsUrls
+      ? videoData.hlsUrls.p720 ||
+        videoData.hlsUrls.p480 ||
+        videoData.hlsUrls.p360
+      : null;
+
+  // Use our HLS API to serve files with proper content-type
+  const hlsUrl = hlsStorageId ? `/api/hls?id=${hlsStorageId}` : null;
+
+  const videoPlaybackData = useMemo(() => {
+    // Use HLS URLs if video is transcoded
+    if (videoData?.isTranscoded && hlsUrl) {
+      console.log("Using HLS URL:", hlsUrl);
+      return {
+        isYouTubeVideo: false,
+        isTikTokVideo: false,
+        isConvexVideo: true,
+        isHLS: true,
+        embedUrl: null,
+        actualVideoUrl: hlsUrl,
+      };
+    }
+
+    // Fallback to original logic
     const videoUrlToCheck = fileUrl || video.videoUrl;
     const isYouTubeVideo =
       videoUrlToCheck.includes("youtube.com") ||
@@ -122,10 +238,18 @@ const VideoPlayer = React.memo(function VideoPlayer({
       isYouTubeVideo,
       isTikTokVideo,
       isConvexVideo,
+      isHLS: false,
       embedUrl,
       actualVideoUrl: fileUrl || videoUrlToCheck,
     };
-  }, [video.videoUrl, fileUrl, getYouTubeEmbedUrl, getTikTokEmbedUrl]);
+  }, [
+    video.videoUrl,
+    fileUrl,
+    videoData,
+    hlsStorageId,
+    getYouTubeEmbedUrl,
+    getTikTokEmbedUrl,
+  ]);
 
   const handleLike = useCallback(async () => {
     if (!user) return;
@@ -187,21 +311,36 @@ const VideoPlayer = React.memo(function VideoPlayer({
             video.aspectRatio === "16:9" ? "aspect-video" : "aspect-[9/16]"
           }`}
         >
-          {videoData.isConvexVideo && fileUrl ? (
+          {videoData?.isTranscoded && videoData?.hlsUrls ? (
+            // Play transcoded video with HLS player
+            <div className="absolute inset-0">
+              <HLSVideoPlayer
+                videoId={video._id}
+                hlsUrls={videoData.hlsUrls}
+                fallbackUrl={videoPlaybackData.actualVideoUrl}
+                title={video.title}
+                autoPlay={true}
+                className="h-full w-full"
+              />
+            </div>
+          ) : videoPlaybackData.isConvexVideo &&
+            videoPlaybackData.actualVideoUrl ? (
+            // Regular video
             <video
               key={video._id}
-              src={videoData.actualVideoUrl}
+              src={videoPlaybackData.actualVideoUrl}
               className="absolute inset-0 h-full w-full object-cover"
               controls
               autoPlay
               playsInline
               onPlay={handleVideoPlay}
             />
-          ) : (videoData.isYouTubeVideo || videoData.isTikTokVideo) &&
-            videoData.embedUrl ? (
+          ) : (videoPlaybackData.isYouTubeVideo ||
+              videoPlaybackData.isTikTokVideo) &&
+            videoPlaybackData.embedUrl ? (
             <iframe
               key={video._id}
-              src={videoData.embedUrl}
+              src={videoPlaybackData.embedUrl}
               className="absolute inset-0 h-full w-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
