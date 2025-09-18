@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       console.log("❌ Transcoded directory does not exist!");
     }
 
-    const uploadedHlsUrls: any = {};
+    const uploadedHlsUrls: Record<string, string> = {};
 
     // Upload each HLS file and its segments to Convex
     for (const [quality, dockerPath] of Object.entries(hlsFiles)) {
