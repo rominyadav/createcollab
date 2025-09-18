@@ -24,6 +24,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { HLSVideoPlayer } from "@/components/ui/hls-video-player";
 
 import { api } from "@/lib/convex-api";
 
@@ -144,12 +145,7 @@ const VideoPlayer = React.memo(function VideoPlayer({
     }
   }, [user, video._id, toggleLikeMutation]);
 
-  // Track video view when video starts playing
-  const handleVideoPlay = useCallback(() => {
-    if (user) {
-      incrementViewsMutation({ id: video._id as any });
-    }
-  }, [user, video._id, incrementViewsMutation]);
+
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -188,14 +184,13 @@ const VideoPlayer = React.memo(function VideoPlayer({
           }`}
         >
           {videoData.isConvexVideo && fileUrl ? (
-            <video
+            <HLSVideoPlayer
               key={video._id}
-              src={videoData.actualVideoUrl}
-              className="absolute inset-0 h-full w-full object-cover"
-              controls
+              videoId={video._id}
+              fallbackUrl={videoData.actualVideoUrl}
+              title={video.title}
               autoPlay
-              playsInline
-              onPlay={handleVideoPlay}
+              className="absolute inset-0 h-full w-full"
             />
           ) : (videoData.isYouTubeVideo || videoData.isTikTokVideo) &&
             videoData.embedUrl ? (
