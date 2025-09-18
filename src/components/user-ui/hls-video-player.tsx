@@ -95,6 +95,17 @@ export function HLSVideoPlayer({
     hideControlsAfterDelay();
   };
 
+  const togglePlay = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (isPlaying) {
+      video.pause();
+    } else {
+      video.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
   // Keyboard support
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -214,17 +225,6 @@ export function HLSVideoPlayer({
     };
   }, [actualHlsUrls, actualFallbackUrl, autoPlay]);
 
-  const togglePlay = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    if (isPlaying) {
-      video.pause();
-    } else {
-      video.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
-
   const toggleMute = () => {
     const video = videoRef.current;
     if (!video) return;
@@ -310,7 +310,7 @@ export function HLSVideoPlayer({
           onPlay={() => {
             setIsPlaying(true);
             if (videoId && !hasTrackedView) {
-              incrementViews({ id: videoId });
+              incrementViews({ id: videoId as any });
               setHasTrackedView(true);
             }
           }}
@@ -396,13 +396,30 @@ export function HLSVideoPlayer({
               </Button>
 
               <div className="w-20" onClick={(e) => e.stopPropagation()}>
-                <Slider
-                  value={volume}
-                  max={100}
-                  step={1}
-                  onValueChange={handleVolumeChange}
-                  className="w-full"
-                />
+                <div
+                  className="relative h-2 w-full cursor-pointer rounded-full bg-gray-600"
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const percent = (e.clientX - rect.left) / rect.width;
+                    const newVolume = percent * 100;
+                    handleVolumeChange([newVolume]);
+                  }}
+                >
+                  {/* Volume level */}
+                  <div
+                    className="absolute h-full rounded-full bg-gray-300"
+                    style={{ width: `${volume[0]}%` }}
+                  />
+                  {/* Volume handle */}
+                  <div
+                    className="absolute h-4 w-4 rounded-full bg-white shadow-lg"
+                    style={{
+                      left: `${volume[0]}%`,
+                      top: "50%",
+                      transform: "translateX(-50%) translateY(-50%)",
+                    }}
+                  />
+                </div>
               </div>
 
               <span className="text-sm text-white">
