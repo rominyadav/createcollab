@@ -58,6 +58,12 @@ const VideoPlayer = React.memo(function VideoPlayer({
   onClose,
 }: VideoPlayerProps) {
   const { user } = useUser();
+
+  // Early return if video is not provided
+  if (!video) {
+    return null;
+  }
+
   const [likesCount, setLikesCount] = useState(
     typeof video.likes === "number"
       ? video.likes
