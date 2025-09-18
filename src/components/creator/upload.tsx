@@ -2,26 +2,38 @@
 
 import { useState } from "react";
 
+import { useUser } from "@clerk/nextjs";
+import { useMutation } from "convex/react";
 import { Upload as UploadIcon, Video, X } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+
+import { api } from "@/lib/convex-api";
+import { getConvexFileUrl } from "@/lib/convex-client";
 
 interface UploadProps {
   onClose: () => void;
 }
 
 export function Upload({ onClose }: UploadProps) {
+  const { user } = useUser();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedThumbnail, setSelectedThumbnail] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [currentTag, setCurrentTag] = useState("");
   const [category, setCategory] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  const generateUploadUrl = useMutation(api.videoFeeds.generateUploadUrl);
+  const createVideoFeed = useMutation(api.videoFeeds.createVideoFeed);
 
   const categories = [
     "Fashion",
@@ -43,6 +55,15 @@ export function Upload({ onClose }: UploadProps) {
     }
   };
 
+  const handleThumbnailSelect = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file && file.type.startsWith("image/")) {
+      setSelectedThumbnail(file);
+    }
+  };
+
   const handleAddTag = () => {
     if (currentTag.trim() && !tags.includes(currentTag.trim())) {
       setTags([...tags, currentTag.trim()]);
@@ -54,32 +75,100 @@ export function Upload({ onClose }: UploadProps) {
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
+  const getDuration = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const video = document.createElement("video");
+      video.preload = "metadata";
+      video.onloadedmetadata = () => {
+        const duration = video.duration;
+        const minutes = Math.floor(duration / 60);
+        const seconds = Math.floor(duration % 60);
+        resolve(`${minutes}:${seconds.toString().padStart(2, "0")}`);
+      };
+      video.src = URL.createObjectURL(file);
+    });
+  };
+
+  const uploadToConvex = async (file: File) => {
+    const uploadUrl = await generateUploadUrl();
+
+    const result = await fetch(uploadUrl, {
+      method: "POST",
+      headers: { "Content-Type": file.type },
+      body: file,
+    });
+
+    const { storageId } = await result.json();
+    return storageId;
+  };
+
   const handleUpload = async () => {
-    if (!selectedFile || !title.trim() || !category) {
+    if (!selectedFile || !title.trim() || !category || !user) {
       alert("Please fill in all required fields");
       return;
     }
 
     setIsUploading(true);
+    setProgress(10);
 
-    // Simulate upload process
-    setTimeout(() => {
-      console.log("Uploading video:", {
-        file: selectedFile.name,
+    try {
+      // Get video duration
+      const duration = await getDuration(selectedFile);
+      setProgress(30);
+
+      // Upload video to Convex
+      const videoFileId = await uploadToConvex(selectedFile);
+      setProgress(50);
+
+      // Upload thumbnail if provided
+      let thumbnailFileId = undefined;
+      let thumbnailUrl = undefined;
+      if (selectedThumbnail) {
+        thumbnailFileId = await uploadToConvex(selectedThumbnail);
+        thumbnailUrl = thumbnailFileId;
+        setProgress(70);
+      }
+
+      // Store file ID, URL will be generated dynamically
+      const videoUrl = videoFileId; // We'll get the actual URL in the component
+
+      // Create video record
+      await createVideoFeed({
         title,
         description,
+        videoFileId,
+        thumbnailFileId,
+        videoUrl,
+        thumbnailUrl,
+        duration,
+        creatorId: user.id,
+        creatorName: user.fullName || user.username || "Unknown",
+        creatorAvatar:
+          user.firstName?.charAt(0) + user.lastName?.charAt(0) || "U",
+        aspectRatio: "9:16",
         category,
-        tags,
+        type: "public",
       });
 
-      setIsUploading(false);
-      onClose();
+      setProgress(100);
 
-      // Show success message
-      alert(
-        "Video uploaded successfully! It will be reviewed before going live."
-      );
-    }, 3000);
+      // Reset form
+      setSelectedFile(null);
+      setSelectedThumbnail(null);
+      setTitle("");
+      setDescription("");
+      setCategory("");
+      setTags([]);
+
+      onClose();
+      alert("Video uploaded successfully!");
+    } catch (error) {
+      console.error("Upload failed:", error);
+      alert("Upload failed. Please try again.");
+    } finally {
+      setIsUploading(false);
+      setProgress(0);
+    }
   };
 
   const formatFileSize = (bytes: number) => {
@@ -149,6 +238,58 @@ export function Upload({ onClose }: UploadProps) {
                     variant="ghost"
                     size="sm"
                     onClick={() => setSelectedFile(null)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Thumbnail Upload */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Thumbnail (Optional)
+            </label>
+            {!selectedThumbnail ? (
+              <div className="rounded-lg border-2 border-dashed border-gray-300 p-4 text-center dark:border-slate-600">
+                <div className="mb-2 text-4xl">🖼️</div>
+                <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
+                  Upload a custom thumbnail
+                </p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleThumbnailSelect}
+                  className="hidden"
+                  id="thumbnail-upload"
+                />
+                <Button asChild variant="outline" size="sm">
+                  <label htmlFor="thumbnail-upload" className="cursor-pointer">
+                    Choose Image
+                  </label>
+                </Button>
+              </div>
+            ) : (
+              <div className="rounded-lg border border-gray-200 p-3 dark:border-slate-600">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={URL.createObjectURL(selectedThumbnail)}
+                    alt="Thumbnail preview"
+                    className="h-16 w-16 rounded object-cover"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
+                      {selectedThumbnail.name}
+                    </p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      {formatFileSize(selectedThumbnail.size)}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedThumbnail(null)}
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -266,6 +407,16 @@ export function Upload({ onClose }: UploadProps) {
               </ul>
             </CardContent>
           </Card>
+
+          {/* Upload Progress */}
+          {isUploading && (
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Upload Progress
+              </label>
+              <Progress value={progress} />
+            </div>
+          )}
 
           {/* Upload Button */}
           <div className="flex gap-3">
