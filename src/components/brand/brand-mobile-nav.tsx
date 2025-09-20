@@ -1,5 +1,6 @@
 "use client";
 
+import { useClerk } from "@clerk/nextjs";
 import {
   Briefcase,
   Home,
@@ -28,6 +29,8 @@ export function BrandMobileNav({
   brandName,
   creatorName,
 }: BrandMobileNavProps) {
+  const { signOut } = useClerk();
+
   const navItems = [
     { id: "feed", icon: Home, label: "Feed" },
     { id: "explore", icon: Search, label: "Explore" },
@@ -88,10 +91,7 @@ export function BrandMobileNav({
           <Button
             variant="ghost"
             className="w-full justify-start gap-3 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-slate-700"
-            onClick={() => {
-              // Add logout logic here
-              console.log("Logout clicked");
-            }}
+            onClick={() => signOut()}
           >
             <LogOut className="h-5 w-5" />
             Logout

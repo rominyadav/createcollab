@@ -1,10 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import Image from "next/image";
+import { useRef, useState } from "react";
 
-import { Building2, Globe, MapPin, Settings, User, Users } from "lucide-react";
+import { useClerk } from "@clerk/nextjs";
+import { useMutation } from "convex/react";
+import {
+  Building2,
+  Camera,
+  Facebook,
+  FileText,
+  Globe,
+  Instagram,
+  Linkedin,
+  LogOut,
+  MapPin,
+  Settings,
+  Twitter,
+  User,
+  Users,
+} from "lucide-react";
 
-import { Creator } from "@/components/mock-data/creator-mockdata";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,58 +28,134 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/user-ui/page-header";
 
+import { api } from "../../../../convex/_generated/api";
+
 interface Brand {
-  id: number;
-  name: string;
-  logo: string;
+  _id: string;
+  clerkId: string;
+  companyName: string;
   industry: string;
   email: string;
   phone: string;
-  website: string;
-  description: string;
-  founded: string;
-  employees: string;
-  revenue: string;
-  status: string;
-  verified: boolean;
+  website?: string;
+  description?: string;
+  founded?: string;
+  employees?: string;
+  revenue?: string;
+  socialMedia: {
+    facebook: { connected: boolean; accountName?: string };
+    instagram: { connected: boolean; accountName?: string };
+    twitter: { connected: boolean; accountName?: string };
+    linkedin: { connected: boolean; accountName?: string };
+  };
   location: {
     address: string;
     city: string;
-    state: string;
     country: string;
+    province: string;
+  };
+  documents: {
+    panNumber?: string;
+    vatNumber?: string;
+    companyRegistration?: string;
+    registrationNumber?: string;
   };
   adminUsers: Array<{
-    id: number;
-    creatorId: number;
-    name: string;
-    email: string;
+    userId: string;
     role: string;
     phone: string;
-    avatar: string;
     isPrimary: boolean;
   }>;
-  campaigns: Array<{
-    id: number;
-    title: string;
-    budget: number;
-    status: string;
-    startDate: string;
-    endDate: string;
-  }>;
+  logo?: string;
+
+  verifyStatus?: "pending" | "verified" | "rejected";
+  isOnboardingComplete: boolean;
+  createdAt: number;
+  updatedAt: number;
+}
+
+interface User {
+  _id: string;
+  clerkId: string;
+  email: string;
+  name: string;
+  avatar?: string;
+  roles: string[];
+  createdAt: number;
+  updatedAt: number;
 }
 
 interface BrandProfileProps {
   brand: Brand;
-  creator: Creator;
+  creator: User;
 }
 
 export function BrandProfile({ brand, creator }: BrandProfileProps) {
   const [activeProfile, setActiveProfile] = useState<"brand" | "individual">(
     "brand"
   );
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
+  const updateBrandLogo = useMutation(api.brands.updateLogo);
+  const updateUserAvatar = useMutation(api.users.updateAvatar);
+  const { signOut } = useClerk();
 
   const handleSettingsClick = () => {
     console.log("Opening settings");
+  };
+
+  const handleLogout = () => {
+    signOut();
+  };
+
+  const handleLogoUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingLogo(true);
+    try {
+      const uploadUrl = await generateUploadUrl();
+      const result = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      const { storageId } = await result.json();
+      await updateBrandLogo({ brandId: brand._id, logoFileId: storageId });
+    } catch (error) {
+      console.error("Logo upload failed:", error);
+    } finally {
+      setIsUploadingLogo(false);
+    }
+  };
+
+  const handleAvatarUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingAvatar(true);
+    try {
+      const uploadUrl = await generateUploadUrl();
+      const result = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      const { storageId } = await result.json();
+      await updateUserAvatar({ userId: creator._id, avatarFileId: storageId });
+    } catch (error) {
+      console.error("Avatar upload failed:", error);
+    } finally {
+      setIsUploadingAvatar(false);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -81,14 +173,39 @@ export function BrandProfile({ brand, creator }: BrandProfileProps) {
     <div className="space-y-6">
       {/* Brand Header */}
       <div className="text-center">
-        <Avatar className="mx-auto mb-4 h-24 w-24">
-          <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-2xl font-bold text-white">
-            {brand.logo}
-          </AvatarFallback>
-        </Avatar>
+        <div className="relative mx-auto mb-4 h-24 w-24">
+          {brand.logo ? (
+            <Image
+              src={brand.logo}
+              alt={brand.companyName}
+              fill
+              className="rounded-full object-cover"
+            />
+          ) : (
+            <Avatar className="h-24 w-24">
+              <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-2xl font-bold text-white">
+                {brand.companyName.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          )}
+          <button
+            onClick={() => logoInputRef.current?.click()}
+            disabled={isUploadingLogo}
+            className="absolute -right-1 -bottom-1 rounded-full bg-blue-600 p-2 text-white hover:bg-blue-700 disabled:opacity-50"
+          >
+            <Camera className="h-3 w-3" />
+          </button>
+          <input
+            ref={logoInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleLogoUpload}
+            className="hidden"
+          />
+        </div>
 
         <h2 className="mb-1 text-xl font-bold text-gray-900 dark:text-white">
-          {brand.name}
+          {brand.companyName}
         </h2>
 
         <p className="mb-2 text-gray-600 dark:text-gray-400">
@@ -96,19 +213,26 @@ export function BrandProfile({ brand, creator }: BrandProfileProps) {
         </p>
 
         <div className="flex items-center justify-center gap-2">
-          {brand.verified && (
-            <Badge className="bg-blue-600 text-white">✓ Verified</Badge>
-          )}
-          <Badge className={getStatusColor(brand.status)}>
-            {brand.status.charAt(0).toUpperCase() + brand.status.slice(1)}
+          <Badge
+            className={
+              brand.verifyStatus === "verified"
+                ? "bg-green-600 text-white"
+                : brand.verifyStatus === "rejected"
+                  ? "bg-red-600 text-white"
+                  : "bg-yellow-600 text-white"
+            }
+          >
+            {brand.verifyStatus === "verified"
+              ? "✓ Verified"
+              : brand.verifyStatus === "rejected"
+                ? "✗ Rejected"
+                : "⏳ Pending Verification"}
           </Badge>
         </div>
 
         <div className="mt-4 flex items-center justify-center gap-6">
           <div className="text-center">
-            <p className="text-lg font-bold text-gray-900 dark:text-white">
-              {brand.campaigns.length}
-            </p>
+            <p className="text-lg font-bold text-gray-900 dark:text-white">0</p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Campaigns
             </p>
@@ -121,7 +245,7 @@ export function BrandProfile({ brand, creator }: BrandProfileProps) {
           </div>
           <div className="text-center">
             <p className="text-lg font-bold text-gray-900 dark:text-white">
-              {brand.founded}
+              {brand.founded || "N/A"}
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">Founded</p>
           </div>
@@ -132,7 +256,7 @@ export function BrandProfile({ brand, creator }: BrandProfileProps) {
       <Card>
         <CardContent className="p-4">
           <p className="text-center text-gray-700 dark:text-slate-300">
-            {brand.description}
+            {brand.description || "No description available"}
           </p>
         </CardContent>
       </Card>
@@ -151,7 +275,7 @@ export function BrandProfile({ brand, creator }: BrandProfileProps) {
               {brand.location.city}, {brand.location.country}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              {brand.location.address}
+              {brand.location.address}, {brand.location.province}
             </p>
           </CardContent>
         </Card>
@@ -164,9 +288,9 @@ export function BrandProfile({ brand, creator }: BrandProfileProps) {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <p className="text-sm">{brand.employees} employees</p>
+            <p className="text-sm">{brand.employees || "N/A"} employees</p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              Revenue: {brand.revenue}
+              Revenue: {brand.revenue || "N/A"}
             </p>
           </CardContent>
         </Card>
@@ -180,14 +304,18 @@ export function BrandProfile({ brand, creator }: BrandProfileProps) {
         <CardContent className="space-y-3">
           <div className="flex items-center gap-2">
             <Globe className="h-4 w-4 text-gray-400" />
-            <a
-              href={`https://${brand.website}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-blue-600 hover:underline dark:text-blue-400"
-            >
-              {brand.website}
-            </a>
+            {brand.website ? (
+              <a
+                href={`https://${brand.website}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 hover:underline dark:text-blue-400"
+              >
+                {brand.website}
+              </a>
+            ) : (
+              <span className="text-sm text-gray-500">No website</span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600 dark:text-gray-400">📧</span>
@@ -204,6 +332,166 @@ export function BrandProfile({ brand, creator }: BrandProfileProps) {
         </CardContent>
       </Card>
 
+      {/* Social Media */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Social Media Accounts</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-3">
+            <div
+              className={`flex items-center gap-3 rounded-lg border p-3 ${
+                brand.socialMedia.facebook.connected
+                  ? "border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20"
+                  : "border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/20"
+              }`}
+            >
+              <Facebook
+                className={`h-5 w-5 ${
+                  brand.socialMedia.facebook.connected
+                    ? "text-blue-600"
+                    : "text-gray-400"
+                }`}
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  Facebook
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  {brand.socialMedia.facebook.connected
+                    ? brand.socialMedia.facebook.accountName || "Connected"
+                    : "Not connected"}
+                </p>
+              </div>
+            </div>
+
+            <div
+              className={`flex items-center gap-3 rounded-lg border p-3 ${
+                brand.socialMedia.instagram.connected
+                  ? "border-pink-200 bg-pink-50 dark:border-pink-800 dark:bg-pink-900/20"
+                  : "border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/20"
+              }`}
+            >
+              <Instagram
+                className={`h-5 w-5 ${
+                  brand.socialMedia.instagram.connected
+                    ? "text-pink-600"
+                    : "text-gray-400"
+                }`}
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  Instagram
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  {brand.socialMedia.instagram.connected
+                    ? brand.socialMedia.instagram.accountName || "Connected"
+                    : "Not connected"}
+                </p>
+              </div>
+            </div>
+
+            <div
+              className={`flex items-center gap-3 rounded-lg border p-3 ${
+                brand.socialMedia.twitter.connected
+                  ? "border-sky-200 bg-sky-50 dark:border-sky-800 dark:bg-sky-900/20"
+                  : "border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/20"
+              }`}
+            >
+              <Twitter
+                className={`h-5 w-5 ${
+                  brand.socialMedia.twitter.connected
+                    ? "text-sky-600"
+                    : "text-gray-400"
+                }`}
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  Twitter
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  {brand.socialMedia.twitter.connected
+                    ? brand.socialMedia.twitter.accountName || "Connected"
+                    : "Not connected"}
+                </p>
+              </div>
+            </div>
+
+            <div
+              className={`flex items-center gap-3 rounded-lg border p-3 ${
+                brand.socialMedia.linkedin.connected
+                  ? "border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20"
+                  : "border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-800/20"
+              }`}
+            >
+              <Linkedin
+                className={`h-5 w-5 ${
+                  brand.socialMedia.linkedin.connected
+                    ? "text-blue-700"
+                    : "text-gray-400"
+                }`}
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  LinkedIn
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  {brand.socialMedia.linkedin.connected
+                    ? brand.socialMedia.linkedin.accountName || "Connected"
+                    : "Not connected"}
+                </p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Company Documents */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <FileText className="h-4 w-4 text-gray-400" />
+            Company Documents
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div className="rounded-lg border border-gray-200 p-3 dark:border-gray-600">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                PAN Number
+              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                {brand.documents.panNumber || "Not provided"}
+              </p>
+            </div>
+            <div className="rounded-lg border border-gray-200 p-3 dark:border-gray-600">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                VAT Number
+              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                {brand.documents.vatNumber || "Not provided"}
+              </p>
+            </div>
+            <div className="rounded-lg border border-gray-200 p-3 dark:border-gray-600">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                Registration Number
+              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                {brand.documents.registrationNumber || "Not provided"}
+              </p>
+            </div>
+            <div className="rounded-lg border border-gray-200 p-3 dark:border-gray-600">
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                Company Registration
+              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                {brand.documents.companyRegistration || "Not provided"}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Admin Users */}
       <Card>
         <CardHeader>
@@ -211,20 +499,20 @@ export function BrandProfile({ brand, creator }: BrandProfileProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {brand.adminUsers.map((admin) => (
+            {brand.adminUsers.map((admin, index) => (
               <div
-                key={admin.id}
+                key={index}
                 className="flex items-center gap-3 rounded-lg border border-gray-200 p-3 dark:border-slate-600"
               >
                 <Avatar className="h-10 w-10">
                   <AvatarFallback className="bg-gradient-to-r from-emerald-400 to-emerald-500 text-white">
-                    {admin.avatar}
+                    {admin.role.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {admin.name}
+                      {admin.role}
                     </p>
                     {admin.isPrimary && (
                       <Badge variant="outline" className="text-xs">
@@ -233,7 +521,7 @@ export function BrandProfile({ brand, creator }: BrandProfileProps) {
                     )}
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {admin.role}
+                    {admin.phone}
                   </p>
                 </div>
               </div>
@@ -248,25 +536,8 @@ export function BrandProfile({ brand, creator }: BrandProfileProps) {
           <CardTitle className="text-base">Recent Campaigns</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {brand.campaigns.map((campaign) => (
-              <div
-                key={campaign.id}
-                className="flex items-center justify-between rounded-lg border border-gray-200 p-3 dark:border-slate-600"
-              >
-                <div>
-                  <p className="font-medium text-gray-900 dark:text-white">
-                    {campaign.title}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Budget: NPR {campaign.budget.toLocaleString()}
-                  </p>
-                </div>
-                <Badge className={getStatusColor(campaign.status)}>
-                  {campaign.status}
-                </Badge>
-              </div>
-            ))}
+          <div className="py-4 text-center text-gray-500">
+            No campaigns available
           </div>
         </CardContent>
       </Card>
@@ -277,91 +548,99 @@ export function BrandProfile({ brand, creator }: BrandProfileProps) {
     <div className="space-y-6">
       {/* Individual Header */}
       <div className="text-center">
-        <Avatar className="mx-auto mb-4 h-24 w-24">
-          <AvatarFallback className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-2xl font-bold text-white">
-            {creator.avatar}
-          </AvatarFallback>
-        </Avatar>
+        <div className="relative mx-auto mb-4 h-24 w-24">
+          {creator.avatar ? (
+            <Image
+              src={creator.avatar}
+              alt={creator.name}
+              fill
+              className="rounded-full object-cover"
+            />
+          ) : (
+            <Avatar className="h-24 w-24">
+              <AvatarFallback className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-2xl font-bold text-white">
+                {creator.name.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          )}
+          <button
+            onClick={() => avatarInputRef.current?.click()}
+            disabled={isUploadingAvatar}
+            className="absolute -right-1 -bottom-1 rounded-full bg-emerald-600 p-2 text-white hover:bg-emerald-700 disabled:opacity-50"
+          >
+            <Camera className="h-3 w-3" />
+          </button>
+          <input
+            ref={avatarInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleAvatarUpload}
+            className="hidden"
+          />
+        </div>
 
         <h2 className="mb-1 text-xl font-bold text-gray-900 dark:text-white">
           {creator.name}
         </h2>
 
         <p className="mb-2 text-gray-600 dark:text-gray-400">
-          {creator.niche} Creator & Brand Admin
+          {creator.roles.join(", ")} & Brand Admin
         </p>
-
-        <div className="flex items-center justify-center gap-2">
-          {creator.verified && (
-            <Badge className="bg-blue-600 text-white">✓ Verified</Badge>
-          )}
-          <Badge className={getStatusColor(creator.status)}>
-            {creator.status.charAt(0).toUpperCase() + creator.status.slice(1)}
-          </Badge>
-        </div>
 
         <div className="mt-4 flex items-center justify-center gap-6">
           <div className="text-center">
             <p className="text-lg font-bold text-gray-900 dark:text-white">
-              {creator.followers}
+              {brand.adminUsers.find((admin) => admin.userId === creator._id)
+                ?.role || "Admin"}
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Followers
-            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Role</p>
           </div>
           <div className="text-center">
             <p className="text-lg font-bold text-gray-900 dark:text-white">
-              {creator.following}
+              {new Date(creator.createdAt).getFullYear()}
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Following
-            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Joined</p>
           </div>
           <div className="text-center">
             <p className="text-lg font-bold text-gray-900 dark:text-white">
-              {creator.videos.length}
+              Active
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Videos</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Status</p>
           </div>
         </div>
       </div>
 
-      {/* Individual Bio */}
+      {/* Individual Info */}
       <Card>
         <CardContent className="p-4">
           <p className="text-center text-gray-700 dark:text-slate-300">
-            {creator.bio}
+            Brand administrator managing campaigns and creator relationships.
           </p>
         </CardContent>
       </Card>
 
-      {/* Creator Stats */}
-      <div className="grid grid-cols-2 gap-4">
+      {/* User Details */}
+      <div className="grid grid-cols-1 gap-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm">
-              <MapPin className="h-4 w-4 text-gray-400" />
-              Location
+              <User className="h-4 w-4 text-gray-400" />
+              Contact Information
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <p className="text-sm">
-              {creator.location.city}, {creator.location.country}
+            <p className="mb-1 text-sm">
+              <span className="text-gray-600">Email:</span> {creator.email}
             </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm">
-              <Users className="h-4 w-4 text-gray-400" />
-              Engagement
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <p className="text-sm">{creator.engagement}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Score: {creator.creatorScore}/100
+            <p className="mb-1 text-sm">
+              <span className="text-gray-600">Phone:</span>{" "}
+              {brand.adminUsers.find((admin) => admin.userId === creator._id)
+                ?.phone || "N/A"}
+            </p>
+            <p className="text-sm">
+              <span className="text-gray-600">Role:</span>{" "}
+              {brand.adminUsers.find((admin) => admin.userId === creator._id)
+                ?.role || "N/A"}
             </p>
           </CardContent>
         </Card>
@@ -370,7 +649,9 @@ export function BrandProfile({ brand, creator }: BrandProfileProps) {
       {/* Creator Role in Brand */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Role in {brand.name}</CardTitle>
+          <CardTitle className="text-base">
+            Role in {brand.companyName}
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-900/20">
@@ -381,43 +662,11 @@ export function BrandProfile({ brand, creator }: BrandProfileProps) {
                   Brand Administrator
                 </p>
                 <p className="text-sm text-emerald-700 dark:text-emerald-300">
-                  Managing campaigns and creator relationships for {brand.name}
+                  Managing campaigns and creator relationships for{" "}
+                  {brand.companyName}
                 </p>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Recent Videos */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Recent Videos</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            {creator.videos.slice(0, 4).map((video) => (
-              <div
-                key={video.id}
-                className="rounded-lg border border-gray-200 p-3 dark:border-slate-600"
-              >
-                <div className="mb-2 flex aspect-video items-center justify-center rounded bg-gradient-to-br from-gray-200 to-gray-300 dark:from-slate-600 dark:to-slate-500">
-                  <div className="text-center">
-                    <div className="mb-1 text-2xl">🎬</div>
-                    <div className="text-xs text-gray-500 dark:text-slate-400">
-                      {video.duration}
-                    </div>
-                  </div>
-                </div>
-                <h4 className="mb-1 text-sm font-medium text-gray-900 dark:text-white">
-                  {video.title}
-                </h4>
-                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-slate-400">
-                  <span>{video.views} views</span>
-                  <span>{video.uploadedAt}</span>
-                </div>
-              </div>
-            ))}
           </div>
         </CardContent>
       </Card>
@@ -429,9 +678,9 @@ export function BrandProfile({ brand, creator }: BrandProfileProps) {
       <PageHeader
         title="Profile"
         action={{
-          icon: Settings,
-          onClick: handleSettingsClick,
-          label: "Settings",
+          icon: LogOut,
+          onClick: handleLogout,
+          label: "Logout",
         }}
       />
 

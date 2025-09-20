@@ -1,11 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import { useUser } from "@clerk/nextjs";
+import { useMutation, useQuery } from "convex/react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
+import { api } from "../../../convex/_generated/api";
 import BrandStep1BasicInfo from "./onboarding/brand-step1-basic-info";
 import BrandStep2SocialMedia from "./onboarding/brand-step2-social-media";
 import BrandStep3Documents from "./onboarding/brand-step3-documents";
@@ -47,8 +51,7 @@ export interface BrandOnboardingData {
 
   // Step 4: Admin Users
   adminUsers: Array<{
-    name: string;
-    email: string;
+    userId: string;
     role: string;
     phone: string;
     isPrimary: boolean;
@@ -86,15 +89,7 @@ export default function BrandOnboarding() {
       companyRegistration: "",
       registrationNumber: "",
     },
-    adminUsers: [
-      {
-        name: "John Doe",
-        email: "john.doe@company.com",
-        role: "CEO",
-        phone: "+977-9841234567",
-        isPrimary: true,
-      },
-    ],
+    adminUsers: [],
   });
 
   const getProgressValue = () => {
@@ -128,9 +123,54 @@ export default function BrandOnboarding() {
     router.push("/brands");
   };
 
-  const handleSubmit = () => {
-    console.log("Submitting brand onboarding data:", formData);
-    router.push("/brands");
+  const { user } = useUser();
+  const createBrand = useMutation(api.brands.createBrand);
+  const convexUser = useQuery(
+    api.users.getUserByClerkId,
+    user?.id ? { clerkId: user.id } : "skip"
+  );
+
+  // Pre-fill current user as primary admin
+  useEffect(() => {
+    if (user && convexUser && formData.adminUsers.length === 0) {
+      setFormData((prev) => ({
+        ...prev,
+        adminUsers: [
+          {
+            userId: convexUser._id,
+            role: "",
+            phone: "",
+            isPrimary: true,
+          },
+        ],
+      }));
+    }
+  }, [user, convexUser, formData.adminUsers.length]);
+
+  const handleSubmit = async () => {
+    if (!user || !convexUser) return;
+
+    try {
+      const brandId = await createBrand({
+        clerkId: user.id,
+        companyName: formData.companyName,
+        industry: formData.industry,
+        email: formData.email,
+        phone: formData.phone,
+        website: formData.website || undefined,
+        description: formData.description || undefined,
+        founded: formData.founded || undefined,
+        employees: formData.employees || undefined,
+        revenue: formData.revenue || undefined,
+        socialMedia: formData.socialMedia,
+        location: formData.location,
+        documents: formData.documents,
+        adminUsers: formData.adminUsers,
+      });
+      router.push(`/brand/${brandId}/${convexUser._id}`);
+    } catch (error) {
+      console.error("Error creating brand:", error);
+    }
   };
 
   const updateFormData = (updates: Partial<BrandOnboardingData>) => {

@@ -28,6 +28,8 @@ export const ClerkSignUpCard = () => {
   const handleUserTypeChange = (value: string | undefined) => {
     if (value) {
       setUserType(value as "creator" | "brand");
+      // Store role in localStorage for user creation
+      localStorage.setItem("selectedRole", value);
       // Clear brand name when switching to creator
       if (value === "creator") {
         form.setValue("brandName", "");

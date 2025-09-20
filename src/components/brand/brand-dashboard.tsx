@@ -98,13 +98,13 @@ export function BrandDashboard({ brand, creator }: BrandDashboardProps) {
   // Load saved tab from localStorage on mount
   useEffect(() => {
     const savedTab = storage.get<string>(
-      `brand-${brand.id}-creator-${creator.id}-active-tab`,
+      `brand-${brand._id}-creator-${creator._id}-active-tab`,
       "feed"
     );
     if (savedTab) {
       setActiveTab(savedTab);
     }
-  }, [brand.id, creator.id]);
+  }, [brand._id, creator._id]);
 
   // Prevent pull-to-refresh on mobile
   useEffect(() => {
@@ -142,7 +142,7 @@ export function BrandDashboard({ brand, creator }: BrandDashboardProps) {
       setShowUpload(true);
     } else {
       setActiveTab(tab);
-      storage.set(`brand-${brand.id}-creator-${creator.id}-active-tab`, tab);
+      storage.set(`brand-${brand._id}-creator-${creator._id}-active-tab`, tab);
     }
   };
 
@@ -161,13 +161,13 @@ export function BrandDashboard({ brand, creator }: BrandDashboardProps) {
       case "feed":
         return <Feed onVideoClick={handleVideoClick} />;
       case "explore":
-        return <CreatorSearch brandId={brand.id} />;
+        return <CreatorSearch brandId={brand._id} />;
       case "my-campaigns":
-        return <BrandMyCampaigns brandId={brand.id} />;
+        return <BrandMyCampaigns brandId={brand._id} />;
       case "chats":
-        return <BrandChats brandId={brand.id} creatorId={creator.id} />;
+        return <BrandChats brandId={brand._id} creatorId={creator._id} />;
       case "wallet":
-        return <BrandWallet brandId={brand.id} />;
+        return <BrandWallet brandId={brand._id} />;
       case "profile":
         return <BrandProfile brand={brand} creator={creator} />;
       default:
@@ -181,7 +181,7 @@ export function BrandDashboard({ brand, creator }: BrandDashboardProps) {
       <BrandMobileNav
         activeTab={activeTab}
         onTabChange={handleTabChange}
-        brandName={brand.name}
+        brandName={brand.companyName}
         creatorName={creator.name}
       />
 
@@ -198,7 +198,7 @@ export function BrandDashboard({ brand, creator }: BrandDashboardProps) {
       {/* Create Campaign Modal */}
       {showCreateCampaign && (
         <CreateCampaign
-          brandId={brand.id}
+          brandId={brand._id}
           onClose={() => setShowCreateCampaign(false)}
         />
       )}
@@ -206,7 +206,7 @@ export function BrandDashboard({ brand, creator }: BrandDashboardProps) {
       {/* Brand Upload Modal */}
       {showUpload && (
         <BrandUpload
-          brandName={brand.name}
+          brandName={brand.companyName}
           onClose={() => setShowUpload(false)}
         />
       )}

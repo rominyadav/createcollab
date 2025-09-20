@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 
+import { useUser } from "@clerk/nextjs";
+
+import { DashboardRedirect } from "@/components/dashboard-redirect";
 import Navigation from "@/components/ui/navigation";
 import FeaturesSection from "@/components/user-ui/features-section";
 import HomeFooter from "@/components/user-ui/home-footer";
@@ -10,6 +13,7 @@ import { JourneyTimeline } from "@/components/user-ui/journey-timeline";
 import StatsSection from "@/components/user-ui/stats-section";
 
 export default function Home() {
+  const { isSignedIn, isLoaded } = useUser();
   const [scrollY, setScrollY] = useState(0);
   const [animatedElements, setAnimatedElements] = useState<Set<string>>(
     new Set()

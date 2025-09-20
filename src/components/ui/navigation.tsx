@@ -8,11 +8,14 @@ import { useConvexAuth } from "convex/react";
 
 import { Button } from "@/components/ui/button";
 
+import { useDashboardRedirect } from "@/hooks/use-dashboard-redirect";
+
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const { isAuthenticated } = useConvexAuth();
+  const { redirectToDashboard } = useDashboardRedirect();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,7 +64,16 @@ export default function Navigation() {
               For Creators
             </Link>
             {isAuthenticated ? (
-              <UserButton />
+              <div className="flex items-center space-x-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={redirectToDashboard}
+                >
+                  Dashboard
+                </Button>
+                <UserButton />
+              </div>
             ) : (
               <>
                 <Link
@@ -125,18 +137,37 @@ export default function Navigation() {
               >
                 For Creators
               </Link>
-              <Link
-                href="/sign-in"
-                className="block px-3 py-2 text-base font-medium text-slate-600 hover:text-slate-900"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Sign In
-              </Link>
-              <div className="px-3 py-2">
-                <Button variant="gradient" size="sm" className="w-full">
-                  <Link href="/sign-up">Get Started</Link>
-                </Button>
-              </div>
+              {isAuthenticated ? (
+                <>
+                  <button
+                    onClick={() => {
+                      redirectToDashboard();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="block px-3 py-2 text-base font-medium text-slate-600 hover:text-slate-900"
+                  >
+                    Dashboard
+                  </button>
+                  <div className="px-3 py-2">
+                    <UserButton />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/sign-in"
+                    className="block px-3 py-2 text-base font-medium text-slate-600 hover:text-slate-900"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                  <div className="px-3 py-2">
+                    <Button variant="gradient" size="sm" className="w-full">
+                      <Link href="/sign-up">Get Started</Link>
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         )}

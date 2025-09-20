@@ -2,6 +2,31 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  users: defineTable({
+    clerkId: v.string(),
+    email: v.string(),
+    name: v.string(),
+    avatar: v.optional(v.string()),
+    roles: v.array(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_clerk_id", ["clerkId"])
+    .index("by_email", ["email"]),
+
+  deletedUsers: defineTable({
+    clerkId: v.string(),
+    email: v.string(),
+    name: v.string(),
+    avatar: v.optional(v.string()),
+    roles: v.array(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    deletedAt: v.number(),
+  })
+    .index("by_clerk_id", ["clerkId"])
+    .index("by_deleted_at", ["deletedAt"]),
+
   videoFeeds: defineTable({
     title: v.string(),
     description: v.optional(v.string()),
@@ -41,6 +66,50 @@ export default defineSchema({
     .index("by_campaign", ["campaignId"])
     .index("by_type", ["type"])
     .index("by_uploaded_at", ["uploadedAt"]),
+
+  brands: defineTable({
+    clerkId: v.string(),
+    companyName: v.string(),
+    industry: v.string(),
+    email: v.string(),
+    phone: v.string(),
+    website: v.optional(v.string()),
+    description: v.optional(v.string()),
+    founded: v.optional(v.string()),
+    employees: v.optional(v.string()),
+    revenue: v.optional(v.string()),
+    socialMedia: v.object({
+      facebook: v.object({ connected: v.boolean(), accountName: v.optional(v.string()) }),
+      instagram: v.object({ connected: v.boolean(), accountName: v.optional(v.string()) }),
+      twitter: v.object({ connected: v.boolean(), accountName: v.optional(v.string()) }),
+      linkedin: v.object({ connected: v.boolean(), accountName: v.optional(v.string()) }),
+    }),
+    location: v.object({
+      address: v.string(),
+      city: v.string(),
+      country: v.string(),
+      province: v.string(),
+    }),
+    documents: v.object({
+      panNumber: v.optional(v.string()),
+      vatNumber: v.optional(v.string()),
+      companyRegistration: v.optional(v.string()),
+      registrationNumber: v.optional(v.string()),
+    }),
+    adminUsers: v.array(v.object({
+      userId: v.id("users"),
+      role: v.string(),
+      phone: v.string(),
+      isPrimary: v.boolean(),
+    })),
+    logo: v.optional(v.string()),
+    verifyStatus: v.optional(v.union(v.literal("pending"), v.literal("verified"), v.literal("rejected"))),
+    isOnboardingComplete: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_clerk_id", ["clerkId"])
+    .index("by_company_name", ["companyName"]),
 
   campaigns: defineTable({
     name: v.string(),

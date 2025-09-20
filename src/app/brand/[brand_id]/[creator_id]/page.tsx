@@ -2,35 +2,42 @@
 
 import { useParams } from "next/navigation";
 
+import { useQuery } from "convex/react";
+
 import { BrandDashboard } from "@/components/brand/brand-dashboard";
-import brandMockData from "@/components/mock-data/brand-mockdata.json";
-import creatorMockData from "@/components/mock-data/creator-mockdata.json";
+
+import { api } from "../../../../../convex/_generated/api";
+import { Id } from "../../../../../convex/_generated/dataModel";
 
 export default function BrandPage() {
   const params = useParams();
-  const brandId = parseInt(params.brand_id as string);
-  const creatorId = parseInt(params.creator_id as string);
+  const brandId = params.brand_id as Id<"brands">;
+  const userId = params.creator_id as Id<"users">;
 
-  // Find brand by ID
-  const brand = brandMockData.find((b) => b.id === brandId);
+  const brand = useQuery(api.brands.getBrandById, { brandId });
+  const user = useQuery(api.users.getUserById, { userId });
+  const hasAccess = useQuery(api.brands.checkBrandAccess, { brandId, userId });
 
-  // Find creator by ID
-  const creator = creatorMockData.find((c) => c.id === creatorId);
-
-  // Verify that the creator is an admin of this brand
-  const isValidAdmin = brand?.adminUsers.some(
-    (admin) => admin.creatorId === creatorId
-  );
-
-  if (!brand || !creator || !isValidAdmin) {
+  if (brand === undefined || user === undefined || hasAccess === undefined) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-slate-900">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900"></div>
+          <p className="mt-2 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!brand || !user || !hasAccess) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="mb-4 text-4xl">🚫</div>
-          <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="mb-2 text-2xl font-bold text-gray-900">
             Access Denied
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-600">
             You don&apos;t have permission to access this brand dashboard.
           </p>
         </div>
@@ -38,5 +45,5 @@ export default function BrandPage() {
     );
   }
 
-  return <BrandDashboard brand={brand} creator={creator} />;
+  return <BrandDashboard brand={brand} creator={user} />;
 }

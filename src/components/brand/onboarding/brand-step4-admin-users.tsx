@@ -1,11 +1,15 @@
 "use client";
 
+import { useUser } from "@clerk/nextjs";
+import { useQuery } from "convex/react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+import { api } from "../../../../convex/_generated/api";
 import type { BrandOnboardingData } from "../brand-onboarding";
 
 interface BrandStep4Props {
@@ -21,6 +25,11 @@ export default function BrandStep4AdminUsers({
   onSubmit,
   onBack,
 }: BrandStep4Props) {
+  const { user } = useUser();
+  const convexUser = useQuery(
+    api.users.getUserByClerkId,
+    user?.id ? { clerkId: user.id } : "skip"
+  );
   const commonRoles = [
     "CEO",
     "Founder",
@@ -34,7 +43,7 @@ export default function BrandStep4AdminUsers({
 
   const updateAdminUser = (
     index: number,
-    field: keyof BrandOnboardingData["adminUsers"][0],
+    field: "role" | "phone" | "isPrimary",
     value: string | boolean
   ) => {
     const updatedUsers = [...formData.adminUsers];
@@ -76,12 +85,8 @@ export default function BrandStep4AdminUsers({
   const isFormValid =
     formData.adminUsers.length > 0 &&
     formData.adminUsers.some(
-      (user) =>
-        user.name.trim() &&
-        user.email.trim() &&
-        user.role.trim() &&
-        user.phone.trim() &&
-        user.isPrimary
+      (adminUser) =>
+        adminUser.role.trim() && adminUser.phone.trim() && adminUser.isPrimary
     );
 
   return (
@@ -126,7 +131,7 @@ export default function BrandStep4AdminUsers({
       </Card>
 
       <div className="space-y-4">
-        {formData.adminUsers.map((user, index) => (
+        {formData.adminUsers.map((adminUser, index) => (
           <Card
             key={index}
             className={`p-4 ${index === 0 ? "border-emerald-200 bg-emerald-50" : ""}`}
@@ -137,7 +142,7 @@ export default function BrandStep4AdminUsers({
                   <Label className="text-sm font-medium">
                     {index === 0 ? "Account Owner" : `Admin User ${index + 1}`}
                   </Label>
-                  {user.isPrimary && (
+                  {adminUser.isPrimary && (
                     <Badge variant="default" className="text-xs">
                       Primary
                     </Badge>
@@ -153,7 +158,7 @@ export default function BrandStep4AdminUsers({
                 </div>
 
                 <div className="flex gap-2">
-                  {!user.isPrimary && (
+                  {!adminUser.isPrimary && (
                     <Button
                       type="button"
                       variant="outline"
@@ -180,29 +185,20 @@ export default function BrandStep4AdminUsers({
 
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor={`name-${index}`}>Full Name *</Label>
+                  <Label>Full Name *</Label>
                   <Input
-                    id={`name-${index}`}
-                    placeholder="John Doe"
-                    value={user.name}
-                    onChange={(e) =>
-                      updateAdminUser(index, "name", e.target.value)
-                    }
-                    className="h-8 text-sm"
+                    value={index === 0 && convexUser ? convexUser.name : ""}
+                    disabled
+                    className="h-8 bg-gray-50 text-sm"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor={`email-${index}`}>Email *</Label>
+                  <Label>Email *</Label>
                   <Input
-                    id={`email-${index}`}
-                    type="email"
-                    placeholder="john@company.com"
-                    value={user.email}
-                    onChange={(e) =>
-                      updateAdminUser(index, "email", e.target.value)
-                    }
-                    className="h-8 text-sm"
+                    value={index === 0 && convexUser ? convexUser.email : ""}
+                    disabled
+                    className="h-8 bg-gray-50 text-sm"
                   />
                 </div>
 
@@ -211,7 +207,7 @@ export default function BrandStep4AdminUsers({
                   <Input
                     id={`role-${index}`}
                     placeholder="CEO"
-                    value={user.role}
+                    value={adminUser.role}
                     onChange={(e) =>
                       updateAdminUser(index, "role", e.target.value)
                     }
@@ -224,7 +220,7 @@ export default function BrandStep4AdminUsers({
                   <Input
                     id={`phone-${index}`}
                     placeholder="+977-9841234567"
-                    value={user.phone}
+                    value={adminUser.phone}
                     onChange={(e) =>
                       updateAdminUser(index, "phone", e.target.value)
                     }

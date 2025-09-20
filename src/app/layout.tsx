@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import { ClerkProvider } from "@clerk/nextjs";
 
+import { AutoSyncUser } from "@/components/auto-sync-user";
 import { ConvexClientProvider } from "@/components/providers/convex-client-provider";
 
 import "./globals.css";
@@ -34,7 +35,10 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ClerkProvider>
-          <ConvexClientProvider>{children}</ConvexClientProvider>
+          <ConvexClientProvider>
+            <AutoSyncUser />
+            {children}
+          </ConvexClientProvider>
         </ClerkProvider>
       </body>
     </html>
