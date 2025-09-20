@@ -1,0 +1,110 @@
+{
+  "countries": {
+    "Nepal": {
+      "provinces": {
+        "Koshi Province": {
+          "districts": {
+            "Jhapa": ["Mechinagar", "Damak", "Birtamod", "Bhadrapur"],
+            "Ilam": ["Ilam", "Phidim", "Mai", "Deumai"],
+            "Panchthar": ["Phidim", "Hilihang", "Kummayak", "Phalelung"]
+          }
+        },
+        "Madhesh Province": {
+          "districts": {
+            "Saptari": ["Rajbiraj", "Kanchanrup", "Dakneshwori", "Tilathi"],
+            "Siraha": ["Siraha", "Lahan", "Dhangadhimai", "Golbazar"],
+            "Dhanusha": ["Janakpur", "Chhireshwarnath", "Hansapur", "Bateshwar"]
+          }
+        },
+        "Bagmati Province": {
+          "districts": {
+            "Kathmandu": [
+              "Kathmandu",
+              "Kageshwori Manohara",
+              "Kirtipur",
+              "Shankharapur"
+            ],
+            "Lalitpur": ["Lalitpur", "Mahalaxmi", "Bagmati", "Godawari"],
+            "Bhaktapur": [
+              "Bhaktapur",
+              "Changunarayan",
+              "Madhyapur Thimi",
+              "Suryabinayak"
+            ]
+          }
+        },
+        "Gandaki Province": {
+          "districts": {
+            "Kaski": ["Pokhara", "Annapurna", "Machhapuchchhre", "Madi"],
+            "Syangja": ["Putalibazar", "Waling", "Phedikhola", "Harinas"],
+            "Parbat": ["Kushma", "Phalewas", "Jaljala", "Mahashila"]
+          }
+        },
+        "Lumbini Province": {
+          "districts": {
+            "Rupandehi": [
+              "Butwal",
+              "Devdaha",
+              "Lumbini Sanskritik",
+              "Sainamaina"
+            ],
+            "Kapilvastu": ["Kapilvastu", "Banganga", "Buddhabhumi", "Shivaraj"],
+            "Nawalpur": ["Bardaghat", "Ramgram", "Sunwal", "Sarawal"]
+          }
+        },
+        "Karnali Province": {
+          "districts": {
+            "Surkhet": [
+              "Birendranagar",
+              "Bheriganga",
+              "Gurbhakot",
+              "Panchpuri"
+            ],
+            "Dailekh": ["Narayan", "Dullu", "Aathabis", "Bhagawatimai"],
+            "Jajarkot": ["Bheri", "Chhedagad", "Tribeni", "Barekot"]
+          }
+        },
+        "Sudurpashchim Province": {
+          "districts": {
+            "Kailali": ["Dhangadhi", "Tikapur", "Ghodaghodi", "Lamki Chuha"],
+            "Kanchanpur": ["Bhimdatta", "Punarbas", "Laljhadi", "Shuklaphanta"],
+            "Doti": ["Dipayal Silgadhi", "Shikhar", "Purbichauki", "Badikedar"]
+          }
+        }
+      }
+    },
+    "India": {
+      "states": {
+        "Maharashtra": {
+          "districts": {
+            "Mumbai": ["Mumbai", "Navi Mumbai", "Thane", "Kalyan"],
+            "Pune": ["Pune", "Pimpri-Chinchwad", "Baramati", "Maval"],
+            "Nagpur": ["Nagpur", "Kamptee", "Katol", "Parseoni"]
+          }
+        },
+        "Delhi": {
+          "districts": {
+            "New Delhi": [
+              "New Delhi",
+              "Connaught Place",
+              "India Gate",
+              "Karol Bagh"
+            ],
+            "North Delhi": [
+              "Civil Lines",
+              "Model Town",
+              "Kamla Nagar",
+              "Timarpur"
+            ],
+            "South Delhi": [
+              "Lajpat Nagar",
+              "Greater Kailash",
+              "Saket",
+              "Vasant Kunj"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

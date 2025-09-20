@@ -3,11 +3,16 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { UserButton } from "@clerk/nextjs";
+import { useConvexAuth } from "convex/react";
+
 import { Button } from "@/components/ui/button";
 
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const { isAuthenticated } = useConvexAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,15 +60,21 @@ export default function Navigation() {
             >
               For Creators
             </Link>
-            <Link
-              href="/sign-in"
-              className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
-            >
-              Sign In
-            </Link>
-            <Button variant="gradient" size="sm">
-              <Link href="/sign-up">Get Started</Link>
-            </Button>
+            {isAuthenticated ? (
+              <UserButton />
+            ) : (
+              <>
+                <Link
+                  href="/sign-in"
+                  className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
+                >
+                  Sign In
+                </Link>
+                <Button variant="gradient" size="sm">
+                  <Link href="/sign-up">Get Started</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
