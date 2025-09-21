@@ -2,7 +2,21 @@
 
 import { useEffect, useState } from "react";
 
-import { Creator } from "@/components/mock-data/creator-mockdata";
+
+// Define Creator type locally to avoid import error
+interface Creator {
+  id: number;
+  name: string;
+  avatar: string;
+  followers: string;
+  following: string;
+  niche: string;
+  email: string;
+  bio: string;
+  socialLinks: string[];
+  pricing: any;
+  videos?: any[];
+}
 
 import { Feed } from "../creator/feed";
 import { storage } from "../creator/utils/storage";
@@ -199,6 +213,8 @@ export function BrandDashboard({ brand, creator }: BrandDashboardProps) {
       {showCreateCampaign && (
         <CreateCampaign
           brandId={brand.id}
+          brandName={brand.name}
+          brandLogo={brand.logo}
           onClose={() => setShowCreateCampaign(false)}
         />
       )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { HLSVideoPlayer } from "@/components/ui/hls-video-player";
+import { HLSVideoPlayer } from "@/components/user-ui/hls-video-player";
 
 interface VideoPlayerProps {
   videoUrl: string;

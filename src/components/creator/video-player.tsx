@@ -3,28 +3,22 @@
 import React, {
   useCallback,
   useEffect,
-  useMemo,
-  useRef,
-  useState,
+  useState
 } from "react";
 
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
 import {
-  ChevronDown,
-  ChevronUp,
   Heart,
   MessageCircle,
   MoreVertical,
   Share,
-  X,
+  X
 } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { HLSVideoPlayer } from "@/components/ui/hls-video-player";
+import { HLSVideoPlayer } from "@/components/user-ui/hls-video-player";
 
 import { api } from "@/lib/convex-api";
 
@@ -81,9 +75,9 @@ const VideoPlayer = React.memo(function VideoPlayer({
     api.videoFeeds.checkUserLike,
     user
       ? {
-          videoId: video._id as any,
-          userId: user.id,
-        }
+        videoId: video._id as any,
+        userId: user.id,
+      }
       : "skip"
   );
 
@@ -91,42 +85,7 @@ const VideoPlayer = React.memo(function VideoPlayer({
   const toggleLikeMutation = useMutation(api.videoFeeds.toggleLike);
   const incrementViewsMutation = useMutation(api.videoFeeds.incrementViews);
 
-  const getYouTubeEmbedUrl = useCallback((url: string) => {
-    const videoId = url.match(
-      /(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([^&\n?#]+)/
-    );
-    return videoId
-      ? `https://www.youtube.com/embed/${videoId[1]}?autoplay=1&rel=0&modestbranding=1`
-      : null;
-  }, []);
-
-  const getTikTokEmbedUrl = useCallback((url: string) => {
-    const videoId = url.match(/\/video\/(\d+)/);
-    return videoId ? `https://www.tiktok.com/embed/v2/${videoId[1]}` : null;
-  }, []);
-
-  const videoData = useMemo(() => {
-    const videoUrlToCheck = fileUrl || video.videoUrl;
-    const isYouTubeVideo =
-      videoUrlToCheck.includes("youtube.com") ||
-      videoUrlToCheck.includes("youtu.be");
-    const isTikTokVideo = videoUrlToCheck.includes("tiktok.com");
-    const isConvexVideo = fileUrl !== undefined;
-
-    const embedUrl = isYouTubeVideo
-      ? getYouTubeEmbedUrl(videoUrlToCheck)
-      : isTikTokVideo
-        ? getTikTokEmbedUrl(videoUrlToCheck)
-        : null;
-
-    return {
-      isYouTubeVideo,
-      isTikTokVideo,
-      isConvexVideo,
-      embedUrl,
-      actualVideoUrl: fileUrl || videoUrlToCheck,
-    };
-  }, [video.videoUrl, fileUrl, getYouTubeEmbedUrl, getTikTokEmbedUrl]);
+  // Only support DB videos now
 
   const handleLike = useCallback(async () => {
     if (!user) return;
@@ -179,28 +138,16 @@ const VideoPlayer = React.memo(function VideoPlayer({
       <div className="relative flex h-full items-center justify-center">
         {/* Video */}
         <div
-          className={`relative mx-auto w-full max-w-sm bg-black transition-opacity duration-150 ${
-            video.aspectRatio === "16:9" ? "aspect-video" : "aspect-[9/16]"
-          }`}
+          className={`relative mx-auto w-full max-w-sm bg-black transition-opacity duration-150 ${video.aspectRatio === "16:9" ? "aspect-video" : "aspect-[9/16]"}`}
         >
-          {videoData.isConvexVideo && fileUrl ? (
+          {fileUrl ? (
             <HLSVideoPlayer
               key={video._id}
               videoId={video._id}
-              fallbackUrl={videoData.actualVideoUrl}
+              fallbackUrl={fileUrl}
               title={video.title}
               autoPlay
               className="absolute inset-0 h-full w-full"
-            />
-          ) : (videoData.isYouTubeVideo || videoData.isTikTokVideo) &&
-            videoData.embedUrl ? (
-            <iframe
-              key={video._id}
-              src={videoData.embedUrl}
-              className="absolute inset-0 h-full w-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              loading="eager"
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
@@ -290,3 +237,4 @@ const VideoPlayer = React.memo(function VideoPlayer({
 });
 
 export { VideoPlayer };
+
