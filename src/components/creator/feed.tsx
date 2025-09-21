@@ -2,62 +2,99 @@
 
 import { useEffect, useState } from "react";
 
-import videosData from "@/components/mock-data/videos-mockdata.json";
+import { useQuery } from "convex/react";
+
 import { PageHeader } from "@/components/user-ui/page-header";
+
+import { api } from "@/lib/convex-api";
 
 import { EmptyState, EndOfContent, LoadingState } from "./feed/loading-state";
 import { VideoGrid } from "./feed/video-grid";
 
 interface Video {
-  id: number;
+  _id: string;
   title: string;
-  thumbnail: string;
   videoUrl: string;
+  videoFileId?: string;
+  thumbnailUrl?: string;
   duration: string;
-  views: string;
-  likes: string;
-  comments: string;
-  shares: string;
-  creatorId: number;
+  views: number;
+  likes: number;
+  comments: number;
+  shares: number;
+  creatorId: string;
   creatorName: string;
   creatorAvatar: string;
-  uploadedAt: string;
+  uploadedAt: number;
   aspectRatio: string;
   category: string;
+  type: "public" | "campaign";
+  campaignName?: string;
 }
 
 interface FeedProps {
   onVideoClick: (video: Video) => void;
 }
 
-const allVideos: Video[] = videosData as Video[];
-
 export function Feed({ onVideoClick }: FeedProps) {
-  const [videos, setVideos] = useState<Video[]>(allVideos.slice(0, 6));
+  const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(allVideos.length > 6);
+  const [hasMore, setHasMore] = useState(true);
+  const [cursor, setCursor] = useState<string | null>(null);
+
+  const videoFeedsQuery = useQuery(api.videoFeeds.getVideoFeeds, {
+    limit: 10,
+    cursor: cursor || undefined,
+  });
+
+  // Load initial videos
+  useEffect(() => {
+    if (videoFeedsQuery && !cursor) {
+      const formattedVideos = videoFeedsQuery.videos.map((video) => ({
+        ...video,
+        views: video.views.toString(),
+        likes: video.likes.toString(),
+        comments: video.comments.toString(),
+        shares: video.shares.toString(),
+        uploadedAt: formatUploadedAt(video.uploadedAt),
+      }));
+      setVideos(formattedVideos);
+      setHasMore(!!videoFeedsQuery.nextCursor);
+    }
+  }, [videoFeedsQuery, cursor]);
+
+  // Load more videos when cursor changes
+  useEffect(() => {
+    if (videoFeedsQuery && cursor) {
+      const formattedVideos = videoFeedsQuery.videos.map((video) => ({
+        ...video,
+        views: video.views.toString(),
+        likes: video.likes.toString(),
+        comments: video.comments.toString(),
+        shares: video.shares.toString(),
+        uploadedAt: formatUploadedAt(video.uploadedAt),
+      }));
+      setVideos((prev) => [...prev, ...formattedVideos]);
+      setHasMore(!!videoFeedsQuery.nextCursor);
+      setLoading(false);
+    }
+  }, [videoFeedsQuery, cursor]);
+
+  const formatUploadedAt = (timestamp: number): string => {
+    const now = Date.now();
+    const diff = now - timestamp;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+
+    if (days > 0) return `${days} day${days > 1 ? "s" : ""} ago`;
+    if (hours > 0) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    return "Just now";
+  };
 
   const loadMoreVideos = () => {
-    if (!hasMore || loading) return;
-
+    if (!hasMore || loading || !videoFeedsQuery?.nextCursor) return;
     setLoading(true);
-    setTimeout(() => {
-      const isDesktop = window.innerWidth >= 768;
-      const videosToAdd = isDesktop ? 12 : 6;
-      const currentLength = videos.length;
-      const remainingVideos = allVideos.slice(
-        currentLength,
-        currentLength + videosToAdd
-      );
-
-      if (remainingVideos.length > 0) {
-        setVideos((prev) => [...prev, ...remainingVideos]);
-        setHasMore(currentLength + remainingVideos.length < allVideos.length);
-      } else {
-        setHasMore(false);
-      }
-      setLoading(false);
-    }, 500);
+    setCursor(videoFeedsQuery.nextCursor);
   };
 
   useEffect(() => {

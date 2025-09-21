@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 
 import { Creator } from "@/components/mock-data/creator-mockdata";
-import videosData from "@/components/mock-data/videos-mockdata.json";
 
 import { ExploreCampaigns } from "./campaigns/explore/explore-campaigns";
 import { MyCampaigns } from "./campaigns/my-campaigns/my-campaigns";
@@ -21,29 +20,30 @@ interface CreatorDashboardProps {
 }
 
 interface Video {
-  id: number;
+  _id: string;
   title: string;
-  thumbnail: string;
   videoUrl: string;
+  videoFileId?: string;
+  thumbnailUrl?: string;
   duration: string;
-  views: string;
-  likes: string;
-  comments: string;
-  shares: string;
-  creatorId: number;
+  views: string | number;
+  likes: string | number;
+  comments: string | number;
+  shares: string | number;
+  creatorId: string;
   creatorName: string;
   creatorAvatar: string;
-  uploadedAt: string;
+  uploadedAt: string | number;
   aspectRatio: string;
   category: string;
+  type: "public" | "campaign";
+  campaignName?: string;
 }
-
-const allVideos: Video[] = videosData as Video[];
 
 export function CreatorDashboard({ creator }: CreatorDashboardProps) {
   const [activeTab, setActiveTab] = useState("feed");
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const [currentVideo, setCurrentVideo] = useState<Video | null>(null);
   const [showUpload, setShowUpload] = useState(false);
   const [appliedCampaigns, setAppliedCampaigns] = useState<number[]>([]);
 
@@ -68,17 +68,13 @@ export function CreatorDashboard({ creator }: CreatorDashboardProps) {
   };
 
   const handleVideoClick = (video: Video) => {
-    const videoIndex = allVideos.findIndex((v) => v.id === video.id);
-    setCurrentVideoIndex(videoIndex >= 0 ? videoIndex : 0);
+    setCurrentVideo(video);
     setShowVideoPlayer(true);
   };
 
   const handleCloseVideoPlayer = () => {
     setShowVideoPlayer(false);
-  };
-
-  const handleVideoIndexChange = (index: number) => {
-    setCurrentVideoIndex(index);
+    setCurrentVideo(null);
   };
 
   const handleViewCampaign = (campaign: unknown) => {
@@ -159,13 +155,8 @@ export function CreatorDashboard({ creator }: CreatorDashboardProps) {
       </main>
 
       {/* Video Player Modal */}
-      {showVideoPlayer && (
-        <VideoPlayer
-          videos={allVideos}
-          currentIndex={currentVideoIndex}
-          onClose={handleCloseVideoPlayer}
-          onIndexChange={handleVideoIndexChange}
-        />
+      {showVideoPlayer && currentVideo && (
+        <VideoPlayer video={currentVideo} onClose={handleCloseVideoPlayer} />
       )}
 
       {/* Upload Modal */}

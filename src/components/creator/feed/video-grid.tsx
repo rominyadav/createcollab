@@ -3,21 +3,24 @@
 import { VideoCard } from "@/components/user-ui/video-card";
 
 interface Video {
-  id: number;
+  _id: string;
   title: string;
-  thumbnail: string;
   videoUrl: string;
+  videoFileId?: string;
+  thumbnailUrl?: string;
   duration: string;
-  views: string;
-  likes: string;
-  comments: string;
-  shares: string;
-  creatorId: number;
+  views: string | number;
+  likes: string | number;
+  comments: string | number;
+  shares: string | number;
+  creatorId: string;
   creatorName: string;
   creatorAvatar: string;
-  uploadedAt: string;
+  uploadedAt: string | number;
   aspectRatio: string;
   category: string;
+  type: "public" | "campaign";
+  campaignName?: string;
 }
 
 interface VideoGridProps {
@@ -27,11 +30,11 @@ interface VideoGridProps {
 
 export function VideoGrid({ videos, onVideoClick }: VideoGridProps) {
   return (
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 md:grid-cols-4 md:gap-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-5 lg:gap-5">
       {videos.map((video) => (
         <VideoCard
-          key={`${video.id}-${Math.random()}`}
-          id={video.id}
+          key={video._id}
+          _id={video._id}
           title={video.title}
           duration={video.duration}
           views={video.views}
@@ -39,6 +42,8 @@ export function VideoGrid({ videos, onVideoClick }: VideoGridProps) {
           creatorAvatar={video.creatorAvatar}
           uploadedAt={video.uploadedAt}
           category={video.category}
+          campaignName={video.campaignName}
+          type={video.type}
           onClick={() => onVideoClick(video)}
         />
       ))}
