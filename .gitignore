@@ -42,3 +42,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
+VIDEO_TRANSCODING_README.md
+SHADCN_MIGRATION_SUMMARY.md
+CAMPAIGN_VIDEO_UPLOAD_README.md

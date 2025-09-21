@@ -8,6 +8,8 @@ import React, {
   useState,
 } from "react";
 
+import { useUser } from "@clerk/nextjs";
+import { useMutation, useQuery } from "convex/react";
 import {
   ChevronDown,
   ChevronUp,
@@ -22,40 +24,72 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { HLSVideoPlayer } from "@/components/ui/hls-video-player";
+
+import { api } from "@/lib/convex-api";
 
 interface Video {
-  id: number;
+  _id: string;
   title: string;
-  thumbnail: string;
   videoUrl: string;
+  videoFileId?: string;
+  thumbnailUrl?: string;
   duration: string;
-  views: string;
-  likes: string;
-  comments: string;
-  shares: string;
-  creatorId: number;
+  views: string | number;
+  likes: string | number;
+  comments: string | number;
+  shares: string | number;
+  creatorId: string;
   creatorName: string;
   creatorAvatar: string;
-  uploadedAt: string;
+  uploadedAt: string | number;
   aspectRatio: string;
   category: string;
+  type: "public" | "campaign";
+  campaignName?: string;
 }
 
 interface VideoPlayerProps {
-  videos: Video[];
-  currentIndex: number;
+  video: Video;
   onClose: () => void;
-  onIndexChange: (index: number) => void;
 }
 
 const VideoPlayer = React.memo(function VideoPlayer({
-  videos,
-  currentIndex,
+  video,
   onClose,
-  onIndexChange,
 }: VideoPlayerProps) {
-  const [isLiked, setIsLiked] = useState(false);
-  const currentVideo = videos[currentIndex];
+  const { user } = useUser();
+
+  // Early return if video is not provided
+  if (!video) {
+    return null;
+  }
+
+  const [likesCount, setLikesCount] = useState(
+    typeof video.likes === "number"
+      ? video.likes
+      : parseInt(video.likes as string) || 0
+  );
+
+  // Get the actual file URL from Convex
+  const fileUrl = useQuery(api.videoFeeds.getFileUrl, {
+    fileId: video.videoFileId as any,
+  });
+
+  // Check if user has liked this video
+  const isLiked = useQuery(
+    api.videoFeeds.checkUserLike,
+    user
+      ? {
+          videoId: video._id as any,
+          userId: user.id,
+        }
+      : "skip"
+  );
+
+  // Mutations
+  const toggleLikeMutation = useMutation(api.videoFeeds.toggleLike);
+  const incrementViewsMutation = useMutation(api.videoFeeds.incrementViews);
 
   const getYouTubeEmbedUrl = useCallback((url: string) => {
     const videoId = url.match(
@@ -72,152 +106,62 @@ const VideoPlayer = React.memo(function VideoPlayer({
   }, []);
 
   const videoData = useMemo(() => {
+    const videoUrlToCheck = fileUrl || video.videoUrl;
     const isYouTubeVideo =
-      currentVideo.videoUrl.includes("youtube.com") ||
-      currentVideo.videoUrl.includes("youtu.be");
-    const isTikTokVideo = currentVideo.videoUrl.includes("tiktok.com");
+      videoUrlToCheck.includes("youtube.com") ||
+      videoUrlToCheck.includes("youtu.be");
+    const isTikTokVideo = videoUrlToCheck.includes("tiktok.com");
+    const isConvexVideo = fileUrl !== undefined;
 
     const embedUrl = isYouTubeVideo
-      ? getYouTubeEmbedUrl(currentVideo.videoUrl)
+      ? getYouTubeEmbedUrl(videoUrlToCheck)
       : isTikTokVideo
-        ? getTikTokEmbedUrl(currentVideo.videoUrl)
+        ? getTikTokEmbedUrl(videoUrlToCheck)
         : null;
 
-    return { isYouTubeVideo, isTikTokVideo, embedUrl };
-  }, [currentVideo.videoUrl, getYouTubeEmbedUrl, getTikTokEmbedUrl]);
-
-  const handlePrevious = useCallback(() => {
-    if (currentIndex > 0) {
-      onIndexChange(currentIndex - 1);
-    }
-  }, [currentIndex, onIndexChange]);
-
-  const handleNext = useCallback(() => {
-    if (currentIndex < videos.length - 1) {
-      onIndexChange(currentIndex + 1);
-    }
-  }, [currentIndex, videos.length, onIndexChange]);
-
-  const handleLike = useCallback(() => {
-    setIsLiked(!isLiked);
-  }, [isLiked]);
-
-  // Preload adjacent videos
-  useEffect(() => {
-    const preloadVideo = (index: number) => {
-      if (index >= 0 && index < videos.length) {
-        const video = videos[index];
-        if (
-          video.videoUrl.includes("youtube.com") ||
-          video.videoUrl.includes("youtu.be")
-        ) {
-          const videoId = video.videoUrl.match(
-            /(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([^&\n?#]+)/
-          );
-          if (videoId) {
-            const link = document.createElement("link");
-            link.rel = "prefetch";
-            link.href = `https://www.youtube.com/embed/${videoId[1]}`;
-            document.head.appendChild(link);
-          }
-        }
-      }
+    return {
+      isYouTubeVideo,
+      isTikTokVideo,
+      isConvexVideo,
+      embedUrl,
+      actualVideoUrl: fileUrl || videoUrlToCheck,
     };
+  }, [video.videoUrl, fileUrl, getYouTubeEmbedUrl, getTikTokEmbedUrl]);
 
-    // Preload next and previous videos
-    preloadVideo(currentIndex + 1);
-    preloadVideo(currentIndex - 1);
-  }, [currentIndex, videos]);
+  const handleLike = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const result = await toggleLikeMutation({
+        videoId: video._id as any,
+        userId: user.id,
+      });
+
+      if (result) {
+        setLikesCount(result.count);
+      }
+    } catch (error) {
+      console.error("Failed to toggle like:", error);
+    }
+  }, [user, video._id, toggleLikeMutation]);
+
+
 
   useEffect(() => {
-    let touchStartY = 0;
-    let isSwiping = false;
-    let wheelTimeout: NodeJS.Timeout | null = null;
-
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        handlePrevious();
-      } else if (e.key === "ArrowDown") {
-        e.preventDefault();
-        handleNext();
       }
-    };
-
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (wheelTimeout) return;
-
-      wheelTimeout = setTimeout(() => {
-        wheelTimeout = null;
-      }, 300);
-
-      if (e.deltaY > 0) {
-        handleNext();
-      } else {
-        handlePrevious();
-      }
-    };
-
-    const handleTouchStart = (e: TouchEvent) => {
-      touchStartY = e.touches[0].clientY;
-      isSwiping = false;
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (!isSwiping) {
-        const currentY = e.touches[0].clientY;
-        const deltaY = Math.abs(touchStartY - currentY);
-        if (deltaY > 10) {
-          isSwiping = true;
-          e.preventDefault();
-        }
-      } else {
-        e.preventDefault();
-      }
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (isSwiping) {
-        const touchEndY = e.changedTouches[0].clientY;
-        const deltaY = touchStartY - touchEndY;
-
-        if (Math.abs(deltaY) > 50) {
-          if (deltaY > 0) {
-            handleNext();
-          } else {
-            handlePrevious();
-          }
-        }
-      }
-      isSwiping = false;
     };
 
     document.addEventListener("keydown", handleKeyDown);
-    document.addEventListener("wheel", handleWheel, { passive: false });
-    document.addEventListener("touchstart", handleTouchStart, {
-      passive: true,
-    });
-    document.addEventListener("touchmove", handleTouchMove, { passive: false });
-    document.addEventListener("touchend", handleTouchEnd, { passive: true });
     document.body.style.overflow = "hidden";
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      document.removeEventListener("wheel", handleWheel);
-      document.removeEventListener("touchstart", handleTouchStart);
-      document.removeEventListener("touchmove", handleTouchMove);
-      document.removeEventListener("touchend", handleTouchEnd);
       document.body.style.overflow = "";
-      if (wheelTimeout) {
-        clearTimeout(wheelTimeout);
-      }
     };
-  }, [handleNext, handlePrevious, onClose]);
+  }, [onClose]);
 
   return (
     <div className="fixed inset-0 z-50 bg-black">
@@ -236,15 +180,22 @@ const VideoPlayer = React.memo(function VideoPlayer({
         {/* Video */}
         <div
           className={`relative mx-auto w-full max-w-sm bg-black transition-opacity duration-150 ${
-            currentVideo.aspectRatio === "16:9"
-              ? "aspect-video"
-              : "aspect-[9/16]"
+            video.aspectRatio === "16:9" ? "aspect-video" : "aspect-[9/16]"
           }`}
         >
-          {(videoData.isYouTubeVideo || videoData.isTikTokVideo) &&
-          videoData.embedUrl ? (
+          {videoData.isConvexVideo && fileUrl ? (
+            <HLSVideoPlayer
+              key={video._id}
+              videoId={video._id}
+              fallbackUrl={videoData.actualVideoUrl}
+              title={video.title}
+              autoPlay
+              className="absolute inset-0 h-full w-full"
+            />
+          ) : (videoData.isYouTubeVideo || videoData.isTikTokVideo) &&
+            videoData.embedUrl ? (
             <iframe
-              key={currentVideo.id}
+              key={video._id}
               src={videoData.embedUrl}
               className="absolute inset-0 h-full w-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -255,35 +206,11 @@ const VideoPlayer = React.memo(function VideoPlayer({
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
               <div className="text-center text-white">
                 <div className="mb-4 text-6xl">🎬</div>
-                <p className="text-lg">{currentVideo.title}</p>
-                <p className="mt-2 text-sm opacity-70">
-                  {currentVideo.duration}
-                </p>
+                <p className="text-lg">{video.title}</p>
+                <p className="mt-2 text-sm opacity-70">{video.duration}</p>
               </div>
             </div>
           )}
-        </div>
-
-        {/* Navigation Arrows */}
-        <div className="absolute top-1/2 right-4 flex -translate-y-1/2 transform flex-col gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handlePrevious}
-            disabled={currentIndex === 0}
-            className="text-white hover:bg-white/20 disabled:opacity-30"
-          >
-            <ChevronUp className="h-6 w-6" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleNext}
-            disabled={currentIndex === videos.length - 1}
-            className="text-white hover:bg-white/20 disabled:opacity-30"
-          >
-            <ChevronDown className="h-6 w-6" />
-          </Button>
         </div>
 
         {/* Video Info & Actions */}
@@ -294,23 +221,28 @@ const VideoPlayer = React.memo(function VideoPlayer({
               <div className="mb-2 flex items-center gap-3">
                 <Avatar className="h-10 w-10">
                   <AvatarFallback className="bg-emerald-500 text-white">
-                    {currentVideo.creatorAvatar}
+                    {video.creatorAvatar}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium text-white">
-                    {currentVideo.creatorName}
-                  </p>
+                  <p className="font-medium text-white">{video.creatorName}</p>
                   <p className="text-sm text-white/70">
-                    {currentVideo.uploadedAt}
+                    {typeof video.uploadedAt === "number"
+                      ? new Date(video.uploadedAt).toLocaleDateString()
+                      : video.uploadedAt}
                   </p>
                 </div>
               </div>
-              <p className="mb-2 text-sm text-white">{currentVideo.title}</p>
+              <p className="mb-2 text-sm text-white">{video.title}</p>
               <div className="flex items-center gap-4 text-sm text-white/70">
-                <span>{currentVideo.views} views</span>
+                <span>
+                  {typeof video.views === "number"
+                    ? video.views.toLocaleString()
+                    : video.views}{" "}
+                  views
+                </span>
                 <span>•</span>
-                <span>{currentVideo.category}</span>
+                <span>{video.category}</span>
               </div>
             </div>
 
@@ -323,17 +255,27 @@ const VideoPlayer = React.memo(function VideoPlayer({
                 <Heart
                   className={`h-6 w-6 ${isLiked ? "fill-red-500 text-red-500" : ""}`}
                 />
-                <span className="mt-1 text-xs">{currentVideo.likes}</span>
+                <span className="mt-1 text-xs">
+                  {likesCount.toLocaleString()}
+                </span>
               </button>
 
               <button className="flex flex-col items-center text-white transition-colors hover:text-blue-500">
                 <MessageCircle className="h-6 w-6" />
-                <span className="mt-1 text-xs">{currentVideo.comments}</span>
+                <span className="mt-1 text-xs">
+                  {typeof video.comments === "number"
+                    ? video.comments.toLocaleString()
+                    : video.comments}
+                </span>
               </button>
 
               <button className="flex flex-col items-center text-white transition-colors hover:text-green-500">
                 <Share className="h-6 w-6" />
-                <span className="mt-1 text-xs">{currentVideo.shares}</span>
+                <span className="mt-1 text-xs">
+                  {typeof video.shares === "number"
+                    ? video.shares.toLocaleString()
+                    : video.shares}
+                </span>
               </button>
 
               <button className="flex flex-col items-center text-white transition-colors hover:text-gray-300">
