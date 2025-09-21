@@ -25,7 +25,6 @@ export function VideoPlayer({
   videoId,
   title,
   autoPlay = false,
-  controls = true,
   className = "",
   hlsUrls,
   isTranscoded = false,
