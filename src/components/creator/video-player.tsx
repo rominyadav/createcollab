@@ -1,29 +1,19 @@
 "use client";
 
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useState } from "react";
 
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
 import {
-  ChevronDown,
-  ChevronUp,
   Heart,
   MessageCircle,
   MoreVertical,
   Share,
-  X,
+  X
 } from "lucide-react";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { HLSVideoPlayer } from "@/components/user-ui/hls-video-player";
 
 import { api } from "@/lib/convex-api";
@@ -54,12 +44,8 @@ interface VideoPlayerProps {
   onClose: () => void;
 }
 
-const VideoPlayer = React.memo(function VideoPlayer({
-  video,
-  onClose,
-}: VideoPlayerProps) {
+const VideoPlayer = React.memo(function VideoPlayer({ video, onClose }: VideoPlayerProps) {
   const { user } = useUser();
-
   const [likesCount, setLikesCount] = useState(
     video
       ? typeof video.likes === "number"
@@ -85,111 +71,14 @@ const VideoPlayer = React.memo(function VideoPlayer({
     api.videoFeeds.checkUserLike,
     user && video
       ? {
-          videoId: video._id as any,
-          userId: user.id,
-        }
+        videoId: video._id as any,
+        userId: user.id,
+      }
       : "skip"
   );
 
   // Mutations
   const toggleLikeMutation = useMutation(api.videoFeeds.toggleLike);
-  const incrementViewsMutation = useMutation(api.videoFeeds.incrementViews);
-
-  const getYouTubeEmbedUrl = useCallback((url: string) => {
-    const videoId = url.match(
-      /(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([^&\n?#]+)/
-    );
-    return videoId
-      ? `https://www.youtube.com/embed/${videoId[1]}?autoplay=1&rel=0&modestbranding=1`
-      : null;
-  }, []);
-
-  const getTikTokEmbedUrl = useCallback((url: string) => {
-    const videoId = url.match(/\/video\/(\d+)/);
-    return videoId ? `https://www.tiktok.com/embed/v2/${videoId[1]}` : null;
-  }, []);
-
-  // Early return if video is not provided
-  if (!video) {
-    return null;
-  }
-
-  console.log("Creator VideoPlayer - videoData:", videoData);
-  console.log("Creator VideoPlayer - fileUrl:", fileUrl);
-
-  // Get HLS URLs from storage IDs
-  const hlsStorageId =
-    videoData?.isTranscoded && videoData?.hlsUrls
-      ? videoData.hlsUrls.p720 ||
-        videoData.hlsUrls.p480 ||
-        videoData.hlsUrls.p360
-      : null;
-
-  // Use our HLS API to serve files with proper content-type
-  const hlsUrl = hlsStorageId ? `/api/hls?id=${hlsStorageId}` : null;
-
-  const videoPlaybackData = useMemo(() => {
-    // Use HLS URLs if video is transcoded
-    if (videoData?.isTranscoded && hlsUrl) {
-      console.log("Using HLS URL:", hlsUrl);
-      return {
-        isYouTubeVideo: false,
-        isTikTokVideo: false,
-        isConvexVideo: true,
-        isHLS: true,
-        embedUrl: null,
-        actualVideoUrl: hlsUrl,
-      };
-    }
-
-    // Fallback to original logic
-    const videoUrlToCheck = fileUrl || video.videoUrl;
-    const isYouTubeVideo =
-      videoUrlToCheck.includes("youtube.com") ||
-      videoUrlToCheck.includes("youtu.be");
-    const isTikTokVideo = videoUrlToCheck.includes("tiktok.com");
-    const isConvexVideo = fileUrl !== undefined;
-
-    const embedUrl = isYouTubeVideo
-      ? getYouTubeEmbedUrl(videoUrlToCheck)
-      : isTikTokVideo
-        ? getTikTokEmbedUrl(videoUrlToCheck)
-        : null;
-
-    return {
-      isYouTubeVideo,
-      isTikTokVideo,
-      isConvexVideo,
-      isHLS: false,
-      embedUrl,
-      actualVideoUrl: fileUrl || videoUrlToCheck,
-    };
-  }, [
-    video.videoUrl,
-    fileUrl,
-    videoData,
-    hlsStorageId,
-    hlsUrl,
-    getYouTubeEmbedUrl,
-    getTikTokEmbedUrl,
-  ]);
-
-  const handleLike = useCallback(async () => {
-    if (!user) return;
-
-    try {
-      const result = await toggleLikeMutation({
-        videoId: video._id as any,
-        userId: user.id,
-      });
-
-      if (result) {
-        setLikesCount(result.count);
-      }
-    } catch (error) {
-      console.error("Failed to toggle like:", error);
-    }
-  }, [user, video._id, toggleLikeMutation]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -207,6 +96,39 @@ const VideoPlayer = React.memo(function VideoPlayer({
     };
   }, [onClose]);
 
+  const handleLike = async () => {
+    if (!user) return;
+    try {
+      const result = await toggleLikeMutation({
+        videoId: video._id as any,
+        userId: user.id,
+      });
+      if (result) {
+        setLikesCount(result.count);
+      }
+    } catch (error) {
+      console.error("Failed to toggle like:", error);
+    }
+  };
+
+  if (!video) {
+    return null;
+  }
+
+  // Get HLS URLs from storage IDs
+  const hlsStorageId =
+    videoData?.isTranscoded && videoData?.hlsUrls
+      ? videoData.hlsUrls.p720 ||
+      videoData.hlsUrls.p480 ||
+      videoData.hlsUrls.p360
+      : null;
+
+  // Use our HLS API to serve files with proper content-type
+  const hlsUrl = hlsStorageId ? `/api/hls?id=${hlsStorageId}` : null;
+
+  // Only support videos from our DB (no YouTube/TikTok)
+  const actualVideoUrl = videoData?.isTranscoded && hlsUrl ? hlsUrl : fileUrl || video.videoUrl;
+
   return (
     <div className="fixed inset-0 z-50 bg-black">
       {/* Close Button */}
@@ -223,9 +145,8 @@ const VideoPlayer = React.memo(function VideoPlayer({
       <div className="relative flex h-full items-center justify-center">
         {/* Video */}
         <div
-          className={`relative mx-auto w-full max-w-sm bg-black transition-opacity duration-150 ${
-            video.aspectRatio === "16:9" ? "aspect-video" : "aspect-[9/16]"
-          }`}
+          className={`relative mx-auto w-full max-w-sm bg-black transition-opacity duration-150 ${video.aspectRatio === "16:9" ? "aspect-video" : "aspect-[9/16]"
+            }`}
         >
           {videoData?.isTranscoded && videoData?.hlsUrls ? (
             // Play transcoded video with HLS player
@@ -233,35 +154,23 @@ const VideoPlayer = React.memo(function VideoPlayer({
               <HLSVideoPlayer
                 videoId={video._id}
                 hlsUrls={videoData.hlsUrls}
-                fallbackUrl={videoPlaybackData.actualVideoUrl}
+                fallbackUrl={actualVideoUrl}
                 title={video.title}
                 autoPlay={true}
                 className="h-full w-full"
               />
             </div>
-          ) : videoPlaybackData.isConvexVideo &&
-            videoPlaybackData.actualVideoUrl ? (
+          ) : actualVideoUrl ? (
             // Regular video using HLS player
             <div className="absolute inset-0">
               <HLSVideoPlayer
                 videoId={video._id}
-                fallbackUrl={videoPlaybackData.actualVideoUrl}
+                fallbackUrl={actualVideoUrl}
                 title={video.title}
                 autoPlay={true}
                 className="h-full w-full"
               />
             </div>
-          ) : (videoPlaybackData.isYouTubeVideo ||
-              videoPlaybackData.isTikTokVideo) &&
-            videoPlaybackData.embedUrl ? (
-            <iframe
-              key={video._id}
-              src={videoPlaybackData.embedUrl}
-              className="absolute inset-0 h-full w-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              loading="eager"
-            />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
               <div className="text-center text-white">
@@ -350,3 +259,4 @@ const VideoPlayer = React.memo(function VideoPlayer({
 });
 
 export { VideoPlayer };
+
